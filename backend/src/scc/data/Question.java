@@ -1,5 +1,5 @@
 package scc.data;
-import java.sql.Time;
+
 import java.sql.Timestamp; // Is this correct import?
 
 /**
