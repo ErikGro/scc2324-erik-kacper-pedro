@@ -3,7 +3,7 @@ import org.apache.commons.codec.digest.DigestUtils;
 import java.util.Arrays;
 
 /**
- * Represents a User, as returned to the clients
+ * Represents a Giyse, as returned to the clients
  * 
  * NOTE: array of house ids is shown as an example of how to store a list of elements and 
  * handle the empty list.
@@ -13,12 +13,12 @@ public class House {
 	private String name;
 	private String description;
 	private String[] photoIds;
-	public User(String id, String name, String description,  String[] photoIds) {
+	public House(String id, String name, String description,  String[] photoIds) {
 		super();
 		this.id = id;
 		this.name = name;
 		this.description = description;
-		this.houseIds = houseIds;
+		this.photoIds = photoIds;
 	}
 	public String getId() {
 		return id;
