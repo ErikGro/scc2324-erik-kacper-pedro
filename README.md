@@ -1,8 +1,12 @@
-
 # scc2324-erik-kacper
+## Group members
+- Erik Großkopf 68858 (MEI)
+- Pedro Ribeiro 55921 (MIEI)
+- Kacper Motyka 68806 (MEI)
 
-**20/October** – delivery of checkpoint – at this point, you are expected to have implemented the basic functionality + application-level caching
-**13/November** – final delivery of the project.
+## Deadlines
+- **20/October** – delivery of checkpoint – at this point, you are expected to have implemented the basic functionality + application-level caching
+- **13/November** – final delivery of the project.
   
 # Backend for a house rental company (short term)
 

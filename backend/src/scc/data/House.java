@@ -1,5 +1,4 @@
 package scc.data;
-import org.apache.commons.codec.digest.DigestUtils;
 import java.util.Arrays;
 
 /**
@@ -35,9 +34,11 @@ public class House {
 	public String getdescription() {
 		return description;
 	}
+	/*
 	public void setdescription(String description) {
 		this.pwd =description;
 	}
+	 */
 	public String[] getphotoIds() {
 		return photoIds == null ? new String[0] : photoIds ;
 	}

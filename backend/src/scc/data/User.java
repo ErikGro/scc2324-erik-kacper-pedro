@@ -1,5 +1,4 @@
 package scc.data;
-import org.apache.commons.codec.digest.DigestUtils;
 import java.util.Arrays;
 
 /**
@@ -37,9 +36,13 @@ public class User {
 	public String getPwd() {
 		return pwd;
 	}
+
+	/*
 	public void setPwd(String pwd) {
 		this.pwd = DigestUtils.sha512Hex(data.password);//password is now hashed to compare paswwords just hash the given before comparing
 	}
+	*/
+
 	public String getPhotoId() {
 		return photoId;
 	}

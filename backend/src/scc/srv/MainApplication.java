@@ -12,8 +12,8 @@ public class MainApplication extends Application
 
 	public MainApplication() {
 		resources.add(ControlResource.class);
-		singletons.add( new MediaResource());	
-        singletons.add( new HouseResource());
+		singletons.add( new MediaResource());
+        //singletons.add( new HouseResource());
 	}
 
 	@Override

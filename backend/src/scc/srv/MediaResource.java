@@ -1,7 +1,5 @@
 package scc.srv;
 
-import scc.utils.Hash;
-
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -28,6 +26,7 @@ public class MediaResource
 	/**
 	 * Post a new image.The id of the image is its hash.
 	 */
+	/*
 	@POST
 	@Path("/")
 	@Consumes(MediaType.APPLICATION_OCTET_STREAM)
@@ -37,7 +36,7 @@ public class MediaResource
 		map.put( key, contents);
 		return key;
 	}
-
+*/
 	/**
 	 * Return the contents of an image. Throw an appropriate error message if
 	 * id does not exist.

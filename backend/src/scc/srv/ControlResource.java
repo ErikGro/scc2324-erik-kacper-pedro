@@ -22,5 +22,4 @@ public class ControlResource
 	public String hello() {
 		return "v: 0001";
 	}
-
 }

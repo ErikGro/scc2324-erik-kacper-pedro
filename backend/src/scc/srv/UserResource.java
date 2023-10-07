@@ -1,22 +1,22 @@
 package scc.srv;
 
-import jakarta.ws.rs.GET;
-import jakarta.ws.rs.Path;
-import jakarta.ws.rs.Produces;
+import jakarta.ws.rs.*;
 import jakarta.ws.rs.core.MediaType;
+import jakarta.ws.rs.core.Response;
 
 /**
  * Class with control endpoints.
  */
 @Path("/user")
-public class ControlResource
+public class UserResource
 {
 
 	/**
 	 * This methods just prints a string. It may be useful to check if the current 
 	 * version is running on Azure.
 	 */
-	@Path("/create")
+/*
+	@Path("/")
 	@POST
 	@Consumes(MediaType.APPLICATION_JSON)
 	@Produces(MediaType.APPLICATION_JSON)
@@ -33,11 +33,11 @@ public class ControlResource
 	}
 	
 	@Path("/{id}/update")
-	@DELETE
+	@PUT
 	@Consumes(MediaType.APPLICATION_JSON)
 	@Produces(MediaType.APPLICATION_JSON)
-	public Response deleteUser(@PathParam("id") String id, RegisterUser data){
+	public Response updateUser(@PathParam("id") String id, RegisterUser data){
 		throw new ServiceUnavailableException();
 	}
-	
+*/
 }

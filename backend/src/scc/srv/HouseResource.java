@@ -1,6 +1,6 @@
 package scc.srv;
 
-import scc.utils.Hash;
+import jakarta.ws.rs.*;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -9,14 +9,6 @@ import java.util.Map;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
 
-import jakarta.ws.rs.Consumes;
-import jakarta.ws.rs.GET;
-import jakarta.ws.rs.NotFoundException;
-import jakarta.ws.rs.POST;
-import jakarta.ws.rs.Path;
-import jakarta.ws.rs.PathParam;
-import jakarta.ws.rs.Produces;
-import jakarta.ws.rs.ServiceUnavailableException;
 import jakarta.ws.rs.core.MediaType;
 
 /**
@@ -30,6 +22,7 @@ public class HouseResource
 	/**
 	 * Post a new image.The id of the image is its hash.
 	 */
+	/*
 	@POST
 	@Path("/add")
 	@Consumes(MediaType.APPLICATION_JSON)
@@ -42,6 +35,7 @@ public class HouseResource
 	 * Return the contents of an image. Throw an appropriate error message if
 	 * id does not exist.
 	 */
+	/*
 	@POST
 	@Path("/{id}/update")
     @Consumes(MediaType.APPLICATION_JSON)
@@ -50,16 +44,18 @@ public class HouseResource
 		
 		throw new ServiceUnavailableException();
 	}
+	*/
     @DELETE
 	@Path("/{id}/delete")
 	@Consumes(MediaType.APPLICATION_JSON)
 	@Produces(MediaType.APPLICATION_JSON)
-	public Response deleteHouse(@PathParam("id") String id,) {
+	public Response deleteHouse(@PathParam("id") String id) {
 		throw new ServiceUnavailableException();
 	}
 	/**
 	 * Lists the ids of images stored.
 	 */
+	/*
 	@POST
 	@Path("/{id}/rental/create")
 	@Produces(MediaType.APPLICATION_JSON)
@@ -97,7 +93,7 @@ public class HouseResource
 		throw new ServiceUnavailableException();
 	}
 
-   
+   */
 
 
     
