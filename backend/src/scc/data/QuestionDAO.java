@@ -1,27 +1,41 @@
 package scc.data;
 
-import java.sql.Timestamp; // Is this correct import?
+import java.sql.Timestamp;
 
-/**
- * Represents Questions asked about a house,
- * stores id of the question, houseId,
- * usedID - user who asked a question,
- * text of the question and timestamp of the question 
- */
-public class Question {
-    private String id; 
+public class QuestionDAO {
+
+    private String _rid;
+    private String _ts;
+    private String id;
     private String houseId;
     private String userId;
     private String text;
     private Timestamp timestamp;
-    
-    public Question(String id, String houseId, String userId, String text, Timestamp timestamp) {
+
+    public QuestionDAO(Question q) {
+        this(q.getId(), q.getHouseId(), q.getUserId(), q.getText(), q.getTimestamp());
+    }
+
+    public QuestionDAO(String id, String houseId, String userId, String text, Timestamp timestamp) {
         this.id = id;
         this.houseId = houseId;
         this.userId = userId;
         this.text = text;
         this.timestamp = timestamp;
     }
+    
+    public String get_rid() {
+		return _rid;
+	}
+	public void set_rid(String _rid) {
+		this._rid = _rid;
+	}
+	public String get_ts() {
+		return _ts;
+	}
+	public void set_ts(String _ts) {
+		this._ts = _ts;
+	}
 
     public String getId() {
         return id;
@@ -67,5 +81,6 @@ public class Question {
     public String toString() {
         return "Question [id=" + id + ", houseId=" + houseId + ", userId=" + userId + ", text=" + text + ", timestamp=" + timestamp + "]";
     }
+
 
 }
