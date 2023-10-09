@@ -7,12 +7,17 @@ import scc.utils.Hash;
  * NOTE: array of house ids is shown as an example of how to store a list of elements and 
  * handle the empty list.
  */
+
 public class User {
 	private String id;
 	private String name;
 	private String pwd;
 	private String photoId;
 	private String[] houseIds;
+	public User() {
+	}
+
+	
 	public User(String id, String name, String pwd, String photoId, String[] houseIds) {
 		super();
 		this.id = id;

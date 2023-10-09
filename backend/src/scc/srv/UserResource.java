@@ -35,8 +35,9 @@ public class UserResource
 		if(!data.isValid())
 			return Response.status(400).entity("Incorrect registration data").build();
 		
-		Locale.setDefault(Locale.ENGLISH);
-		CosmosDBLayer db = CosmosDBLayer.getInstance();
+		Locale.setDefault(Locale.US);
+		CosmosDBLayer db0=CosmosDBLayer.getInstance();
+		UserDB db=db0.userDB;
 		String id = "0:" + System.currentTimeMillis();
 		CosmosItemResponse<UserDAO> res = null;
 		UserDAO u = new UserDAO();
@@ -50,20 +51,42 @@ public class UserResource
 		data.setId(id);
 		return Response.ok(data.getId()).build();
 	}
-
+	
+	public Boolean userExists(String id) {
+		Locale.setDefault(Locale.US);
+		CosmosDBLayer db0=CosmosDBLayer.getInstance();
+		UserDB db=db0.userDB;
+		return  db.getUserById(id)!=null;
+	}
+	
 	@Path("/{id}/delete")
 	@DELETE
 	@Consumes(MediaType.APPLICATION_JSON)
 	@Produces(MediaType.APPLICATION_JSON)
 	public Response deleteUser(@PathParam("id") String id){
+		if(!userExists(id))
+			return Response.status(400).entity("No such user").build();
+		
+		CosmosDBLayer db0=CosmosDBLayer.getInstance();
+		UserDB db=db0.userDB;
+		//TODO: add compatibility with houses to show that the user has been deleted
+		db.delUserById(id);
 		throw new ServiceUnavailableException();
+
 	}
-	
+	//TODO: transactions
 	@Path("/{id}/update")
 	@PUT
 	@Consumes(MediaType.APPLICATION_JSON)
 	@Produces(MediaType.APPLICATION_JSON)
 	public Response updateUser(@PathParam("id") String id, User data){
+		if(!userExists(id))
+			return Response.status(400).entity("No such user").build();
+		
+		CosmosDBLayer db0=CosmosDBLayer.getInstance();
+		UserDB db=db0.userDB;
+		
+		
 		throw new ServiceUnavailableException();
 	}
 
