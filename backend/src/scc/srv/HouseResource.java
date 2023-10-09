@@ -10,6 +10,7 @@ import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
 
 import jakarta.ws.rs.core.MediaType;
+import scc.data.House;
 
 /**
  * Resource for managing media files, such as images.
@@ -17,84 +18,39 @@ import jakarta.ws.rs.core.MediaType;
 @Path("/house")
 public class HouseResource
 {
-	Map<String,byte[]> map = new HashMap<String,byte[]>();
-
 	/**
-	 * Post a new image.The id of the image is its hash.
+	 * Create a single house
+	 * @param house the house to be created
+	 * @return the id of the house
 	 */
-	/*
 	@POST
-	@Path("/add")
+	@Path("/")
 	@Consumes(MediaType.APPLICATION_JSON)
-	@Produces(MediaType.APPLICATION_JSON + ";charset=utf-8")
-	public Response upload(RegisterHouse data) {
+	public Response post(House house) {
     	throw new ServiceUnavailableException();
 	}
 
 	/**
-	 * Return the contents of an image. Throw an appropriate error message if
-	 * id does not exist.
+	 * Update a house by a given id
+	 * @param id the id of the house to be updated
+	 * @param house the updated content
+	 * @return nothing - 2xx if update was successful
 	 */
-	/*
-	@POST
-	@Path("/{id}/update")
-    @Consumes(MediaType.APPLICATION_JSON)
-	@Produces(MediaType.APPLICATION_JSON)
-	public Response update(@PathParam("id") String id, RegisterHouse house) {
-		
-		throw new ServiceUnavailableException();
-	}
-	*/
-    @DELETE
-	@Path("/{id}/delete")
+	@PUT
+	@Path("/{id}")
 	@Consumes(MediaType.APPLICATION_JSON)
-	@Produces(MediaType.APPLICATION_JSON)
-	public Response deleteHouse(@PathParam("id") String id) {
+	public Response put(@PathParam("id") String id, House house) {
 		throw new ServiceUnavailableException();
 	}
+
 	/**
-	 * Lists the ids of images stored.
+	 * Delete a house by a given id
+	 * @param id of the house to be deleted
+	 * @return nothing - 2xx if delete succeeded
 	 */
-	/*
-	@POST
-	@Path("/{id}/rental/create")
-	@Produces(MediaType.APPLICATION_JSON)
-	public Response createRental(@PathParam("id") String id,RentalInformation rental) {
+	@DELETE
+	@Path("/{id}")
+	public Response delete(@PathParam("id") String id) {
 		throw new ServiceUnavailableException();
 	}
-    @POST
-	@Path("/{id}/rental/update")
-	@Consumes(MediaType.APPLICATION_JSON)
-	@Produces(MediaType.APPLICATION_JSON)
-	public Response updateRental(@PathParam("id") String id,RentalInformation rental) {
-		throw new ServiceUnavailableException();
-	}
-   
-    @POST
-	@Path("/{id}/question/create")
-	@Produces(MediaType.APPLICATION_JSON)
-	public Response listRental(@PathParam("id") String id) {
-		throw new ServiceUnavailableException();
-	}
-    //might have to do something different for questions since they might have to be sorted through id
-    @POST
-	@Path("/{id}/question/reply")
-	@Produces(MediaType.APPLICATION_JSON)
-	public Response listRental(@PathParam("id") String id) {
-		throw new ServiceUnavailableException();
-	}
-
-
-
-    @GET
-	@Path("/{id}/rental/list")
-	@Produces(MediaType.APPLICATION_JSON)
-	public Response listRental(@PathParam("id") String id) {
-		throw new ServiceUnavailableException();
-	}
-
-   */
-
-
-    
 }
