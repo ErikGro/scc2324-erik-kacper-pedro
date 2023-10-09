@@ -27,6 +27,7 @@ public class HouseResource
 	@Path("/")
 	@Consumes(MediaType.APPLICATION_JSON)
 	public Response post(House house) {
+		//db.create(house);
     	throw new ServiceUnavailableException();
 	}
 
