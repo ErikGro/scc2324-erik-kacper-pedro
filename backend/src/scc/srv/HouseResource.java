@@ -1,5 +1,6 @@
 package scc.srv;
 
+import com.azure.cosmos.models.CosmosItemResponse;
 import jakarta.ws.rs.*;
 
 import java.util.ArrayList;
@@ -11,6 +12,9 @@ import javax.ws.rs.core.Response.Status;
 
 import jakarta.ws.rs.core.MediaType;
 import scc.data.House;
+import scc.data.HouseDAO;
+import scc.db.CosmosDBLayer;
+import scc.db.HouseDB;
 
 /**
  * Resource for managing media files, such as images.
@@ -18,6 +22,12 @@ import scc.data.House;
 @Path("/house")
 public class HouseResource
 {
+	HouseDB db;
+
+	HouseResource() {
+		db = CosmosDBLayer.getInstance().houseDB;
+	}
+
 	/**
 	 * Create a single house
 	 * @param house the house to be created
@@ -27,8 +37,10 @@ public class HouseResource
 	@Path("/")
 	@Consumes(MediaType.APPLICATION_JSON)
 	public Response post(House house) {
-		//db.create(house);
-    	throw new ServiceUnavailableException();
+		HouseDAO dao = new HouseDAO(house.getName());
+		CosmosItemResponse<HouseDAO> response = db.putHouse(dao);
+
+		return Response.status(response.getStatusCode()).build();
 	}
 
 	/**

@@ -42,6 +42,8 @@ public class CosmosDBLayer {
 
 	public CosmosDBLayer(CosmosClient client) {
 		this.client = client;
+
+		init();
 	}
 	
 	private synchronized void init() {
