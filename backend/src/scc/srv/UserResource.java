@@ -48,7 +48,6 @@ public class UserResource
 
 		res = db.putUser(u);
 		data.setId(id);
-		
 		return Response.ok(data.getId()).build();
 	}
 
