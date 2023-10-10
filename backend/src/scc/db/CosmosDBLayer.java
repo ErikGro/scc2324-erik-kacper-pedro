@@ -8,9 +8,9 @@ import com.azure.cosmos.CosmosDatabase;
 import scc.utils.Env;
 
 public class CosmosDBLayer {
-	private static final String CONNECTION_URL = Env.getInstance().getDBConnectionUrl();
-	private static final String DB_KEY = Env.getInstance().getDBKey();
-	private static final String DB_NAME = Env.getInstance().getDBName();
+	private static final String CONNECTION_URL = "https://kmotyka68806.documents.azure.com:443/";
+	private static final String DB_KEY = "nJKGRvbOHDNHSXr9PnwF8lfPQLk2Kjilbg7nF0enOYJ9ThvFBkQ40jnMeyaWP8PqhEng42QjDblfACDbzeHBnA====";
+	private static final String DB_NAME = "sccbackendquestions";
 	
 	private static CosmosDBLayer instance;
 
@@ -39,9 +39,11 @@ public class CosmosDBLayer {
 
 	public UserDB userDB;
 	public HouseDB houseDB;
+	public QuestionDB questionDB;
 
 	public CosmosDBLayer(CosmosClient client) {
 		this.client = client;
+		init();
 	}
 	
 	private synchronized void init() {
@@ -54,6 +56,9 @@ public class CosmosDBLayer {
 
 		CosmosContainer housesContainer = db.getContainer("houses");
 		houseDB = new HouseDB(housesContainer);
+
+		CosmosContainer questionsContainer = db.getContainer("questions");
+		questionDB = new QuestionDB(questionsContainer);
 	}
 
 

@@ -13,9 +13,11 @@ public class Question {
     private String houseId;
     private String userId;
     private String text;
-    private Timestamp timestamp;
+    private String timestamp;
     
-    public Question(String id, String houseId, String userId, String text, Timestamp timestamp) {
+    public Question () {}
+    
+    public Question(String id, String houseId, String userId, String text, String timestamp) {
         this.id = id;
         this.houseId = houseId;
         this.userId = userId;
@@ -55,11 +57,11 @@ public class Question {
         this.text = text;
     }
 
-    public Timestamp getTimestamp() {
+    public String getTimestamp() {
         return timestamp;
     }
 
-    public void setTimestamp(Timestamp timestamp) {
+    public void setTimestamp(String timestamp) {
         this.timestamp = timestamp;
     }
 

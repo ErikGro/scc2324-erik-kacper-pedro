@@ -10,13 +10,13 @@ public class QuestionDAO {
     private String houseId;
     private String userId;
     private String text;
-    private Timestamp timestamp;
+    private String timestamp;
 
     public QuestionDAO(Question q) {
         this(q.getId(), q.getHouseId(), q.getUserId(), q.getText(), q.getTimestamp());
     }
 
-    public QuestionDAO(String id, String houseId, String userId, String text, Timestamp timestamp) {
+    public QuestionDAO(String id, String houseId, String userId, String text, String timestamp) {
         this.id = id;
         this.houseId = houseId;
         this.userId = userId;
@@ -69,12 +69,16 @@ public class QuestionDAO {
         this.text = text;
     }
 
-    public Timestamp getTimestamp() {
+    public String getTimestamp() {
         return timestamp;
     }
 
-    public void setTimestamp(Timestamp timestamp) {
+    public void setTimestamp(String timestamp) {
         this.timestamp = timestamp;
+    }
+
+    public Question toQuestion() {
+        return new Question(id, houseId, userId, text, timestamp);
     }
 
     @Override
