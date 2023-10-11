@@ -8,9 +8,9 @@ import com.azure.cosmos.CosmosDatabase;
 import scc.utils.Env;
 
 public class CosmosDBLayer {
-	private static final String CONNECTION_URL = Env.getInstance().getDBConnectionUrl();
-	private static final String DB_KEY = Env.getInstance().getDBKey();
-	private static final String DB_NAME = Env.getInstance().getDBName();
+	private static final String CONNECTION_URL = "https://scc232468858.documents.azure.com:443/";//Env.getInstance().getDBConnectionUrl();
+	private static final String DB_KEY = "4NKcl0CqL4Z1fTO5b3R5wz9hORc06NFFKBEZsJtScrakMuUmZg2dkzhkmjry00g9U2Snaflfd3vyACDbhlq8Jw==";//Env.getInstance().getDBKey();
+	private static final String DB_NAME = "sc2324";//Env.getInstance().getDBName();
 	
 	private static CosmosDBLayer instance;
 
