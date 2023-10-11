@@ -3,15 +3,12 @@ package scc.srv;
 import scc.db.*;
 
 import java.util.Locale;
-import java.util.Random;
-import java.util.RandomAccess;
-
-import com.azure.cosmos.implementation.apachecommons.math.random.RandomData;
 import com.azure.cosmos.models.CosmosItemResponse;
 
 import jakarta.ws.rs.*;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
+import scc.data.HouseIds;
 import scc.data.User;
 import scc.data.UserDAO;
 
@@ -51,7 +48,37 @@ public class UserResource
 		data.setId(id);
 		return Response.ok(data.getId()).build();
 	}
-	
+	@Path("/add")
+	@POST
+	@Consumes(MediaType.APPLICATION_JSON)
+	@Produces(MediaType.APPLICATION_JSON)
+	public Response addHouseid(@QueryParam("id") String id, HouseIds house ) {
+		
+		CosmosDBLayer db0=CosmosDBLayer.getInstance();
+		UserDB db=db0.userDB;
+		UserDAO u=  db.getUserById(id).iterator().next();
+		u.getHouseIds();
+		
+		String[] combinedHouseIds = concatenate(u.getHouseIds(), house.getHouseIds());
+
+		// Now you can set the combined IDs back to the user or save them or whatever you intend
+		u.setHouseIds(combinedHouseIds);
+
+		// Assuming you have a method to update the user in the DB
+		db.updateUser(u);
+
+		return Response.ok(u.getHouseIds()).build(); // Return appropriate response
+	}
+
+	private String[] concatenate(String[] a, String[] b) {
+		int aLen = a.length;
+		int bLen = b.length;
+		String[] result = new String[aLen + bLen];
+		System.arraycopy(a, 0, result, 0, aLen);
+		System.arraycopy(b, 0, result, aLen, bLen);
+		return result;
+	}
+	//Public method to use when checking that the id belongs to a user
 	public Boolean userExists(String id) {
 		Locale.setDefault(Locale.UK);
 		CosmosDBLayer db0=CosmosDBLayer.getInstance();

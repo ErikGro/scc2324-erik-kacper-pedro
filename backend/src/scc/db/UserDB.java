@@ -24,10 +24,13 @@ public class UserDB extends DBContainer {
 
     public CosmosItemResponse<UserDAO> putUser(UserDAO user) {
         return container.createItem(user);
-    }
+    	}
 
     public CosmosPagedIterable<UserDAO> getUserById(String id) {
         return container.queryItems("SELECT * FROM users WHERE users.id=\"" + id + "\"", new CosmosQueryRequestOptions(), UserDAO.class);
+    }
+    public CosmosItemResponse<UserDAO> updateUser(UserDAO user) {
+        return container.upsertItem(user);
     }
 
     public CosmosPagedIterable<UserDAO> getUsers() {
