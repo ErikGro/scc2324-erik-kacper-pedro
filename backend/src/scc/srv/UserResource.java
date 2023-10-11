@@ -53,17 +53,16 @@ public class UserResource
 	}
 	
 	public Boolean userExists(String id) {
-		Locale.setDefault(Locale.US);
+		Locale.setDefault(Locale.UK);
 		CosmosDBLayer db0=CosmosDBLayer.getInstance();
 		UserDB db=db0.userDB;
 		return  db.getUserById(id)!=null;
 	}
 	
-	@Path("/{id}/delete")
 	@DELETE
 	@Consumes(MediaType.APPLICATION_JSON)
 	@Produces(MediaType.APPLICATION_JSON)
-	public Response deleteUser(@PathParam("id") String id){
+	public Response deleteUser(@QueryParam("id") String id){
 		if(!userExists(id))
 			return Response.status(400).entity("No such user").build();
 		
@@ -71,23 +70,31 @@ public class UserResource
 		UserDB db=db0.userDB;
 		//TODO: add compatibility with houses to show that the user has been deleted
 		db.delUserById(id);
-		throw new ServiceUnavailableException();
+		return Response.ok(id).build();
+		//throw new ServiceUnavailableException();
 
 	}
 	//TODO: transactions
-	@Path("/{id}/update")
 	@PUT
 	@Consumes(MediaType.APPLICATION_JSON)
 	@Produces(MediaType.APPLICATION_JSON)
-	public Response updateUser(@PathParam("id") String id, User data){
+	public Response updateUser(@QueryParam("id") String id, User data){
 		if(!userExists(id))
 			return Response.status(400).entity("No such user").build();
 		
 		CosmosDBLayer db0=CosmosDBLayer.getInstance();
 		UserDB db=db0.userDB;
 		
-		
-		throw new ServiceUnavailableException();
+		db.delUserById(id);
+		UserDAO u = new UserDAO();
+		u.setId(id);
+		u.setName(data.getName());
+		u.setPwd(data.getPwd());
+		u.setPhotoId(data.getPhotoId());
+		u.setHouseIds(data.getHouseIds());
+
+		 db.putUser(u);
+		return Response.ok(id).build();
 	}
 
 }
