@@ -15,6 +15,7 @@ public class MainApplication extends Application
 		resources.add(ControlResource.class);
 		resources.add(HouseResource.class);
 		resources.add(QuestionResource.class);
+		resources.add(AnswerResource.class);
 	}
 
 	@Override

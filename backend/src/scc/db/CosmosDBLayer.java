@@ -39,6 +39,7 @@ public class CosmosDBLayer {
 	public UserDB userDB;
 	public HouseDB houseDB;
 	public QuestionDB questionDB;
+	public AnswerDB answerDB;
 
 	public CosmosDBLayer(CosmosClient client) {
 		this.client = client;
@@ -58,6 +59,9 @@ public class CosmosDBLayer {
 
 		CosmosContainer questionsContainer = db.getContainer("questions");
 		questionDB = new QuestionDB(questionsContainer);
+
+		CosmosContainer answersContainer = db.getContainer("answers");
+		answerDB = new AnswerDB(answersContainer);
 	}
 
 

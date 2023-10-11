@@ -54,8 +54,28 @@ public class QuestionResource {
 
         CosmosDBLayer dbLayer = CosmosDBLayer.getInstance();
         QuestionDB db = dbLayer.questionDB;
-
+        
         Iterator<QuestionDAO> res = db.getQuestions(houseId).iterator();
+        // Get all questions from a house using getQuestions from QuestionDB
+        List<String> questions = new ArrayList<String>();
+        while (res.hasNext()) {
+            QuestionDAO q = res.next();
+            questions.add(q.toString());
+        }
+        
+        return Response.ok(questions).build();
+    }
+
+    @Path("/{id}/")
+    @GET
+    @Consumes(MediaType.APPLICATION_JSON)
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response getQuestion(@PathParam("id") String id) {
+
+        CosmosDBLayer dbLayer = CosmosDBLayer.getInstance();
+        QuestionDB db = dbLayer.questionDB;
+        
+        Iterator<QuestionDAO> res = db.getQuestion(id).iterator();
         // Get all questions from a house using getQuestions from QuestionDB
         List<String> questions = new ArrayList<String>();
         while (res.hasNext()) {

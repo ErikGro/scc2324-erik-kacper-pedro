@@ -23,5 +23,11 @@ public class QuestionDB extends DBContainer {
     public CosmosPagedIterable<QuestionDAO> getQuestions(String houseId) {
         return container.queryItems("SELECT * FROM questions WHERE questions.houseId=\"" + houseId + "\"", new CosmosQueryRequestOptions(), QuestionDAO.class);
     }
+
+    // questionExists method
+    public boolean questionExists(String id) {
+        CosmosPagedIterable<QuestionDAO> res = container.queryItems("SELECT * FROM questions WHERE questions.id=\"" + id + "\"", new CosmosQueryRequestOptions(), QuestionDAO.class);
+        return res.iterator().hasNext();
+    }
 }
 

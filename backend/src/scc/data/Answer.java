@@ -1,5 +1,5 @@
 package scc.data;
-import java.sql.Timestamp;
+
 
 /**
  * Represents Answers to questions asked about a house,
@@ -12,9 +12,11 @@ public class Answer {
     private String questionId;
     private String userId;
     private String text;
-    private Timestamp timestamp;
+    private String timestamp;
 
-    public Answer(String id, String questionId, String userId, String text, Timestamp timestamp) {
+    public Answer() {}
+
+    public Answer(String id, String questionId, String userId, String text, String timestamp) {
         super();
         this.id = id;
         this.questionId = questionId;
@@ -55,11 +57,11 @@ public class Answer {
         this.text = text;
     }
 
-    public Timestamp getTimestamp() {
+    public String getTimestamp() {
         return timestamp;
     }
 
-    public void setTimestamp(Timestamp timestamp) {
+    public void setTimestamp(String timestamp) {
         this.timestamp = timestamp;
     }
 
