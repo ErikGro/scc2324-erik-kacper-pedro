@@ -4,7 +4,7 @@ import java.util.HashSet;
 import java.util.Set;
 
 import jakarta.ws.rs.core.Application;
-import scc.db.CosmosDBLayer;
+import scc.db.CosmosDBLayer; 
 
 public class MainApplication extends Application
 {
@@ -12,10 +12,12 @@ public class MainApplication extends Application
 	private Set<Class<?>> resources = new HashSet<Class<?>>();
 
 	public MainApplication() {
-		resources.add(ControlResource.class);
+		singletons.add(CosmosDBLayer.getInstance());
 		resources.add(HouseResource.class);
 		resources.add(QuestionResource.class);
 		resources.add(AnswerResource.class);
+		resources.add(MediaResource.class);
+		resources.add(UserResource.class);
 	}
 
 	@Override

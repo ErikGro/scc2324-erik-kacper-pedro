@@ -1,18 +1,23 @@
 package scc.data;
 import java.util.Arrays;
-
+import scc.utils.Hash;
 /**
  * Represents a User, as returned to the clients
  * 
  * NOTE: array of house ids is shown as an example of how to store a list of elements and 
  * handle the empty list.
  */
+
 public class User {
 	private String id;
 	private String name;
 	private String pwd;
 	private String photoId;
 	private String[] houseIds;
+	public User() {
+	}
+
+	
 	public User(String id, String name, String pwd, String photoId, String[] houseIds) {
 		super();
 		this.id = id;
@@ -37,11 +42,11 @@ public class User {
 		return pwd;
 	}
 
-	/*
+	
 	public void setPwd(String pwd) {
-		this.pwd = DigestUtils.sha512Hex(data.password);//password is now hashed to compare paswwords just hash the given before comparing
+		this.pwd = Hash.of(pwd);//password is now hashed to compare paswwords just hash the given before comparing
 	}
-	*/
+	
 
 	public String getPhotoId() {
 		return photoId;
@@ -60,5 +65,8 @@ public class User {
 		return "User [id=" + id + ", name=" + name + ", pwd=" + pwd + ", photoId=" + photoId + ", houseIds="
 				+ Arrays.toString(houseIds) + "]";
 	}
-
+	public boolean isValid() {
+		return !(id.isEmpty()&&pwd.isEmpty()&&name.isEmpty());
+		
+	}
 }

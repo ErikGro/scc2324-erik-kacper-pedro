@@ -27,7 +27,6 @@ public class CosmosDBLayer {
 		         .connectionSharingAcrossClientsEnabled(true)
 		         .contentResponseOnWriteEnabled(true)
 		         .buildClient();
-
 		instance = new CosmosDBLayer(client);
 
 		return instance;
