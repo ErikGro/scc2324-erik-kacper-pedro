@@ -143,8 +143,8 @@
 			                </resource>
 			            </resources>
 			        </deployment>
-			        <resourceGroup>scc-backend-resource-erikg</resourceGroup>
-			        <appName>scc-backend-erikg</appName>
+			        <resourceGroup>scc-backend-resource-pedro</resourceGroup>
+			        <appName>scc-backend-pedro</appName>
 			    </configuration>
 			</plugin>
 		</plugins>

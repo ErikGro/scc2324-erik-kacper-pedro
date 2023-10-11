@@ -8,9 +8,9 @@ import com.azure.cosmos.CosmosDatabase;
 import scc.utils.Env;
 
 public class CosmosDBLayer {
-	private static final String CONNECTION_URL = Env.getInstance().getDBConnectionUrl();
-	private static final String DB_KEY = Env.getInstance().getDBKey();
-	private static final String DB_NAME = Env.getInstance().getDBName();
+	private static final String CONNECTION_URL = "https://scc-pedro55921.documents.azure.com:443/";//Env.getInstance().getDBConnectionUrl();
+	private static final String DB_KEY = "Rk0dqIkq3mg0JYQ0aHeCsHuYpBP4G7A1bKEmjOc8FQMhLNkpteSctoJnvu96traHAdCnKZdRV5aBACDbEfaR9Q";//Env.getInstance().getDBKey();
+	private static final String DB_NAME = "sccbackendusers";//Env.getInstance().getDBName();
 	
 	private static CosmosDBLayer instance;
 
@@ -28,7 +28,6 @@ public class CosmosDBLayer {
 		         .connectionSharingAcrossClientsEnabled(true)
 		         .contentResponseOnWriteEnabled(true)
 		         .buildClient();
-
 		instance = new CosmosDBLayer(client);
 
 		return instance;
@@ -42,6 +41,7 @@ public class CosmosDBLayer {
 
 	public CosmosDBLayer(CosmosClient client) {
 		this.client = client;
+		init();
 	}
 	
 	private synchronized void init() {
