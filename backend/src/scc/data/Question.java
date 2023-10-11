@@ -1,7 +1,5 @@
 package scc.data;
 
-import java.sql.Timestamp; // Is this correct import?
-
 /**
  * Represents Questions asked about a house,
  * stores id of the question, houseId,

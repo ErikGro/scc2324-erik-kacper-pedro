@@ -1,7 +1,5 @@
 package scc.data;
 
-import java.sql.Timestamp;
-
 public class QuestionDAO {
 
     private String _rid;
@@ -12,6 +10,8 @@ public class QuestionDAO {
     private String text;
     private String timestamp;
 
+    public QuestionDAO() {}
+    
     public QuestionDAO(Question q) {
         this(q.getId(), q.getHouseId(), q.getUserId(), q.getText(), q.getTimestamp());
     }

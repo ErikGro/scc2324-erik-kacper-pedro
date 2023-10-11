@@ -12,12 +12,9 @@ public class MainApplication extends Application
 	private Set<Class<?>> resources = new HashSet<Class<?>>();
 
 	public MainApplication() {
-
-		singletons.add(CosmosDBLayer.getInstance());
 		resources.add(ControlResource.class);
 		resources.add(HouseResource.class);
 		resources.add(QuestionResource.class);
-
 	}
 
 	@Override
