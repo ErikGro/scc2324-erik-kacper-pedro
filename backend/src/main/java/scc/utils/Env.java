@@ -10,12 +10,14 @@ public class Env {
 
     public static synchronized Env getInstance() {
         if (instance == null) {
+//            URL resource = YourClass.class.getResource("abc");
+//            Paths.get(resource.toURI()).toFile();
+
             dotenv = Dotenv
                     .configure()
                     .load();
             
             instance = new Env();
-            System.out.println(dotenv.toString());
         }
 
         return instance;

@@ -4,7 +4,6 @@ import java.util.HashSet;
 import java.util.Set;
 
 import jakarta.ws.rs.core.Application;
-import scc.db.CosmosDBLayer;
 
 public class MainApplication extends Application
 {

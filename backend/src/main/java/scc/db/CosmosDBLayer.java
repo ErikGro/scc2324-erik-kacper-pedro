@@ -8,10 +8,6 @@ import com.azure.cosmos.CosmosDatabase;
 import scc.utils.Env;
 
 public class CosmosDBLayer {
-	private static final String CONNECTION_URL = "https://scc-pedro55921.documents.azure.com:443/";//Env.getInstance().getDBConnectionUrl();
-	private static final String DB_KEY = "Rk0dqIkq3mg0JYQ0aHeCsHuYpBP4G7A1bKEmjOc8FQMhLNkpteSctoJnvu96traHAdCnKZdRV5aBACDbEfaR9Q";//Env.getInstance().getDBKey();
-	private static final String DB_NAME = "sccbackendusers";//Env.getInstance().getDBName();
-	
 	private static CosmosDBLayer instance;
 
 	public static synchronized CosmosDBLayer getInstance() {
@@ -19,8 +15,8 @@ public class CosmosDBLayer {
 			return instance;
 
 		CosmosClient client = new CosmosClientBuilder()
-		         .endpoint(CONNECTION_URL)
-		         .key(DB_KEY)
+		         .endpoint(Env.getInstance().getDBConnectionUrl())
+		         .key(Env.getInstance().getDBKey())
 		         //.directMode()
 		         .gatewayMode()		
 		         // replace by .directMode() for better performance
@@ -48,7 +44,7 @@ public class CosmosDBLayer {
 	private synchronized void init() {
 		if( db != null)
 			return;
-		db = client.getDatabase(DB_NAME);
+		db = client.getDatabase(Env.getInstance().getDBName());
 
 		CosmosContainer usersContainer = db.getContainer("users");
 		userDB = new UserDB(usersContainer);

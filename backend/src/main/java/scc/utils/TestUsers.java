@@ -1,14 +1,5 @@
 package scc.utils;
 
-import java.util.Locale;
-
-import com.azure.cosmos.models.CosmosItemResponse;
-import com.azure.cosmos.util.CosmosPagedIterable;
-
-import scc.data.UserDAO;
-import scc.db.CosmosDBLayer;
-import scc.db.UserDB;
-
 /**
  * Standalone program for accessing the database
  *
