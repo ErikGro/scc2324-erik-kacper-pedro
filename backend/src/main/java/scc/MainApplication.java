@@ -1,13 +1,16 @@
-package scc.srv;
+package scc;
 
 import java.util.HashSet;
 import java.util.Set;
 
 import jakarta.ws.rs.core.Application;
+import scc.srv.HouseResource;
+import scc.srv.MediaResource;
+import scc.srv.UserResource;
 
 public class MainApplication extends Application
 {
-	private Set<Class<?>> resources = new HashSet<Class<?>>();
+	private final Set<Class<?>> resources = new HashSet<Class<?>>();
 
 	public MainApplication() {
 		resources.add(HouseResource.class);

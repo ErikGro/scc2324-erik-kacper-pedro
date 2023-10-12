@@ -5,7 +5,6 @@ import com.azure.cosmos.CosmosClient;
 import com.azure.cosmos.CosmosClientBuilder;
 import com.azure.cosmos.CosmosContainer;
 import com.azure.cosmos.CosmosDatabase;
-import scc.utils.Env;
 
 public class CosmosDBLayer {
 	private static CosmosDBLayer instance;
@@ -15,8 +14,8 @@ public class CosmosDBLayer {
 			return instance;
 
 		CosmosClient client = new CosmosClientBuilder()
-		         .endpoint(Env.getInstance().getDBConnectionUrl())
-		         .key(Env.getInstance().getDBKey())
+		         .endpoint(System.getenv("DB_CONNECTION_URL"))
+		         .key(System.getenv("DB_KEY"))
 		         //.directMode()
 		         .gatewayMode()		
 		         // replace by .directMode() for better performance
@@ -44,7 +43,7 @@ public class CosmosDBLayer {
 	private synchronized void init() {
 		if( db != null)
 			return;
-		db = client.getDatabase(Env.getInstance().getDBName());
+		db = client.getDatabase(System.getenv("DB_NAME"));
 
 		CosmosContainer usersContainer = db.getContainer("users");
 		userDB = new UserDB(usersContainer);
