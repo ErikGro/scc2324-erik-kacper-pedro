@@ -1,15 +1,14 @@
 package scc.srv;
 
+import com.azure.cosmos.models.CosmosItemResponse;
 import jakarta.ws.rs.*;
-
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import javax.ws.rs.core.Response;
-import javax.ws.rs.core.Response.Status;
-
 import jakarta.ws.rs.core.MediaType;
+import jakarta.ws.rs.core.Response;
+import scc.data.House;
+import scc.data.HouseDAO;
+import scc.db.CosmosDBLayer;
+
+import java.util.UUID;
 
 /**
  * Resource for managing media files, such as images.
@@ -17,84 +16,44 @@ import jakarta.ws.rs.core.MediaType;
 @Path("/house")
 public class HouseResource
 {
-	Map<String,byte[]> map = new HashMap<String,byte[]>();
+	/**
+	 * Create a single house
+	 * @param house the house to be created
+	 * @return the id of the house
+	 */
+	@POST
+	@Path("/")
+	@Consumes(MediaType.APPLICATION_JSON)
+	public Response post(HouseDAO house) {
+		UUID uuid = UUID.randomUUID();
+//		HouseDAO dao = new HouseDAO(uuid.toString(), house.getName());
+		house.setId(uuid.toString());
+		CosmosItemResponse<HouseDAO> response = CosmosDBLayer.getInstance().houseDB.putHouse(house);
+
+		return Response.status(response.getStatusCode()).build();
+	}
 
 	/**
-	 * Post a new image.The id of the image is its hash.
+	 * Update a house by a given id
+	 * @param id the id of the house to be updated
+	 * @param house the updated content
+	 * @return nothing - 2xx if update was successful
 	 */
-	/*
-	@POST
-	@Path("/add")
+	@PUT
+	@Path("/{id}")
 	@Consumes(MediaType.APPLICATION_JSON)
-	@Produces(MediaType.APPLICATION_JSON + ";charset=utf-8")
-	public Response upload(RegisterHouse data) {
-    	throw new ServiceUnavailableException();
+	public Response put(@PathParam("id") String id, House house) {
+		throw new ServiceUnavailableException();
 	}
 
 	/**
-	 * Return the contents of an image. Throw an appropriate error message if
-	 * id does not exist.
+	 * Delete a house by a given id
+	 * @param id of the house to be deleted
+	 * @return nothing - 2xx if delete succeeded
 	 */
-	/*
-	@POST
-	@Path("/{id}/update")
-    @Consumes(MediaType.APPLICATION_JSON)
-	@Produces(MediaType.APPLICATION_JSON)
-	public Response update(@PathParam("id") String id, RegisterHouse house) {
-		
+	@DELETE
+	@Path("/{id}")
+	public Response delete(@PathParam("id") String id) {
 		throw new ServiceUnavailableException();
 	}
-	*/
-    @DELETE
-	@Path("/{id}/delete")
-	@Consumes(MediaType.APPLICATION_JSON)
-	@Produces(MediaType.APPLICATION_JSON)
-	public Response deleteHouse(@PathParam("id") String id) {
-		throw new ServiceUnavailableException();
-	}
-	/**
-	 * Lists the ids of images stored.
-	 */
-	/*
-	@POST
-	@Path("/{id}/rental/create")
-	@Produces(MediaType.APPLICATION_JSON)
-	public Response createRental(@PathParam("id") String id,RentalInformation rental) {
-		throw new ServiceUnavailableException();
-	}
-    @POST
-	@Path("/{id}/rental/update")
-	@Consumes(MediaType.APPLICATION_JSON)
-	@Produces(MediaType.APPLICATION_JSON)
-	public Response updateRental(@PathParam("id") String id,RentalInformation rental) {
-		throw new ServiceUnavailableException();
-	}
-   
-    @POST
-	@Path("/{id}/question/create")
-	@Produces(MediaType.APPLICATION_JSON)
-	public Response listRental(@PathParam("id") String id) {
-		throw new ServiceUnavailableException();
-	}
-    //might have to do something different for questions since they might have to be sorted through id
-    @POST
-	@Path("/{id}/question/reply")
-	@Produces(MediaType.APPLICATION_JSON)
-	public Response listRental(@PathParam("id") String id) {
-		throw new ServiceUnavailableException();
-	}
-
-
-
-    @GET
-	@Path("/{id}/rental/list")
-	@Produces(MediaType.APPLICATION_JSON)
-	public Response listRental(@PathParam("id") String id) {
-		throw new ServiceUnavailableException();
-	}
-
-   */
-
-
-    
 }

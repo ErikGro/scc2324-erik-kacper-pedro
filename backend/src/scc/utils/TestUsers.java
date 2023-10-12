@@ -7,6 +7,7 @@ import com.azure.cosmos.util.CosmosPagedIterable;
 
 import scc.data.UserDAO;
 import scc.db.CosmosDBLayer;
+import scc.db.UserDB;
 
 /**
  * Standalone program for accessing the database
@@ -19,7 +20,8 @@ public class TestUsers
 
 		try {
 			Locale.setDefault(Locale.US);
-			CosmosDBLayer db = CosmosDBLayer.getInstance();
+			CosmosDBLayer dbLayer = CosmosDBLayer.getInstance();
+			UserDB db = dbLayer.userDB;
 			String id = "0:" + System.currentTimeMillis();
 			CosmosItemResponse<UserDAO> res = null;
 			UserDAO u = new UserDAO();
@@ -77,7 +79,7 @@ public class TestUsers
 				System.out.println( e);
 			}
 
-			db.close();
+			dbLayer.close();
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
