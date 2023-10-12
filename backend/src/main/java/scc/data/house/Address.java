@@ -1,4 +1,4 @@
-package scc.data;
+package scc.data.house;
 
 public class Address {
     private String street;

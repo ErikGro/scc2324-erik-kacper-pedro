@@ -4,8 +4,9 @@ import com.azure.cosmos.models.CosmosItemResponse;
 import jakarta.ws.rs.*;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
-import scc.data.House;
-import scc.data.HouseDAO;
+import scc.data.house.AvailableMonthDAO;
+import scc.data.house.House;
+import scc.data.house.HouseDAO;
 import scc.db.CosmosDBLayer;
 
 import java.util.UUID;
@@ -24,11 +25,17 @@ public class HouseResource
 	@POST
 	@Path("/")
 	@Consumes(MediaType.APPLICATION_JSON)
-	public Response post(HouseDAO house) {
-		UUID uuid = UUID.randomUUID();
-		house.setId(uuid.toString());
+	public Response post(House house) {
+		HouseDAO houseDAO = new HouseDAO(house);
+		houseDAO.setId(UUID.randomUUID().toString());
+		CosmosItemResponse<HouseDAO> response = CosmosDBLayer.getInstance().houseDB.putHouse(houseDAO);
 
-		CosmosItemResponse<HouseDAO> response = CosmosDBLayer.getInstance().houseDB.putHouse(house);
+		house.getAvailableMonths().forEach(availableMonth -> {
+			AvailableMonthDAO dao = new AvailableMonthDAO(availableMonth);
+			dao.setHouseID(response.getItem().getId());
+			dao.setId(UUID.randomUUID().toString());
+			CosmosDBLayer.getInstance().availableMonthDB.putAvailableMonth(dao);
+		});
 
 		return Response.status(response.getStatusCode()).build();
 	}

@@ -34,6 +34,8 @@ public class CosmosDBLayer {
 	public UserDB userDB;
 	public HouseDB houseDB;
 
+	public AvailableMonthDB availableMonthDB;
+
 	public CosmosDBLayer(CosmosClient client) {
 		this.client = client;
 
@@ -43,13 +45,12 @@ public class CosmosDBLayer {
 	private synchronized void init() {
 		if( db != null)
 			return;
+
 		db = client.getDatabase(System.getenv("DB_NAME"));
 
-		CosmosContainer usersContainer = db.getContainer("users");
-		userDB = new UserDB(usersContainer);
-
-		CosmosContainer housesContainer = db.getContainer("houses");
-		houseDB = new HouseDB(housesContainer);
+		userDB = new UserDB(db.getContainer("users"));
+		houseDB = new HouseDB(db.getContainer("houses"));
+		availableMonthDB = new AvailableMonthDB(db.getContainer("availableMonth"));
 	}
 
 
