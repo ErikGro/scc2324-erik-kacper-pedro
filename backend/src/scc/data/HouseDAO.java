@@ -1,8 +1,6 @@
 package scc.data;
 
 import java.time.Month;
-import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
@@ -10,28 +8,14 @@ public class HouseDAO {
     private String _rid;
     private String _ts;
     private String id;
+    private String ownerID;
     private String name;
-
     private Address address;
-
     private String description;
-
     private String[] photoIDs;
-
     private Set<Month> availableMonths;
     private Map<Month, Float> normalPricePerMonth;
     private Map<Month, Float> promotionPricePerMonth;
-
-    public HouseDAO() {}
-
-    public HouseDAO(String name, Address address, String description, Set<Month> availableMonths, Map<Month, Float> normalPricePerMonth, Map<Month, Float> promotionPricePerMonth) {
-        this.name = name;
-        this.address = address;
-        this.description = description;
-        this.availableMonths = availableMonths;
-        this.normalPricePerMonth = normalPricePerMonth;
-        this.promotionPricePerMonth = promotionPricePerMonth;
-    }
 
     public String get_rid() {
         return _rid;
@@ -55,6 +39,14 @@ public class HouseDAO {
 
     public void setId(String id) {
         this.id = id;
+    }
+
+    public String getOwnerID() {
+        return ownerID;
+    }
+
+    public void setOwnerID(String ownerID) {
+        this.ownerID = ownerID;
     }
 
     public String getName() {

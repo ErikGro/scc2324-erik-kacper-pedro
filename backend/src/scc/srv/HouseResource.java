@@ -26,8 +26,8 @@ public class HouseResource
 	@Consumes(MediaType.APPLICATION_JSON)
 	public Response post(HouseDAO house) {
 		UUID uuid = UUID.randomUUID();
-//		HouseDAO dao = new HouseDAO(uuid.toString(), house.getName());
 		house.setId(uuid.toString());
+
 		CosmosItemResponse<HouseDAO> response = CosmosDBLayer.getInstance().houseDB.putHouse(house);
 
 		return Response.status(response.getStatusCode()).build();

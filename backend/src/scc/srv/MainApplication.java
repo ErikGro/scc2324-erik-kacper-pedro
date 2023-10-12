@@ -14,7 +14,6 @@ public class MainApplication extends Application
 		resources.add(HouseResource.class);
 		resources.add(MediaResource.class);
 		resources.add(UserResource.class);
-		resources.add(CosmosDBLayer.class);
 	}
 
 	@Override
