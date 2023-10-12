@@ -41,10 +41,7 @@ public class CosmosDBLayer {
 
 	public CosmosDBLayer(CosmosClient client) {
 		this.client = client;
-<<<<<<< HEAD
-=======
 
->>>>>>> erik-houses
 		init();
 	}
 	
