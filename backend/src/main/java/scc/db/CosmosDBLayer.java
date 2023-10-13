@@ -7,9 +7,6 @@ import com.azure.cosmos.CosmosContainer;
 import com.azure.cosmos.CosmosDatabase;
 
 public class CosmosDBLayer {
-	private static final String CONNECTION_URL = "https://kmotyka68806.documents.azure.com:443/";
-	private static final String DB_KEY = "nJKGRvbOHDNHSXr9PnwF8lfPQLk2Kjilbg7nF0enOYJ9ThvFBkQ40jnMeyaWP8PqhEng42QjDblfACDbzeHBnA==";
-	private static final String DB_NAME = "sccbackend";
 	
 	private static CosmosDBLayer instance;
 

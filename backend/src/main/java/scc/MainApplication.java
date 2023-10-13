@@ -4,9 +4,11 @@ import java.util.HashSet;
 import java.util.Set;
 
 import jakarta.ws.rs.core.Application;
-import scc.db.CosmosDBLayer; 
+import scc.db.CosmosDBLayer;
+import scc.srv.AnswerResource;
 import scc.srv.HouseResource;
 import scc.srv.MediaResource;
+import scc.srv.QuestionResource;
 import scc.srv.UserResource;
 
 public class MainApplication extends Application

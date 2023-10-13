@@ -5,6 +5,7 @@ import scc.data.Answer;
 import scc.data.AnswerDAO;
 import scc.db.AnswerDB;
 import scc.db.CosmosDBLayer;
+import scc.db.HouseDB;
 import scc.db.QuestionDB;
 
 import java.text.SimpleDateFormat;
@@ -40,7 +41,19 @@ public class AnswerResource {
 
         // TODO: Add checking if user replying the question is the owner of the house
         // If not, return 403 Forbidden
+        HouseDB dbHouse = dbLayer.houseDB;
+        
+        // Get house from db
+        if (!dbHouse.houseExists(houseId)) {
+            return Response.status(404, "House doesn't exist.").build();
+        }
 
+        // Check if user is the owner of the house
+        if (!dbHouse.getHouse(houseId).iterator().next().getOwnerID().equals(ans.getUserId())) {
+            return Response.status(403, "Only the onwer of the house can respond to the question.").build();
+        }
+
+        
         if (db.answerExists(questionId)) {
             return Response.status(409, "Answer already exists.").build();
         }

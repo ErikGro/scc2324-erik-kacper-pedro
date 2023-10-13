@@ -18,4 +18,10 @@ public class HouseDB extends DBContainer {
     public CosmosPagedIterable<HouseDAO> getHouse(String id) {
         return container.queryItems("SELECT * FROM users WHERE users.id=\"" + id + "\"", new CosmosQueryRequestOptions(), HouseDAO.class);
     }
+
+    public boolean houseExists(String id) {
+        CosmosPagedIterable<HouseDAO> res = container.queryItems("SELECT * FROM houses WHERE houses.id=\"" + id + "\"", new CosmosQueryRequestOptions(), HouseDAO.class);
+        return res.iterator().hasNext();
+    }
+	
 }

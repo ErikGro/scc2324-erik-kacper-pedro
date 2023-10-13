@@ -10,11 +10,11 @@ import jakarta.ws.rs.core.MediaType;
 import scc.data.Question;
 import scc.data.QuestionDAO;
 import scc.db.CosmosDBLayer;
+import scc.db.HouseDB;
 import scc.db.QuestionDB;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Date;
 
 
 
@@ -33,6 +33,13 @@ public class QuestionResource {
     public Response createQuestion(@PathParam("houseId") String houseId,  Question q) {
 
         CosmosDBLayer dbLayer = CosmosDBLayer.getInstance();
+        HouseDB dbHouse = dbLayer.houseDB;
+        
+        // Get house from db
+        if (!dbHouse.houseExists(houseId)) {
+            return Response.status(404, "House doesn't exist.").build();
+        }
+    
         QuestionDB db = dbLayer.questionDB;
         
         String id = "q:" + System.currentTimeMillis();
@@ -55,6 +62,12 @@ public class QuestionResource {
         CosmosDBLayer dbLayer = CosmosDBLayer.getInstance();
         QuestionDB db = dbLayer.questionDB;
         
+        HouseDB dbHouse = dbLayer.houseDB;
+        // Get house from db
+        if (!dbHouse.houseExists(houseId)) {
+            return Response.status(404, "House doesn't exist.").build();
+        }
+
         Iterator<QuestionDAO> res = db.getQuestions(houseId).iterator();
         // Get all questions from a house using getQuestions from QuestionDB
         List<String> questions = new ArrayList<String>();
