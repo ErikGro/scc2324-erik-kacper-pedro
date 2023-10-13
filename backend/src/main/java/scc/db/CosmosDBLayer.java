@@ -18,8 +18,8 @@ public class CosmosDBLayer {
 			return instance;
 
 		CosmosClient client = new CosmosClientBuilder()
-		         .endpoint(CONNECTION_URL)
-		         .key(DB_KEY)
+		         .endpoint(System.getenv("DB_CONNECTION_URL"))
+		         .key(System.getenv("DB_KEY"))
 		         //.directMode()
 		         .gatewayMode()		
 		         // replace by .directMode() for better performance
@@ -40,18 +40,19 @@ public class CosmosDBLayer {
 	public QuestionDB questionDB;
 	public AnswerDB answerDB;
 
+	public AvailableMonthDB availableMonthDB;
+
 	public CosmosDBLayer(CosmosClient client) {
 		this.client = client;
+
 		init();
 	}
 	
 	private synchronized void init() {
 		if( db != null)
 			return;
-		db = client.getDatabase(DB_NAME);
 
-		CosmosContainer usersContainer = db.getContainer("users");
-		userDB = new UserDB(usersContainer);
+		db = client.getDatabase(System.getenv("DB_NAME"));
 
 		CosmosContainer housesContainer = db.getContainer("houses");
 		houseDB = new HouseDB(housesContainer);
@@ -61,6 +62,9 @@ public class CosmosDBLayer {
 
 		CosmosContainer answersContainer = db.getContainer("answers");
 		answerDB = new AnswerDB(answersContainer);
+		userDB = new UserDB(db.getContainer("users"));
+		houseDB = new HouseDB(db.getContainer("houses"));
+		availableMonthDB = new AvailableMonthDB(db.getContainer("availableMonth"));
 	}
 
 

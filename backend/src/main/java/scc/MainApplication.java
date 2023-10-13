@@ -1,18 +1,19 @@
-package scc.srv;
+package scc;
 
 import java.util.HashSet;
 import java.util.Set;
 
 import jakarta.ws.rs.core.Application;
 import scc.db.CosmosDBLayer; 
+import scc.srv.HouseResource;
+import scc.srv.MediaResource;
+import scc.srv.UserResource;
 
 public class MainApplication extends Application
 {
-	private Set<Object> singletons = new HashSet<Object>();
-	private Set<Class<?>> resources = new HashSet<Class<?>>();
+	private final Set<Class<?>> resources = new HashSet<Class<?>>();
 
 	public MainApplication() {
-		singletons.add(CosmosDBLayer.getInstance());
 		resources.add(HouseResource.class);
 		resources.add(QuestionResource.class);
 		resources.add(AnswerResource.class);
@@ -23,10 +24,5 @@ public class MainApplication extends Application
 	@Override
 	public Set<Class<?>> getClasses() {
 		return resources;
-	}
-
-	@Override
-	public Set<Object> getSingletons() {
-		return singletons;
 	}
 }
