@@ -153,11 +153,14 @@ public class HouseResource
 		houseDAO.setId(id);
 		CosmosItemResponse<HouseDAO> response = CosmosDBLayer.getInstance().houseDB.putHouse(houseDAO);
 
+		String houseID = response.getItem().getId();
+		CosmosDBLayer.getInstance().availablePeriodDB.deletePeriodsForHouse(houseID);
+
 		house.getAvailablePeriods().forEach(period -> {
 			AvailablePeriodDAO dao = new AvailablePeriodDAO(period);
-			dao.setHouseID(response.getItem().getId());
+			dao.setHouseID(houseID);
 			dao.setId(UUID.randomUUID().toString());
-			CosmosDBLayer.getInstance().availablePeriodDB.putAvailablePeriod(dao);
+			CosmosDBLayer.getInstance().availablePeriodDB.createAvailablePeriod(dao);
 		});
 
 		return response;
