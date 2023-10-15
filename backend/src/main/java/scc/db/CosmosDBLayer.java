@@ -3,7 +3,6 @@ package scc.db;
 import com.azure.cosmos.ConsistencyLevel;
 import com.azure.cosmos.CosmosClient;
 import com.azure.cosmos.CosmosClientBuilder;
-import com.azure.cosmos.CosmosContainer;
 import com.azure.cosmos.CosmosDatabase;
 
 public class CosmosDBLayer {
@@ -34,7 +33,9 @@ public class CosmosDBLayer {
 	public UserDB userDB;
 	public HouseDB houseDB;
 
-	public AvailableMonthDB availableMonthDB;
+	public AvailablePeriodDB availablePeriodDB;
+
+	public RentalDB rentalDB;
 
 	public CosmosDBLayer(CosmosClient client) {
 		this.client = client;
@@ -50,7 +51,8 @@ public class CosmosDBLayer {
 
 		userDB = new UserDB(db.getContainer("users"));
 		houseDB = new HouseDB(db.getContainer("houses"));
-		availableMonthDB = new AvailableMonthDB(db.getContainer("availableMonth"));
+		availablePeriodDB = new AvailablePeriodDB(db.getContainer("availablePeriod"));
+		rentalDB = new RentalDB(db.getContainer("rental"));
 	}
 
 

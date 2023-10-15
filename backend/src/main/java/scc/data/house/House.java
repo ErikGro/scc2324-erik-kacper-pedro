@@ -10,11 +10,11 @@ public class House {
 	private Address address;
 	private String description;
 	private String[] photoIDs;
-	private Set<AvailableMonth> availableMonths;
+	private Set<AvailablePeriod> availablePeriods;
 
 	public House () {};
 
-	public House(HouseDAO houseDAO, Set<AvailableMonthDAO> availableMonths) {
+	public House(HouseDAO houseDAO, Set<AvailablePeriodDAO> availableMonths) {
 		this.id = houseDAO.getId();
 		this.ownerID = houseDAO.getOwnerID();
 		this.name = houseDAO.getName();
@@ -22,7 +22,7 @@ public class House {
 		this.description = houseDAO.getDescription();
 		this.photoIDs = houseDAO.getPhotoIDs();
 
-		this.availableMonths = availableMonths.stream().map(AvailableMonth::new).collect(Collectors.toSet());
+		this.availablePeriods = availableMonths.stream().map(AvailablePeriodDAO::toAvailablePeriod).collect(Collectors.toSet());
 	}
 
 	public String getOwnerID() {
@@ -65,12 +65,12 @@ public class House {
 		this.photoIDs = photoIDs;
 	}
 
-	public Set<AvailableMonth> getAvailableMonths() {
-		return availableMonths;
+	public Set<AvailablePeriod> getAvailablePeriods() {
+		return availablePeriods;
 	}
 
-	public void setAvailableMonths(Set<AvailableMonth> availableMonths) {
-		this.availableMonths = availableMonths;
+	public void setAvailablePeriods(Set<AvailablePeriod> availablePeriods) {
+		this.availablePeriods = availablePeriods;
 	}
 }
 
