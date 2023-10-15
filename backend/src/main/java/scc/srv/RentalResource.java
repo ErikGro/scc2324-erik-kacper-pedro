@@ -53,7 +53,7 @@ public class RentalResource {
 
     /**
      * If rental with given id exists, return rental as JSON
-     * @param id
+     * @param id of the rental
      * @return Response with rental JSON for given id in body
      */
     @GET
@@ -67,10 +67,11 @@ public class RentalResource {
 
     /**
      * Returns all rentals for a given query parameter userID
-     * @param userID
+     * @param userID the user for which to fetch all rentals
      * @return all rentals for a given query parameter userID
      */
     @GET
+    @Path("/")
     @Produces(MediaType.APPLICATION_JSON)
     public Response getRentalsByUserID(@QueryParam("userID") String userID) {
         CosmosPagedIterable<RentalDAO> response = CosmosDBLayer.getInstance().rentalDB.getRentalsByUserID(userID);

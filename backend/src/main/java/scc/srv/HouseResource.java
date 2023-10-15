@@ -56,14 +56,14 @@ public class HouseResource
 	@Path("/{id}")
 	@Consumes(MediaType.APPLICATION_JSON)
 	public Response put(@PathParam("id") String id, House house) {
-		CosmosItemResponse<HouseDAO> repsonse = putHouse(id, house);
+		CosmosItemResponse<HouseDAO> response = putHouse(id, house);
 
-		return Response.status(repsonse.getStatusCode()).build();
+		return Response.status(response.getStatusCode()).build();
 	}
 
 	/**
 	 * If house with given id exists, return house as JSON
-	 * @param id
+	 * @param id of the house
 	 * @return Response with house JSON for given id in body
 	 */
 	@GET
@@ -77,10 +77,11 @@ public class HouseResource
 
 	/**
 	 * Returns all houses for a given query parameter userID
-	 * @param userID
+	 * @param userID the user owning the houses
 	 * @return all houses for a given query parameter userID
 	 */
 	@GET
+	@Path("/")
 	@Produces(MediaType.APPLICATION_JSON)
 	public Response getHousesByUserID(@QueryParam("userID") String userID) {
 		CosmosPagedIterable<HouseDAO> response = CosmosDBLayer.getInstance().houseDB.getHousesByUserID(userID);
