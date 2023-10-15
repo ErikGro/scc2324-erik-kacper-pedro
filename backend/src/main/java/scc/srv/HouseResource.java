@@ -9,7 +9,10 @@ import scc.data.house.AvailablePeriodDAO;
 import scc.data.house.House;
 import scc.data.house.HouseDAO;
 import scc.db.CosmosDBLayer;
+import scc.utils.Constants;
 
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.util.UUID;
 
 /**
@@ -27,9 +30,20 @@ public class HouseResource
 	@Path("/")
 	@Consumes(MediaType.APPLICATION_JSON)
 	public Response post(House house) {
-		int statusCode = putHouse(UUID.randomUUID().toString(), house);
+		CosmosItemResponse<HouseDAO> response = putHouse(UUID.randomUUID().toString(), house);
 
-		return Response.status(statusCode).build();
+		if (response.getStatusCode() == 201) {
+			try {
+				String id = response.getItem().getId();
+
+				URI houseURL = new URI(Constants.getApplicationURL() + "/rest/house/" + id);
+				return Response.created(houseURL).build();
+			} catch (URISyntaxException e) {
+				return Response.status(500).build();
+			}
+        }
+
+		return Response.status(response.getStatusCode()).build();
 	}
 
 	/**
@@ -42,9 +56,9 @@ public class HouseResource
 	@Path("/{id}")
 	@Consumes(MediaType.APPLICATION_JSON)
 	public Response put(@PathParam("id") String id, House house) {
-		int statusCode = putHouse(id, house);
+		CosmosItemResponse<HouseDAO> repsonse = putHouse(id, house);
 
-		return Response.status(statusCode).build();
+		return Response.status(repsonse.getStatusCode()).build();
 	}
 
 	/**
@@ -54,6 +68,7 @@ public class HouseResource
 	 */
 	@GET
 	@Path("/{id}")
+	@Produces(MediaType.APPLICATION_JSON)
 	public Response getHouseByID(@PathParam("id") String id) {
 		CosmosItemResponse<HouseDAO> response = CosmosDBLayer.getInstance().houseDB.getHouseByID(id);
 
@@ -66,7 +81,7 @@ public class HouseResource
 	 * @return all houses for a given query parameter userID
 	 */
 	@GET
-	@Path("/{id}")
+	@Produces(MediaType.APPLICATION_JSON)
 	public Response getHousesByUserID(@QueryParam("userID") String userID) {
 		CosmosPagedIterable<HouseDAO> response = CosmosDBLayer.getInstance().houseDB.getHousesByUserID(userID);
 
@@ -85,7 +100,7 @@ public class HouseResource
 		return Response.status(response.getStatusCode()).build();
 	}
 
-	private int putHouse(String id, House house) {
+	private CosmosItemResponse<HouseDAO> putHouse(String id, House house) {
 		HouseDAO houseDAO = new HouseDAO(house);
 		houseDAO.setId(id);
 		CosmosItemResponse<HouseDAO> response = CosmosDBLayer.getInstance().houseDB.putHouse(houseDAO);
@@ -97,6 +112,6 @@ public class HouseResource
 			CosmosDBLayer.getInstance().availablePeriodDB.putAvailablePeriod(dao);
 		});
 
-		return response.getStatusCode();
+		return response;
 	}
 }

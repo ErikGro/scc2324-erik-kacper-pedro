@@ -8,7 +8,10 @@ import jakarta.ws.rs.core.Response;
 import scc.data.Rental;
 import scc.data.RentalDAO;
 import scc.db.CosmosDBLayer;
+import scc.utils.Constants;
 
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.util.UUID;
 
 @Path("/rental")
@@ -17,9 +20,20 @@ public class RentalResource {
     @Path("/")
     @Consumes(MediaType.APPLICATION_JSON)
     public Response post(Rental rental) {
-        int statusCode = putRental(UUID.randomUUID().toString(), rental);
+        CosmosItemResponse<RentalDAO> response = putRental(UUID.randomUUID().toString(), rental);
 
-        return Response.status(statusCode).build();
+        if (response.getStatusCode() == 201) {
+            try {
+                String id = response.getItem().getId();
+
+                URI rentalURL = new URI(Constants.getApplicationURL() + "/rest/rental/" + id);
+                return Response.created(rentalURL).build();
+            } catch (URISyntaxException e) {
+                return Response.status(500).build();
+            }
+        }
+
+        return Response.status(response.getStatusCode()).build();
     }
 
     /**
@@ -32,9 +46,9 @@ public class RentalResource {
     @Path("/{id}")
     @Consumes(MediaType.APPLICATION_JSON)
     public Response put(@PathParam("id") String id, Rental rental) {
-        int statusCode = putRental(id, rental);
+        CosmosItemResponse<RentalDAO> response = putRental(id, rental);
 
-        return Response.status(statusCode).build();
+        return Response.status(response.getStatusCode()).build();
     }
 
     /**
@@ -44,6 +58,7 @@ public class RentalResource {
      */
     @GET
     @Path("/{id}")
+    @Produces(MediaType.APPLICATION_JSON)
     public Response getRentalByID(@PathParam("id") String id) {
         CosmosItemResponse<RentalDAO> response = CosmosDBLayer.getInstance().rentalDB.getRentalByID(id);
 
@@ -56,7 +71,7 @@ public class RentalResource {
      * @return all rentals for a given query parameter userID
      */
     @GET
-    @Path("/{id}")
+    @Produces(MediaType.APPLICATION_JSON)
     public Response getRentalsByUserID(@QueryParam("userID") String userID) {
         CosmosPagedIterable<RentalDAO> response = CosmosDBLayer.getInstance().rentalDB.getRentalsByUserID(userID);
 
@@ -72,14 +87,14 @@ public class RentalResource {
     @Path("/{id}")
     public Response delete(@PathParam("id") String id) {
         CosmosItemResponse<Object> response = CosmosDBLayer.getInstance().rentalDB.deleteRental(id);
+
         return Response.status(response.getStatusCode()).build();
     }
 
-    private int putRental(String id, Rental rental) {
+    private CosmosItemResponse<RentalDAO> putRental(String id, Rental rental) {
         RentalDAO rentalDAO = new RentalDAO(rental);
         rentalDAO.setId(id);
-        CosmosItemResponse<RentalDAO> response = CosmosDBLayer.getInstance().rentalDB.putRental(rentalDAO);
 
-        return response.getStatusCode();
+        return CosmosDBLayer.getInstance().rentalDB.putRental(rentalDAO);
     }
 }
