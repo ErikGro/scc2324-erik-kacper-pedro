@@ -11,9 +11,6 @@ public class HouseDAO {
     private Address address;
     private String description;
     private String[] photoIDs;
-    private Set<Month> availableMonths;
-    private Map<Month, Float> normalPricePerMonth;
-    private Map<Month, Float> promotionPricePerMonth;
 
     public HouseDAO() {}
 
@@ -63,30 +60,6 @@ public class HouseDAO {
 
     public void setAddress(Address address) {
         this.address = address;
-    }
-
-    public Set<Month> getAvailableMonths() {
-        return availableMonths;
-    }
-
-    public void setAvailableMonths(Set<Month> availableMonths) {
-        this.availableMonths = availableMonths;
-    }
-
-    public Map<Month, Float> getNormalPricePerMonth() {
-        return normalPricePerMonth;
-    }
-
-    public void setNormalPricePerMonth(Map<Month, Float> normalPricePerMonth) {
-        this.normalPricePerMonth = normalPricePerMonth;
-    }
-
-    public Map<Month, Float> getPromotionPricePerMonth() {
-        return promotionPricePerMonth;
-    }
-
-    public void setPromotionPricePerMonth(Map<Month, Float> promotionPricePerMonth) {
-        this.promotionPricePerMonth = promotionPricePerMonth;
     }
 
     public String[] getPhotoIDs() {

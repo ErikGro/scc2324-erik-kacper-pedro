@@ -1,9 +1,6 @@
 package scc.db;
 
-import com.azure.cosmos.ConsistencyLevel;
-import com.azure.cosmos.CosmosClient;
-import com.azure.cosmos.CosmosClientBuilder;
-import com.azure.cosmos.CosmosDatabase;
+import com.azure.cosmos.*;
 
 public class CosmosDBLayer {
 	

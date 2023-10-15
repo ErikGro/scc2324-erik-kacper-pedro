@@ -26,18 +26,9 @@ public class HouseResource
 	@Path("/")
 	@Consumes(MediaType.APPLICATION_JSON)
 	public Response post(House house) {
-		HouseDAO houseDAO = new HouseDAO(house);
-		houseDAO.setId(UUID.randomUUID().toString());
-		CosmosItemResponse<HouseDAO> response = CosmosDBLayer.getInstance().houseDB.putHouse(houseDAO);
+		int statusCode = putHouse(UUID.randomUUID().toString(), house);
 
-		house.getAvailablePeriods().forEach(period -> {
-			AvailablePeriodDAO dao = new AvailablePeriodDAO(period);
-			dao.setHouseID(response.getItem().getId());
-			dao.setId(UUID.randomUUID().toString());
-			CosmosDBLayer.getInstance().availablePeriodDB.putAvailablePeriod(dao);
-		});
-
-		return Response.status(response.getStatusCode()).build();
+		return Response.status(statusCode).build();
 	}
 
 	/**
@@ -50,7 +41,9 @@ public class HouseResource
 	@Path("/{id}")
 	@Consumes(MediaType.APPLICATION_JSON)
 	public Response put(@PathParam("id") String id, House house) {
-		throw new ServiceUnavailableException();
+		int statusCode = putHouse(id, house);
+
+		return Response.status(statusCode).build();
 	}
 
 	/**
@@ -61,6 +54,22 @@ public class HouseResource
 	@DELETE
 	@Path("/{id}")
 	public Response delete(@PathParam("id") String id) {
-		throw new ServiceUnavailableException();
+		CosmosItemResponse<Object> response = CosmosDBLayer.getInstance().houseDB.deleteHouse(id);
+		return Response.status(response.getStatusCode()).build();
+	}
+
+	private int putHouse(String id, House house) {
+		HouseDAO houseDAO = new HouseDAO(house);
+		houseDAO.setId(id);
+		CosmosItemResponse<HouseDAO> response = CosmosDBLayer.getInstance().houseDB.putHouse(houseDAO);
+
+		house.getAvailablePeriods().forEach(period -> {
+			AvailablePeriodDAO dao = new AvailablePeriodDAO(period);
+			dao.setHouseID(response.getItem().getId());
+			dao.setId(UUID.randomUUID().toString());
+			CosmosDBLayer.getInstance().availablePeriodDB.putAvailablePeriod(dao);
+		});
+
+		return response.getStatusCode();
 	}
 }
