@@ -90,6 +90,20 @@ public class HouseResource
 	}
 
 	/**
+	 * Returns all houses for a given city
+	 * @param city the city to be queried
+	 * @return all houses for a given query parameter city
+	 */
+	@GET
+	@Path("/")
+	@Produces(MediaType.APPLICATION_JSON)
+	public Response getHousesByCity(@QueryParam("city") String city) {
+		CosmosPagedIterable<HouseDAO> response = CosmosDBLayer.getInstance().houseDB.getHousesByCity(city);
+
+		return Response.accepted(response.stream().toList()).build();
+	}
+
+	/**
 	 * Delete a house by a given id
 	 * @param id of the house to be deleted
 	 * @return nothing - 2xx if delete succeeded

@@ -21,6 +21,10 @@ public class HouseDB extends DBContainer {
         return container.queryItems("SELECT * FROM houses WHERE houses.ownerID=\"" + id + "\"", new CosmosQueryRequestOptions(), HouseDAO.class);
     }
 
+    public CosmosPagedIterable<HouseDAO> getHousesByCity(String name) {
+        return container.queryItems("SELECT * FROM houses WHERE houses.address.city=\"" + name + "\"", new CosmosQueryRequestOptions(), HouseDAO.class);
+    }
+
     public CosmosItemResponse<HouseDAO> getHouseByID(String id) {
         return container.readItem(id, new PartitionKey(id), HouseDAO.class);
     }
