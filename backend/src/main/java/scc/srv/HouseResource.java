@@ -76,15 +76,48 @@ public class HouseResource
 	}
 
 	/**
-	 * Returns all houses for a given query parameter userID
-	 * @param userID the user owning the houses
-	 * @return all houses for a given query parameter userID
+	 * Returns all houses for the given query Parameter.
+	 * Valid Query parameters are:
+	 * - useID
+	 * - city
+	 * - city & start-date & end-date
+	 * @param userID of the owner of the house
+	 * @param city of the house
+	 * @param startDate of the period
+	 * @param endDate of the period
+	 * @return all houses for the given query parameters
 	 */
 	@GET
 	@Path("/")
 	@Produces(MediaType.APPLICATION_JSON)
-	public Response getHousesByUserID(@QueryParam("userID") String userID) {
-		CosmosPagedIterable<HouseDAO> response = CosmosDBLayer.getInstance().houseDB.getHousesByUserID(userID);
+	public Response getHousesByQuery(@QueryParam("userID") String userID,
+									 @QueryParam("city") String city,
+									 @QueryParam("start-date") String startDate,
+									 @QueryParam("end-date") String endDate) {
+		CosmosPagedIterable<HouseDAO> response;
+
+		if (userID != null) { // List of houses of a given user
+			response = CosmosDBLayer.getInstance().houseDB.getHousesByUserID(userID);
+		} else if (city != null && startDate != null && endDate != null) { // Search of available houses for a given period and location
+			response = CosmosDBLayer.getInstance().houseDB.getHousesByCityAndPeriod(city, startDate, endDate);
+		} else if (city != null) { // List of available houses for a given location
+			response = CosmosDBLayer.getInstance().houseDB.getHousesByCity(city);
+		} else {
+			return Response.status(400).build();
+		}
+
+		return Response.accepted(response.stream().toList()).build();
+	}
+
+	/**
+	 * Returns all houses which have soon a discount
+	 * @return all houses which have soon a discount
+	 */
+	@GET
+	@Path("/discounted-soon")
+	@Produces(MediaType.APPLICATION_JSON)
+	public Response getDiscountedHousesNearFuture() {
+		CosmosPagedIterable<HouseDAO> response = CosmosDBLayer.getInstance().houseDB.getDiscountedHousesNearFuture();
 
 		return Response.accepted(response.stream().toList()).build();
 	}

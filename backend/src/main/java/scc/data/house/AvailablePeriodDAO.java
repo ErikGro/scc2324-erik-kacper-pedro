@@ -5,26 +5,22 @@ import java.time.Month;
 public class AvailablePeriodDAO {
     private String id;
     private String houseID;
-    private Month startMonth;
-    private Integer startYear;
-    private Month endMonth;
-    private Integer endYear;
+    private String startDate;
+    private String endDate;
     private Float normalPrice;
     private Float promotionPrice;
 
     public AvailablePeriodDAO() {};
 
     public AvailablePeriodDAO(AvailablePeriod period) {
-        this.startMonth = period.getStartMonth();
-        this.startYear = period.getStartYear();
-        this.endMonth = period.getEndMonth();
-        this.endYear = period.getEndYear();
+        this.startDate = period.getStartDate();
+        this.endDate = period.getEndDate();
         this.normalPrice = period.getNormalPrice();
         this.promotionPrice = period.getPromotionPrice();
     }
 
     public AvailablePeriod toAvailablePeriod() {
-        return new AvailablePeriod(startMonth, startYear, endMonth, endYear, normalPrice, promotionPrice);
+        return new AvailablePeriod(startDate, endDate, normalPrice, promotionPrice);
     }
 
     public String getId() {
@@ -43,36 +39,20 @@ public class AvailablePeriodDAO {
         this.houseID = houseID;
     }
 
-    public Month getStartMonth() {
-        return startMonth;
+    public String getStartDate() {
+        return startDate;
     }
 
-    public void setStartMonth(Month startMonth) {
-        this.startMonth = startMonth;
+    public void setStartDate(String startDate) {
+        this.startDate = startDate;
     }
 
-    public Integer getStartYear() {
-        return startYear;
+    public String getEndDate() {
+        return endDate;
     }
 
-    public void setStartYear(Integer startYear) {
-        this.startYear = startYear;
-    }
-
-    public Month getEndMonth() {
-        return endMonth;
-    }
-
-    public void setEndMonth(Month endMonth) {
-        this.endMonth = endMonth;
-    }
-
-    public Integer getEndYear() {
-        return endYear;
-    }
-
-    public void setEndYear(Integer endYear) {
-        this.endYear = endYear;
+    public void setEndDate(String endDate) {
+        this.endDate = endDate;
     }
 
     public Float getNormalPrice() {
