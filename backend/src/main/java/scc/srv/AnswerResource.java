@@ -49,7 +49,7 @@ public class AnswerResource {
         }
 
         // Check if user is the owner of the house
-        if (!dbHouse.getHouse(houseId).iterator().next().getOwnerID().equals(ans.getUserId())) {
+        if (!dbHouse.getHouseByID(houseId).getItem().getOwnerID().equals(ans.getUserId())) {
             return Response.status(403, "Only the onwer of the house can respond to the question.").build();
         }
 
