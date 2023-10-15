@@ -44,7 +44,7 @@ public class AnswerResource {
         HouseDB dbHouse = dbLayer.houseDB;
         
         // Get house from db
-        if (!dbHouse.houseExists(houseId)) {
+        if (!dbHouse.hasHouse(houseId)) {
             return Response.status(404, "House doesn't exist.").build();
         }
 

@@ -23,7 +23,7 @@ public class RentalDB extends DBContainer {
     }
 
     public CosmosPagedIterable<RentalDAO> getRentalsByUserID(String id) {
-        return container.queryItems("SELECT * FROM rental WHERE users.id=\"" + id + "\"", new CosmosQueryRequestOptions(), RentalDAO.class);
+        return container.queryItems("SELECT * FROM rental WHERE rental.tenantID=\"" + id + "\"", new CosmosQueryRequestOptions(), RentalDAO.class);
     }
 
     public CosmosItemResponse<Object> deleteRental(String id) {

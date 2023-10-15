@@ -67,7 +67,7 @@ public class RentalResource {
 
     /**
      * Returns all rentals for a given query parameter userID
-     * @param userID the user for which to fetch all rentals
+     * @param userID the user who is the tenant for the rentals
      * @return all rentals for a given query parameter userID
      */
     @GET

@@ -18,7 +18,7 @@ public class HouseDB extends DBContainer {
     }
 
     public CosmosPagedIterable<HouseDAO> getHousesByUserID(String id) {
-        return container.queryItems("SELECT * FROM users WHERE users.id=\"" + id + "\"", new CosmosQueryRequestOptions(), HouseDAO.class);
+        return container.queryItems("SELECT * FROM houses WHERE houses.ownerID=\"" + id + "\"", new CosmosQueryRequestOptions(), HouseDAO.class);
     }
 
     public CosmosItemResponse<HouseDAO> getHouseByID(String id) {
@@ -30,9 +30,8 @@ public class HouseDB extends DBContainer {
         return container.deleteItem(id, new PartitionKey(id), new CosmosItemRequestOptions());
     }
 
-    public boolean houseExists(String id) {
-        CosmosPagedIterable<HouseDAO> res = container.queryItems("SELECT * FROM houses WHERE houses.id=\"" + id + "\"", new CosmosQueryRequestOptions(), HouseDAO.class);
+    public boolean hasHouse(String id) {
+        CosmosPagedIterable<HouseDAO> res = getHousesByUserID(id);
         return res.iterator().hasNext();
     }
-	
 }
