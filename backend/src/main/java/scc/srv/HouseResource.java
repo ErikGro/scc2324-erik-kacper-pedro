@@ -1,6 +1,7 @@
 package scc.srv;
 
 import com.azure.cosmos.models.CosmosItemResponse;
+import com.azure.cosmos.util.CosmosPagedIterable;
 import jakarta.ws.rs.*;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
@@ -12,7 +13,7 @@ import scc.db.CosmosDBLayer;
 import java.util.UUID;
 
 /**
- * Resource for managing media files, such as images.
+ * Resource for accessing houses
  */ 
 @Path("/house")
 public class HouseResource
@@ -44,6 +45,32 @@ public class HouseResource
 		int statusCode = putHouse(id, house);
 
 		return Response.status(statusCode).build();
+	}
+
+	/**
+	 * If house with given id exists, return house as JSON
+	 * @param id
+	 * @return Response with house JSON for given id in body
+	 */
+	@GET
+	@Path("/{id}")
+	public Response getHouseByID(@PathParam("id") String id) {
+		CosmosItemResponse<HouseDAO> response = CosmosDBLayer.getInstance().houseDB.getHouseByID(id);
+
+		return Response.accepted(response.getItem()).build();
+	}
+
+	/**
+	 * Returns all houses for a given query parameter userID
+	 * @param userID
+	 * @return all houses for a given query parameter userID
+	 */
+	@GET
+	@Path("/{id}")
+	public Response getHousesByUserID(@QueryParam("userID") String userID) {
+		CosmosPagedIterable<HouseDAO> response = CosmosDBLayer.getInstance().houseDB.getHousesByUserID(userID);
+
+		return Response.accepted(response.stream().toList()).build();
 	}
 
 	/**

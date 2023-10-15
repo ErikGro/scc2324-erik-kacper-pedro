@@ -14,17 +14,21 @@ public class HouseDB extends DBContainer {
     }
 
     public CosmosItemResponse<HouseDAO> putHouse(HouseDAO house) {
-        return container.createItem(house);
+        return container.upsertItem(house);
     }
 
-    public CosmosPagedIterable<HouseDAO> getHouse(String id) {
+    public CosmosPagedIterable<HouseDAO> getHousesByUserID(String id) {
         return container.queryItems("SELECT * FROM users WHERE users.id=\"" + id + "\"", new CosmosQueryRequestOptions(), HouseDAO.class);
     }
+
+    public CosmosItemResponse<HouseDAO> getHouseByID(String id) {
+        return container.readItem(id, new PartitionKey(id), HouseDAO.class);
+    }
+
 
     public CosmosItemResponse<Object> deleteHouse(String id) {
         return container.deleteItem(id, new PartitionKey(id), new CosmosItemRequestOptions());
     }
-
 
     public boolean houseExists(String id) {
         CosmosPagedIterable<HouseDAO> res = container.queryItems("SELECT * FROM houses WHERE houses.id=\"" + id + "\"", new CosmosQueryRequestOptions(), HouseDAO.class);
