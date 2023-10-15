@@ -9,6 +9,7 @@ import scc.srv.AnswerResource;
 import scc.srv.HouseResource;
 import scc.srv.MediaResource;
 import scc.srv.QuestionResource;
+import scc.srv.RentalResource;
 import scc.srv.UserResource;
 
 public class MainApplication extends Application
@@ -21,6 +22,7 @@ public class MainApplication extends Application
 		resources.add(AnswerResource.class);
 		resources.add(MediaResource.class);
 		resources.add(UserResource.class);
+		resources.add(RentalResource.class);
 	}
 
 	@Override

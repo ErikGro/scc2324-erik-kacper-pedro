@@ -4,7 +4,7 @@ import com.azure.cosmos.models.CosmosItemResponse;
 import jakarta.ws.rs.*;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
-import scc.data.house.AvailableMonthDAO;
+import scc.data.house.AvailablePeriodDAO;
 import scc.data.house.House;
 import scc.data.house.HouseDAO;
 import scc.db.CosmosDBLayer;
@@ -30,11 +30,11 @@ public class HouseResource
 		houseDAO.setId(UUID.randomUUID().toString());
 		CosmosItemResponse<HouseDAO> response = CosmosDBLayer.getInstance().houseDB.putHouse(houseDAO);
 
-		house.getAvailableMonths().forEach(availableMonth -> {
-			AvailableMonthDAO dao = new AvailableMonthDAO(availableMonth);
+		house.getAvailablePeriods().forEach(period -> {
+			AvailablePeriodDAO dao = new AvailablePeriodDAO(period);
 			dao.setHouseID(response.getItem().getId());
 			dao.setId(UUID.randomUUID().toString());
-			CosmosDBLayer.getInstance().availableMonthDB.putAvailableMonth(dao);
+			CosmosDBLayer.getInstance().availablePeriodDB.putAvailablePeriod(dao);
 		});
 
 		return Response.status(response.getStatusCode()).build();
