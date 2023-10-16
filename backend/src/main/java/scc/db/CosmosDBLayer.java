@@ -4,7 +4,8 @@ import com.azure.cosmos.*;
 
 public class CosmosDBLayer {
 	private static CosmosDBLayer instance;
-	private CosmosClient client;
+	private final CosmosClient client;
+	private final CosmosDatabase db;
 	public UserDB userDB;
 	public HouseDB houseDB;
 	public QuestionDB questionDB;
@@ -22,10 +23,6 @@ public class CosmosDBLayer {
 	}
 
 	private CosmosDBLayer() {
-		initialize();
-	}
-	
-	private synchronized void initialize() {
 		client = new CosmosClientBuilder()
 				.endpoint(System.getenv("DB_CONNECTION_URL"))
 				.key(System.getenv("DB_KEY"))
@@ -37,7 +34,7 @@ public class CosmosDBLayer {
 				.contentResponseOnWriteEnabled(true)
 				.buildClient();
 
-		CosmosDatabase db = client.getDatabase(System.getenv("DB_NAME"));
+		db = client.getDatabase(System.getenv("DB_NAME"));
 
 		questionDB = new QuestionDB(db.getContainer("questions"));
 		answerDB = new AnswerDB(db.getContainer("answers"));
