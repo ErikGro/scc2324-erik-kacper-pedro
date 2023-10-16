@@ -13,7 +13,9 @@ import scc.utils.Constants;
 
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.util.Set;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 /**
  * Resource for accessing houses
@@ -70,15 +72,23 @@ public class HouseResource
 	@Path("/{id}")
 	@Produces(MediaType.APPLICATION_JSON)
 	public Response getHouseByID(@PathParam("id") String id) {
-		CosmosItemResponse<HouseDAO> response = CosmosDBLayer.getInstance().houseDB.getHouseByID(id);
+		CosmosItemResponse<HouseDAO> responseHouse = CosmosDBLayer.getInstance().houseDB.getHouseByID(id);
 
-		return Response.accepted(response.getItem()).build();
+		if (responseHouse.getStatusCode() < 300) {
+			CosmosPagedIterable<AvailablePeriodDAO> responseAvailability = CosmosDBLayer.getInstance().availablePeriodDB.getAvailablePeriodsForHouse(id);
+			Set<AvailablePeriodDAO> availablePeriods = responseAvailability.stream().collect(Collectors.toSet());
+			House house = new House(responseHouse.getItem(), availablePeriods);
+
+			return Response.accepted(house).build();
+		} else {
+			return Response.noContent().build();
+		}
 	}
 
 	/**
 	 * Returns all houses for the given query Parameter.
 	 * Valid Query parameters are:
-	 * - useID
+	 * - userID
 	 * - city
 	 * - city & start-date & end-date
 	 * @param userID of the owner of the house
@@ -148,6 +158,7 @@ public class HouseResource
 		return Response.status(response.getStatusCode()).build();
 	}
 
+	//////////////////////////////// Helper methods ////////////////////////////////
 	private CosmosItemResponse<HouseDAO> putHouse(String id, House house) {
 		HouseDAO houseDAO = new HouseDAO(house);
 		houseDAO.setId(id);

@@ -13,16 +13,14 @@ public class House {
 	private Set<AvailablePeriod> availablePeriods;
 
 	public House () {};
-
-	public House(HouseDAO houseDAO, Set<AvailablePeriodDAO> availableMonths) {
+	public House(HouseDAO houseDAO, Set<AvailablePeriodDAO> availablePeriods) {
 		this.id = houseDAO.getId();
 		this.ownerID = houseDAO.getOwnerID();
 		this.name = houseDAO.getName();
 		this.address = houseDAO.getAddress();
 		this.description = houseDAO.getDescription();
 		this.photoIDs = houseDAO.getPhotoIDs();
-
-		this.availablePeriods = availableMonths.stream().map(AvailablePeriodDAO::toAvailablePeriod).collect(Collectors.toSet());
+		this.availablePeriods = availablePeriods.stream().map(AvailablePeriodDAO::toAvailablePeriod).collect(Collectors.toSet());
 	}
 
 	public String getOwnerID() {

@@ -26,7 +26,7 @@ public class AvailablePeriodDB extends DBContainer {
     }
 
     public CosmosPagedIterable<AvailablePeriodDAO> getAvailablePeriodsForHouse(String id) {
-        return container.queryItems("SELECT * FROM availablePeriod WHERE availableMonth.houseID=\"" + id + "\"", new CosmosQueryRequestOptions(), AvailablePeriodDAO.class);
+        return container.queryItems("SELECT * FROM availablePeriod WHERE availablePeriod.availableMonth.houseID=\"" + id + "\"", new CosmosQueryRequestOptions(), AvailablePeriodDAO.class);
     }
 }
 
