@@ -5,6 +5,7 @@ import com.azure.cosmos.util.CosmosPagedIterable;
 import jakarta.ws.rs.*;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
+import scc.data.RentalDAO;
 import scc.data.house.HouseDAO;
 import scc.db.CosmosDBLayer;
 import scc.utils.Constants;
@@ -27,7 +28,7 @@ public class HouseResource
 	@POST
 	@Path("/")
 	@Consumes(MediaType.APPLICATION_JSON)
-	public Response post(HouseDAO houseDAO) {
+	public Response postHouse(HouseDAO houseDAO) {
 		houseDAO.setId(UUID.randomUUID().toString());
 		CosmosItemResponse<HouseDAO> response = CosmosDBLayer.getInstance().houseDB.upsertHouse(houseDAO);
 
@@ -54,7 +55,7 @@ public class HouseResource
 	@PUT
 	@Path("/{id}")
 	@Consumes(MediaType.APPLICATION_JSON)
-	public Response put(@PathParam("id") String id, HouseDAO houseDAO) {
+	public Response putHouse(@PathParam("id") String id, HouseDAO houseDAO) {
 		houseDAO.setId(id);
 		CosmosItemResponse<HouseDAO> response = CosmosDBLayer.getInstance().houseDB.upsertHouse(houseDAO);
 
@@ -87,7 +88,7 @@ public class HouseResource
 	 */
 	@DELETE
 	@Path("/{id}")
-	public Response delete(@PathParam("id") String id) {
+	public Response deleteHouse(@PathParam("id") String id) {
 		CosmosItemResponse<Object> response = CosmosDBLayer.getInstance().houseDB.deleteHouse(id);
 		return Response.status(response.getStatusCode()).build();
 	}
@@ -141,5 +142,75 @@ public class HouseResource
 		CosmosPagedIterable<HouseDAO> response = CosmosDBLayer.getInstance().houseDB.getDiscountedHousesNearFuture();
 
 		return Response.accepted(response.stream().toList()).build();
+	}
+
+	/////////////////// RENTAL ENDPOINTS ///////////////////////
+
+	@POST
+	@Path("/{houseID}/rental")
+	@Consumes(MediaType.APPLICATION_JSON)
+	public Response postRental(@PathParam("houseID") String houseID, RentalDAO rentalDAO) {
+		String rentalID = UUID.randomUUID().toString();
+		rentalDAO.setId(rentalID);
+		rentalDAO.setHouseID(houseID);
+		CosmosItemResponse<RentalDAO> response = CosmosDBLayer.getInstance().rentalDB.upsertRental(rentalDAO);
+
+		if (response.getStatusCode() == 201) {
+			try {
+				String path = "/rest/house/" + houseID + "/rental" + rentalID;
+				URI rentalURL = new URI(Constants.getApplicationURL() + path);
+				return Response.created(rentalURL).build();
+			} catch (URISyntaxException e) {
+				return Response.status(500).build();
+			}
+		}
+
+		return Response.status(response.getStatusCode()).build();
+	}
+
+	/**
+	 * Update a rental by a given id
+  	 * @param houseID the id of the house to which the rental belongs
+	 * @param rentalID the id of the rental to be updated
+	 * @param rentalDAO the updated content
+	 * @return nothing - 2xx if update was successful
+	 */
+	@PUT
+	@Path("/{houseID}/rental/{rentalID}")
+	@Consumes(MediaType.APPLICATION_JSON)
+	public Response putRental(@PathParam("houseID") String houseID, @PathParam("rentalID") String rentalID, RentalDAO rentalDAO) {
+		rentalDAO.setId(rentalID);
+		rentalDAO.setHouseID(houseID);
+		CosmosItemResponse<RentalDAO> response = CosmosDBLayer.getInstance().rentalDB.upsertRental(rentalDAO);
+
+		return Response.status(response.getStatusCode()).build();
+	}
+
+	/**
+	 * If rental with given id exists, return rental as JSON
+	 * @param houseID the id of the house to which the rental belongs
+	 * @param rentalID the id of the rental to be fetched
+	 * @return Response with rental JSON for given id in body
+	 */
+	@GET
+	@Path("/{houseID}/rental/{rentalID}")
+	@Produces(MediaType.APPLICATION_JSON)
+	public Response getRentalByID(@PathParam("houseID") String houseID, @PathParam("rentalID") String rentalID) {
+		CosmosItemResponse<RentalDAO> response = CosmosDBLayer.getInstance().rentalDB.getRentalByID(rentalID);
+
+		return Response.accepted(response.getItem()).build();
+	}
+
+	/**
+	 * Delete a rental by a given id
+	 * @param rentalID of the rental to be deleted
+	 * @return nothing - 2xx if delete succeeded
+	 */
+	@DELETE
+	@Path("/{houseID}/rental/{rentalID}")
+	public Response deleteRental(@PathParam("houseID") String houseID, @PathParam("rentalID") String rentalID) {
+		CosmosItemResponse<Object> response = CosmosDBLayer.getInstance().rentalDB.deleteRental(rentalID);
+
+		return Response.status(response.getStatusCode()).build();
 	}
 }
