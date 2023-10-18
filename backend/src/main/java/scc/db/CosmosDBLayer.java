@@ -10,7 +10,6 @@ public class CosmosDBLayer {
 	public HouseDB houseDB;
 	public QuestionDB questionDB;
 	public AnswerDB answerDB;
-	public AvailablePeriodDB availablePeriodDB;
 	public RentalDB rentalDB;
 
 	public static synchronized CosmosDBLayer getInstance() {
@@ -40,7 +39,6 @@ public class CosmosDBLayer {
 		answerDB = new AnswerDB(db.getContainer("answers"));
 		userDB = new UserDB(db.getContainer("users"));
 		houseDB = new HouseDB(db.getContainer("houses"));
-		availablePeriodDB = new AvailablePeriodDB(db.getContainer("availablePeriod"));
 		rentalDB = new RentalDB(db.getContainer("rental"));
 	}
 

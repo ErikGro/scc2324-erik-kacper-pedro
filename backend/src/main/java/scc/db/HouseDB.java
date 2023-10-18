@@ -22,27 +22,32 @@ public class HouseDB extends DBContainer {
     }
 
     public CosmosPagedIterable<HouseDAO> getHousesByUserID(String id) {
-        return container.queryItems("SELECT * FROM houses WHERE houses.ownerID=\"" + id + "\"", new CosmosQueryRequestOptions(), HouseDAO.class);
+        String query = "SELECT * FROM houses WHERE houses.ownerID=\"" + id + "\"";
+        return container.queryItems(query, new CosmosQueryRequestOptions(), HouseDAO.class);
     }
 
     public CosmosPagedIterable<HouseDAO> getHousesByCity(String name) {
-        return container.queryItems("SELECT * FROM houses WHERE houses.address.city=\"" + name + "\"", new CosmosQueryRequestOptions(), HouseDAO.class);
+        String query = "SELECT * FROM houses WHERE houses.address.city=\"" + name + "\"";
+        return container.queryItems(query, new CosmosQueryRequestOptions(), HouseDAO.class);
     }
 
     public CosmosPagedIterable<HouseDAO> getHousesByCityAndPeriod(String name, String startDate, String endDate) {
-        return container.queryItems("SELECT * FROM houses INNER JOIN availablePeriod ON houses.id=availablePeriod.houseID WHERE houses.address.city=\"" + name + "\" AND houses.startDate>=\"" + startDate + "\" AND houses.endDate>=\"" + endDate + "\"", new CosmosQueryRequestOptions(), HouseDAO.class);
+        String query = "SELECT * FROM houses WHERE houses.address.city=\"" + name + "\" AND EXISTS (SELECT VALUE p FROM p IN houses.availablePeriods WHERE p.startDate >= \"" + startDate + "\" AND p.startDate <= \"" + endDate + "\"";
+        return container.queryItems(query, new CosmosQueryRequestOptions(), HouseDAO.class);
     }
 
     public CosmosPagedIterable<HouseDAO> getDiscountedHousesNearFuture() {
         Calendar cal = Calendar.getInstance();
-        DateFormat dateFormat = new SimpleDateFormat("yyyy-MM");
+        DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
 
         String startDate = dateFormat.format(cal.getTime());
 
         cal.add(Calendar.MONTH, 3);
         String endDate = dateFormat.format(cal.getTime());
 
-        return container.queryItems("SELECT * FROM houses INNER JOIN availablePeriod ON houses.id=availablePeriod.houseID WHERE houses.startDate>=\"" + startDate + "\" AND houses.endDate>=\"" + endDate + "\"", new CosmosQueryRequestOptions(), HouseDAO.class);
+        String query = "SELECT * FROM houses WHERE EXISTS (SELECT VALUE p FROM p IN houses.availablePeriods WHERE p.startDate >= \"" + startDate + "\" AND p.startDate <= \"" + endDate + "\" AND IS_DEFINED(p.promotionPrice))";
+
+        return container.queryItems(query, new CosmosQueryRequestOptions(), HouseDAO.class);
     }
 
     public CosmosItemResponse<HouseDAO> getHouseByID(String id) {

@@ -12,15 +12,17 @@ public class HouseDAO {
     private String description;
     private String[] photoIDs;
 
+    private Set<AvailablePeriod> availablePeriods;
+
     public HouseDAO() {}
 
-    public HouseDAO(House house) {
-        this.ownerID = house.getOwnerID();
-        this.name = house.getName();
-        this.address = house.getAddress();
-        this.description = house.getDescription();
-        this.photoIDs = house.getPhotoIDs();
-    }
+//    public HouseDAO(House house) {
+//        this.ownerID = house.getOwnerID();
+//        this.name = house.getName();
+//        this.address = house.getAddress();
+//        this.description = house.getDescription();
+//        this.photoIDs = house.getPhotoIDs();
+//    }
 
     public String getId() {
         return id;
@@ -68,5 +70,13 @@ public class HouseDAO {
 
     public void setPhotoIDs(String[] photoIDs) {
         this.photoIDs = photoIDs;
+    }
+
+    public Set<AvailablePeriod> getAvailablePeriods() {
+        return availablePeriods;
+    }
+
+    public void setAvailablePeriods(Set<AvailablePeriod> availablePeriods) {
+        this.availablePeriods = availablePeriods;
     }
 }
