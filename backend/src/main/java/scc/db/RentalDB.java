@@ -7,14 +7,13 @@ import com.azure.cosmos.models.CosmosQueryRequestOptions;
 import com.azure.cosmos.models.PartitionKey;
 import com.azure.cosmos.util.CosmosPagedIterable;
 import scc.data.RentalDAO;
-import scc.data.house.HouseDAO;
 
 public class RentalDB extends DBContainer {
     RentalDB(CosmosContainer container) {
         super(container);
     }
 
-    public CosmosItemResponse<RentalDAO> putRental(RentalDAO rental) {
+    public CosmosItemResponse<RentalDAO> upsertRental(RentalDAO rental) {
         return container.upsertItem(rental);
     }
 

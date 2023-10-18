@@ -5,7 +5,6 @@ import com.azure.cosmos.util.CosmosPagedIterable;
 import jakarta.ws.rs.*;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
-import scc.data.Rental;
 import scc.data.RentalDAO;
 import scc.db.CosmosDBLayer;
 import scc.utils.Constants;
@@ -19,13 +18,13 @@ public class RentalResource {
     @POST
     @Path("/")
     @Consumes(MediaType.APPLICATION_JSON)
-    public Response post(Rental rental) {
-        CosmosItemResponse<RentalDAO> response = putRental(UUID.randomUUID().toString(), rental);
+    public Response post(RentalDAO rentalDAO) {
+        String id = UUID.randomUUID().toString();
+        rentalDAO.setId(id);
+        CosmosItemResponse<RentalDAO> response = CosmosDBLayer.getInstance().rentalDB.upsertRental(rentalDAO);
 
         if (response.getStatusCode() == 201) {
             try {
-                String id = response.getItem().getId();
-
                 URI rentalURL = new URI(Constants.getApplicationURL() + "/rest/rental/" + id);
                 return Response.created(rentalURL).build();
             } catch (URISyntaxException e) {
@@ -39,14 +38,15 @@ public class RentalResource {
     /**
      * Update a rental by a given id
      * @param id the id of the rental to be updated
-     * @param rental the updated content
+     * @param rentalDAO the updated content
      * @return nothing - 2xx if update was successful
      */
     @PUT
     @Path("/{id}")
     @Consumes(MediaType.APPLICATION_JSON)
-    public Response put(@PathParam("id") String id, Rental rental) {
-        CosmosItemResponse<RentalDAO> response = putRental(id, rental);
+    public Response put(@PathParam("id") String id, RentalDAO rentalDAO) {
+        rentalDAO.setId(id);
+        CosmosItemResponse<RentalDAO> response = CosmosDBLayer.getInstance().rentalDB.upsertRental(rentalDAO);
 
         return Response.status(response.getStatusCode()).build();
     }
@@ -90,12 +90,5 @@ public class RentalResource {
         CosmosItemResponse<Object> response = CosmosDBLayer.getInstance().rentalDB.deleteRental(id);
 
         return Response.status(response.getStatusCode()).build();
-    }
-
-    private CosmosItemResponse<RentalDAO> putRental(String id, Rental rental) {
-        RentalDAO rentalDAO = new RentalDAO(rental);
-        rentalDAO.setId(id);
-
-        return CosmosDBLayer.getInstance().rentalDB.putRental(rentalDAO);
     }
 }

@@ -11,13 +11,6 @@ public class RentalDAO {
     private Float price;
 
     public RentalDAO() {}
-    public RentalDAO(Rental rental) {
-        this.houseID = rental.getHouseID();
-        this.tenantID = rental.getTenantID();
-        this.startDate = rental.getStartDate();
-        this.endDate = rental.getEndDate();
-        this.price = rental.getPrice();
-    }
 
     public String getId() {
         return id;

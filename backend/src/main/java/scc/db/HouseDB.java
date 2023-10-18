@@ -17,7 +17,7 @@ public class HouseDB extends DBContainer {
         super(container);
     }
 
-    public CosmosItemResponse<HouseDAO> putHouse(HouseDAO house) {
+    public CosmosItemResponse<HouseDAO> upsertHouse(HouseDAO house) {
         return container.upsertItem(house);
     }
 

@@ -29,7 +29,7 @@ public class HouseResource
 	@Consumes(MediaType.APPLICATION_JSON)
 	public Response post(HouseDAO houseDAO) {
 		houseDAO.setId(UUID.randomUUID().toString());
-		CosmosItemResponse<HouseDAO> response = CosmosDBLayer.getInstance().houseDB.putHouse(houseDAO);
+		CosmosItemResponse<HouseDAO> response = CosmosDBLayer.getInstance().houseDB.upsertHouse(houseDAO);
 
 		if (response.getStatusCode() == 201) {
 			try {
@@ -56,7 +56,7 @@ public class HouseResource
 	@Consumes(MediaType.APPLICATION_JSON)
 	public Response put(@PathParam("id") String id, HouseDAO houseDAO) {
 		houseDAO.setId(id);
-		CosmosItemResponse<HouseDAO> response = CosmosDBLayer.getInstance().houseDB.putHouse(houseDAO);
+		CosmosItemResponse<HouseDAO> response = CosmosDBLayer.getInstance().houseDB.upsertHouse(houseDAO);
 
 		return Response.status(response.getStatusCode()).build();
 	}
