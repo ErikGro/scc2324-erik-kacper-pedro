@@ -8,6 +8,9 @@ config:
     - duration: 20
       arrivalRate: 5
       name: Main test
+  plugins:
+    metrics-by-endpoint: 
+      useOnlyRequestNames: true
   http:
     defaults:
       headers:
@@ -19,6 +22,7 @@ scenarios:
     flow:
       - post:
           url: "/house"
+          name: "POST /house"
           json:
             name: "testHouse"
             ownerID: "testOwner"
@@ -29,24 +33,7 @@ scenarios:
           afterResponse: "afterPOSTHandler"
       - get:
           url: "/house/{{ location }}"
+          name: "GET /house"
       - delete:
           url: "/house/{{ location }}"
-  - name: "Rental Flow"
-    weight: 1
-    flow:
-      - post:
-          url: "/rental"
-          json:
-            houseID: "unknowHouseID"
-            tenantID: "unknownTenantID"
-            startDate: "2024-01-01"
-            endDate: "2024-03-01"
-            price: 1200.50
-          capture:
-            - header: "location"
-              as: "location"
-          afterResponse: "afterPOSTHandler"
-      - get:
-          url: "/rental/{{ location }}"
-      - delete:
-          url: "/rental/{{ location }}"
+          name: "DELETE /house"
