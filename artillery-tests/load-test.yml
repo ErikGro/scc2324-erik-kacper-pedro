@@ -1,0 +1,52 @@
+config:
+  target: https://scc-backend-erikg.azurewebsites.net/rest
+  phases:
+    - duration: 10
+      arrivalRate: 1 # virtual users per second
+      rampTo: 5
+      name: Warm up phase
+    - duration: 20
+      arrivalRate: 5
+      name: Main test
+  http:
+    defaults:
+      headers:
+        Content-Type: "application/json"
+  processor: "./processor.js"
+scenarios:
+  - name: "House Flow"
+    weight: 1
+    flow:
+      - post:
+          url: "/house"
+          json:
+            name: "testHouse"
+            ownerID: "testOwner"
+            description: "testDescription"
+          capture:
+            - header: "location"
+              as: "location"
+          afterResponse: "afterPOSTHandler"
+      - get:
+          url: "/house/{{ location }}"
+      - delete:
+          url: "/house/{{ location }}"
+  - name: "Rental Flow"
+    weight: 1
+    flow:
+      - post:
+          url: "/rental"
+          json:
+            houseID: "unknowHouseID"
+            tenantID: "unknownTenantID"
+            startDate: "2024-01-01"
+            endDate: "2024-03-01"
+            price: 1200.50
+          capture:
+            - header: "location"
+              as: "location"
+          afterResponse: "afterPOSTHandler"
+      - get:
+          url: "/rental/{{ location }}"
+      - delete:
+          url: "/rental/{{ location }}"
