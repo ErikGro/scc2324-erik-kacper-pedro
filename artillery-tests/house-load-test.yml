@@ -18,7 +18,6 @@ config:
   processor: "./processor.js"
 scenarios:
   - name: "House Flow"
-    weight: 1
     flow:
       - post:
           url: "/house"
@@ -29,11 +28,11 @@ scenarios:
             description: "testDescription"
           capture:
             - header: "location"
-              as: "location"
-          afterResponse: "afterPOSTHandler"
+              as: "houseID"
+          afterResponse: "setHouseID"
       - get:
-          url: "/house/{{ location }}"
-          name: "GET /house"
+          url: "/house/{{ houseID }}"
+          name: "GET /house/:houseID"
       - delete:
-          url: "/house/{{ location }}"
-          name: "DELETE /house"
+          url: "/house/{{ houseID }}"
+          name: "DELETE /house/:houseID"
