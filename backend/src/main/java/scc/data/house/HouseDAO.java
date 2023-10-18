@@ -11,19 +11,18 @@ public class HouseDAO {
     private Address address;
     private String description;
     private String[] photoIDs;
-    private Set<Month> availableMonths;
-    private Map<Month, Float> normalPricePerMonth;
-    private Map<Month, Float> promotionPricePerMonth;
+
+    private Set<AvailablePeriod> availablePeriods;
 
     public HouseDAO() {}
 
-    public HouseDAO(House house) {
-        this.ownerID = house.getOwnerID();
-        this.name = house.getName();
-        this.address = house.getAddress();
-        this.description = house.getDescription();
-        this.photoIDs = house.getPhotoIDs();
-    }
+//    public HouseDAO(House house) {
+//        this.ownerID = house.getOwnerID();
+//        this.name = house.getName();
+//        this.address = house.getAddress();
+//        this.description = house.getDescription();
+//        this.photoIDs = house.getPhotoIDs();
+//    }
 
     public String getId() {
         return id;
@@ -65,35 +64,19 @@ public class HouseDAO {
         this.address = address;
     }
 
-    public Set<Month> getAvailableMonths() {
-        return availableMonths;
-    }
-
-    public void setAvailableMonths(Set<Month> availableMonths) {
-        this.availableMonths = availableMonths;
-    }
-
-    public Map<Month, Float> getNormalPricePerMonth() {
-        return normalPricePerMonth;
-    }
-
-    public void setNormalPricePerMonth(Map<Month, Float> normalPricePerMonth) {
-        this.normalPricePerMonth = normalPricePerMonth;
-    }
-
-    public Map<Month, Float> getPromotionPricePerMonth() {
-        return promotionPricePerMonth;
-    }
-
-    public void setPromotionPricePerMonth(Map<Month, Float> promotionPricePerMonth) {
-        this.promotionPricePerMonth = promotionPricePerMonth;
-    }
-
     public String[] getPhotoIDs() {
         return photoIDs;
     }
 
     public void setPhotoIDs(String[] photoIDs) {
         this.photoIDs = photoIDs;
+    }
+
+    public Set<AvailablePeriod> getAvailablePeriods() {
+        return availablePeriods;
+    }
+
+    public void setAvailablePeriods(Set<AvailablePeriod> availablePeriods) {
+        this.availablePeriods = availablePeriods;
     }
 }

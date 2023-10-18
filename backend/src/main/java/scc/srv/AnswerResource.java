@@ -44,12 +44,12 @@ public class AnswerResource {
         HouseDB dbHouse = dbLayer.houseDB;
         
         // Get house from db
-        if (!dbHouse.houseExists(houseId)) {
+        if (!dbHouse.hasHouse(houseId)) {
             return Response.status(404, "House doesn't exist.").build();
         }
 
         // Check if user is the owner of the house
-        if (!dbHouse.getHouse(houseId).iterator().next().getOwnerID().equals(ans.getUserId())) {
+        if (!dbHouse.getHouseByID(houseId).getItem().getOwnerID().equals(ans.getUserId())) {
             return Response.status(403, "Only the onwer of the house can respond to the question.").build();
         }
 

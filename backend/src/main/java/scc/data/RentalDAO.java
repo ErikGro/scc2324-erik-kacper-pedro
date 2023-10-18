@@ -6,20 +6,16 @@ public class RentalDAO {
     private String id;
     private String houseID;
     private String tenantID;
-    private Month startMonth;
-    private Integer startYear;
-    private Month endMonth;
-    private Integer endYear;
+    private String startDate;
+    private String endDate;
     private Float price;
 
     public RentalDAO() {}
     public RentalDAO(Rental rental) {
         this.houseID = rental.getHouseID();
         this.tenantID = rental.getTenantID();
-        this.startMonth = rental.getStartMonth();
-        this.startYear = rental.getStartYear();
-        this.endMonth = rental.getEndMonth();
-        this.endYear = rental.getEndYear();
+        this.startDate = rental.getStartDate();
+        this.endDate = rental.getEndDate();
         this.price = rental.getPrice();
     }
 
@@ -47,36 +43,20 @@ public class RentalDAO {
         this.tenantID = tenantID;
     }
 
-    public Month getStartMonth() {
-        return startMonth;
+    public String getStartDate() {
+        return startDate;
     }
 
-    public void setStartMonth(Month startMonth) {
-        this.startMonth = startMonth;
+    public void setStartDate(String startDate) {
+        this.startDate = startDate;
     }
 
-    public Integer getStartYear() {
-        return startYear;
+    public String getEndDate() {
+        return endDate;
     }
 
-    public void setStartYear(Integer startYear) {
-        this.startYear = startYear;
-    }
-
-    public Month getEndMonth() {
-        return endMonth;
-    }
-
-    public void setEndMonth(Month endMonth) {
-        this.endMonth = endMonth;
-    }
-
-    public Integer getEndYear() {
-        return endYear;
-    }
-
-    public void setEndYear(Integer endYear) {
-        this.endYear = endYear;
+    public void setEndDate(String endDate) {
+        this.endDate = endDate;
     }
 
     public Float getPrice() {

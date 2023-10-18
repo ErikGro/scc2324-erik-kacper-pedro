@@ -5,20 +5,16 @@ import java.time.Month;
 public class Rental {
     private String houseID;
     private String tenantID;
-    private Month startMonth;
-    private Integer startYear;
-    private Month endMonth;
-    private Integer endYear;
+    private String startDate;
+    private String endDate;
     private Float price;
 
     public Rental() {}
-    public Rental(String houseID, String tenantID, Month startMonth, Integer startYear, Month endMonth, Integer endYear, Float price) {
+    public Rental(String houseID, String tenantID, String startDate, String endDate, Float price) {
         this.houseID = houseID;
         this.tenantID = tenantID;
-        this.startMonth = startMonth;
-        this.startYear = startYear;
-        this.endMonth = endMonth;
-        this.endYear = endYear;
+        this.startDate = startDate;
+        this.endDate = endDate;
         this.price = price;
     }
 
@@ -38,36 +34,20 @@ public class Rental {
         this.tenantID = tenantID;
     }
 
-    public Month getStartMonth() {
-        return startMonth;
+    public String getStartDate() {
+        return startDate;
     }
 
-    public void setStartMonth(Month startMonth) {
-        this.startMonth = startMonth;
+    public void setStartDate(String startDate) {
+        this.startDate = startDate;
     }
 
-    public Integer getStartYear() {
-        return startYear;
+    public String getEndDate() {
+        return endDate;
     }
 
-    public void setStartYear(Integer startYear) {
-        this.startYear = startYear;
-    }
-
-    public Month getEndMonth() {
-        return endMonth;
-    }
-
-    public void setEndMonth(Month endMonth) {
-        this.endMonth = endMonth;
-    }
-
-    public Integer getEndYear() {
-        return endYear;
-    }
-
-    public void setEndYear(Integer endYear) {
-        this.endYear = endYear;
+    public void setEndDate(String endDate) {
+        this.endDate = endDate;
     }
 
     public Float getPrice() {
