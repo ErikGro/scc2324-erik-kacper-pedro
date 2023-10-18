@@ -157,7 +157,7 @@ public class HouseResource
 
 		if (response.getStatusCode() == 201) {
 			try {
-				String path = "/rest/house/" + houseID + "/rental" + rentalID;
+				String path = "/rest/house/" + houseID + "/rental/" + rentalID;
 				URI rentalURL = new URI(Constants.getApplicationURL() + path);
 				return Response.created(rentalURL).build();
 			} catch (URISyntaxException e) {
