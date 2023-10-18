@@ -81,6 +81,18 @@ public class HouseResource
 	}
 
 	/**
+	 * Delete a house by a given id
+	 * @param id of the house to be deleted
+	 * @return nothing - 2xx if delete succeeded
+	 */
+	@DELETE
+	@Path("/{id}")
+	public Response delete(@PathParam("id") String id) {
+		CosmosItemResponse<Object> response = CosmosDBLayer.getInstance().houseDB.deleteHouse(id);
+		return Response.status(response.getStatusCode()).build();
+	}
+
+	/**
 	 * Returns all houses for the given query Parameter.
 	 * Valid Query parameters are:
 	 * - userID
@@ -101,17 +113,21 @@ public class HouseResource
 									 @QueryParam("end-date") String endDate) {
 		CosmosPagedIterable<HouseDAO> response;
 
-		if (userID != null) { // List of houses of a given user
+		if (isValidQuery(userID)) { // List of houses of a given user
 			response = CosmosDBLayer.getInstance().houseDB.getHousesByUserID(userID);
-		} else if (city != null && startDate != null && endDate != null) { // Search of available houses for a given period and location
+		} else if (isValidQuery(city) && isValidQuery(startDate) && isValidQuery(endDate)) { // Search of available houses for a given period and location
 			response = CosmosDBLayer.getInstance().houseDB.getHousesByCityAndPeriod(city, startDate, endDate);
-		} else if (city != null) { // List of available houses for a given location
+		} else if (isValidQuery(city)) { // List of available houses for a given location
 			response = CosmosDBLayer.getInstance().houseDB.getHousesByCity(city);
 		} else {
 			return Response.status(400).build();
 		}
 
 		return Response.accepted(response.stream().toList()).build();
+	}
+
+	private boolean isValidQuery(String string) {
+		return string != null && !string.trim().isEmpty();
 	}
 
 	/**
@@ -125,31 +141,5 @@ public class HouseResource
 		CosmosPagedIterable<HouseDAO> response = CosmosDBLayer.getInstance().houseDB.getDiscountedHousesNearFuture();
 
 		return Response.accepted(response.stream().toList()).build();
-	}
-
-	/**
-	 * Returns all houses for a given city
-	 * @param city the city to be queried
-	 * @return all houses for a given query parameter city
-	 */
-	@GET
-	@Path("/")
-	@Produces(MediaType.APPLICATION_JSON)
-	public Response getHousesByCity(@QueryParam("city") String city) {
-		CosmosPagedIterable<HouseDAO> response = CosmosDBLayer.getInstance().houseDB.getHousesByCity(city);
-
-		return Response.accepted(response.stream().toList()).build();
-	}
-
-	/**
-	 * Delete a house by a given id
-	 * @param id of the house to be deleted
-	 * @return nothing - 2xx if delete succeeded
-	 */
-	@DELETE
-	@Path("/{id}")
-	public Response delete(@PathParam("id") String id) {
-		CosmosItemResponse<Object> response = CosmosDBLayer.getInstance().houseDB.deleteHouse(id);
-		return Response.status(response.getStatusCode()).build();
 	}
 }
