@@ -1,6 +1,7 @@
 package scc.srv;
 
 import scc.db.*;
+import scc.db.blob.BlobLayer;
 
 import java.util.Locale;
 import com.azure.cosmos.models.CosmosItemResponse;
@@ -124,4 +125,46 @@ public class UserResource
 		return Response.ok(id).build();
 	}
 
+	@Path("/{id}/photo")
+	@POST
+	@Consumes(MediaType.APPLICATION_OCTET_STREAM)
+	@Produces(MediaType.TEXT_PLAIN)
+	public Response uploadPhoto(@PathParam("id") String id, byte[] photo) {
+		if(!userExists(id))
+			return Response.status(400).entity("No such user").build();
+		
+		CosmosDBLayer db0=CosmosDBLayer.getInstance();
+		UserDB db=db0.userDB;
+		UserDAO u = db.getUserById(id).iterator().next();
+		String photoId = u.getPhotoId();
+		if(photoId == null) {
+			photoId = "u:" + System.currentTimeMillis();
+			u.setPhotoId(photoId);
+		}
+
+		BlobLayer blobLayer = BlobLayer.getInstance();
+		blobLayer.usersContainer.uploadImage(photoId, photo);
+		
+		db.updateUser(u);
+		return Response.ok(photoId).build();
+	}
+
+	@Path("/{id}/photo")
+	@GET
+	@Produces(MediaType.APPLICATION_OCTET_STREAM)
+	public Response getPhoto(@PathParam("id") String id) {
+		if(!userExists(id))
+			return Response.status(400).entity("No such user").build();
+		
+		CosmosDBLayer db0=CosmosDBLayer.getInstance();
+		UserDB db=db0.userDB;
+		UserDAO u = db.getUserById(id).iterator().next();
+		String photoId = u.getPhotoId();
+		if(photoId == null)
+			return Response.status(404).entity("No photo for user").build();
+
+		BlobLayer blobLayer = BlobLayer.getInstance();
+		byte[] photo = blobLayer.usersContainer.getImage(photoId);
+		return Response.ok(photo).build();
+	}
 }
