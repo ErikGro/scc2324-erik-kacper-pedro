@@ -36,4 +36,13 @@ public class UserDB extends DBContainer {
     public CosmosPagedIterable<UserDAO> getUsers() {
         return container.queryItems("SELECT * FROM users ", new CosmosQueryRequestOptions(), UserDAO.class);
     }
+    public void deleteAllUsers() {
+        CosmosPagedIterable<UserDAO> users = getUsers();
+        
+        for (UserDAO user : users) {
+            delUser(user);
+        }
+    }
+
+  
 }
