@@ -21,8 +21,10 @@
 -   Media **(/rest/media)** GET/POST: upload media, download media.
 -   House **(/rest/house)** GET/PUT/POST/DELETE: create a house, update a house (HouseAvailability), delete a house. 
 -   Rental **(/rest/house/{id}/rental)** GET/PUT/POST: base URL for rental information, supporting operations for creating, updating and listing rental information.
--   Question **(/rest/house/{id}/question/{id}/?type=reply)** GET/POST: create question or reply
-- Questions **(/rest/house/{id}/questions)** GET/POST: list questions for a house
+-   Question **(/rest/house/{houseId}/question/)** POST/GET Posting a question about a house or listing all questions available for a house
+-   Question **(/rest/house/{houseId}/question/{questionId})** GET - return a specific quesion with questionId
+-   Answers **(/rest/house/{houseId}/question/{questionId}/answer)** POST: Replying to the question with questionId
+
 
 ## Models
 ### CosmosDB
