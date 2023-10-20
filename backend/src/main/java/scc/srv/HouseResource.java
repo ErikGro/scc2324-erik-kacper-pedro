@@ -6,12 +6,19 @@ import jakarta.ws.rs.*;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
 import scc.data.RentalDAO;
+import scc.data.house.AvailablePeriod;
 import scc.data.house.HouseDAO;
 import scc.db.CosmosDBLayer;
 import scc.utils.Constants;
 
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.time.Duration;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.temporal.ChronoUnit;
+import java.util.Optional;
+import java.util.Set;
 import java.util.UUID;
 
 /**
@@ -153,6 +160,36 @@ public class HouseResource
 		String rentalID = UUID.randomUUID().toString();
 		rentalDAO.setId(rentalID);
 		rentalDAO.setHouseID(houseID);
+
+		CosmosItemResponse<HouseDAO> responseHouse = CosmosDBLayer.getInstance().houseDB.getHouseByID(houseID);
+		HouseDAO houseDAO = responseHouse.getItem();
+
+		// TODO catch Exception
+		LocalDate start = LocalDate.parse(rentalDAO.getStartDate(), Constants.dateFormat);
+		LocalDate end = LocalDate.parse(rentalDAO.getEndDate(), Constants.dateFormat);
+
+		// Check if there is an available period which contains the wanted rental period
+		Optional<AvailablePeriod> period = houseDAO
+				.getAvailablePeriods()
+				.stream()
+				.filter(p -> p.containsPeriod(start, end))
+				.findFirst();
+
+		if (period.isEmpty()) {
+			return Response.noContent().build();
+		}
+
+		// Update house available periods
+		Set<AvailablePeriod> newPeriods = period.get().subtract(start, end);
+		houseDAO.getAvailablePeriods().remove(period.get());
+		houseDAO.getAvailablePeriods().addAll(newPeriods);
+		CosmosDBLayer.getInstance().houseDB.upsertHouse(houseDAO);
+
+		// Compute price of the rental
+		long daysBetween = start.until(end, ChronoUnit.DAYS);
+		Float price = daysBetween * period.get().getNormalPricePerDay();
+		rentalDAO.setPrice(price);
+
 		CosmosItemResponse<RentalDAO> response = CosmosDBLayer.getInstance().rentalDB.upsertRental(rentalDAO);
 
 		if (response.getStatusCode() == 201) {
