@@ -2,9 +2,13 @@ package scc.srv;
 
 import com.azure.cosmos.models.CosmosItemResponse;
 import com.azure.cosmos.util.CosmosPagedIterable;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.ws.rs.*;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
+import redis.clients.jedis.Jedis;
+import scc.cache.RedisCache;
 import scc.data.RentalDAO;
 import scc.data.house.AvailablePeriod;
 import scc.data.house.HouseDAO;
@@ -13,9 +17,7 @@ import scc.utils.Constants;
 
 import java.net.URI;
 import java.net.URISyntaxException;
-import java.time.Duration;
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
 import java.util.Optional;
 import java.util.Set;
@@ -78,11 +80,29 @@ public class HouseResource
 	@Path("/{id}")
 	@Produces(MediaType.APPLICATION_JSON)
 	public Response getHouseByID(@PathParam("id") String id) {
-		CosmosItemResponse<HouseDAO> responseHouse = CosmosDBLayer.getInstance().houseDB.getHouseByID(id);
-		HouseDAO house = responseHouse.getItem();
+		ObjectMapper mapper = new ObjectMapper();
+		Jedis jedis = RedisCache.getCachePool().getResource();
 
-		if (responseHouse.getStatusCode() < 300 && house != null) {
-			return Response.accepted(house).build();
+		try {
+			HouseDAO houseDAOcache = mapper.readValue(jedis.get("house:" + id), HouseDAO.class);
+			jedis.close();
+			return Response.accepted(houseDAOcache).build();
+		} catch (JsonProcessingException e) {
+			// Item not in cache
+		}
+
+		// Load house from database
+		CosmosItemResponse<HouseDAO> responseHouse = CosmosDBLayer.getInstance().houseDB.getHouseByID(id);
+		HouseDAO houseDAO = responseHouse.getItem();
+
+		try {
+			jedis.set("house:" + houseDAO.getId(), mapper.writeValueAsString(houseDAO));
+		} catch (JsonProcessingException e) {
+			
+        }
+
+        if (responseHouse.getStatusCode() < 300) {
+			return Response.accepted(houseDAO).build();
 		} else {
 			return Response.noContent().build();
 		}
