@@ -309,6 +309,13 @@ public class HouseResource
 	@Path("/{houseID}/photo/{photoID}")
 	@Produces(MediaType.APPLICATION_OCTET_STREAM)
 	public Response getPhoto(@PathParam("houseID") String houseID, @PathParam("photoID") String photoID) {
+
+		CosmosDBLayer dbLayer = CosmosDBLayer.getInstance();
+		HouseDB dbHouse = dbLayer.houseDB;
+		if (!dbHouse.houseExists(houseID)) {
+			return Response.status(404).entity("House doesn't exist.").build();
+		}
+		
 		BlobLayer blobLayer = BlobLayer.getInstance();
 
 		byte[] photo;
