@@ -209,20 +209,10 @@ public Response deleteAllUsers() {
 		if(!userExists(id))
 			return Response.status(400).entity("No such user").build();
 		
-		CosmosDBLayer db0=CosmosDBLayer.getInstance();
-		UserDB db=db0.userDB;
-		UserDAO u = db.getUserById(id).iterator().next();
-		String photoId = u.getPhotoId();
-		if(photoId == null) {
-			photoId = "u:" + System.currentTimeMillis();
-			u.setPhotoId(photoId);
-		}
-
 		BlobLayer blobLayer = BlobLayer.getInstance();
-		blobLayer.usersContainer.uploadImage(photoId, photo);
+		blobLayer.usersContainer.uploadImage(id, photo);
 		
-		db.updateUser(u);
-		return Response.ok(photoId).build();
+		return Response.ok(id).build();
 	}
 
 	@Path("/{id}/photo")
@@ -232,15 +222,16 @@ public Response deleteAllUsers() {
 		if(!userExists(id))
 			return Response.status(400).entity("No such user").build();
 		
-		CosmosDBLayer db0=CosmosDBLayer.getInstance();
-		UserDB db=db0.userDB;
-		UserDAO u = db.getUserById(id).iterator().next();
-		String photoId = u.getPhotoId();
-		if(photoId == null)
-			return Response.status(404).entity("No photo for user").build();
 
 		BlobLayer blobLayer = BlobLayer.getInstance();
-		byte[] photo = blobLayer.usersContainer.getImage(photoId);
+
+		byte[] photo;
+		try {
+			photo = blobLayer.usersContainer.getImage(id);
+		} catch (Exception e) {
+			return Response.status(404).entity("No photo found").build();
+		}
+		
 		return Response.ok(photo).build();
 	}
 }
