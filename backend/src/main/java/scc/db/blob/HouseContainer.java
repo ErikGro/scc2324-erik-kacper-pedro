@@ -1,8 +1,11 @@
 package scc.db.blob;
 
+import java.io.ByteArrayInputStream;
+
 import com.azure.core.util.BinaryData;
 import com.azure.storage.blob.BlobClient;
 import com.azure.storage.blob.BlobContainerClient;
+import com.azure.storage.blob.models.BlobHttpHeaders;
 
 public class HouseContainer extends BlobContainer {
 
@@ -14,8 +17,11 @@ public class HouseContainer extends BlobContainer {
     public String uploadImage(String id, byte[] image) {
         
         BlobClient blobClient = container.getBlobClient(id);
-        BinaryData binaryImage = BinaryData.fromBytes(image);
-        blobClient.upload(binaryImage);
+        
+        blobClient.upload(new ByteArrayInputStream(image), image.length, true);
+
+        BlobHttpHeaders headers = new BlobHttpHeaders().setContentType("image/jpeg");
+        blobClient.setHttpHeaders(headers);
 
         return "File uploaded successfully ";
     }
@@ -23,9 +29,7 @@ public class HouseContainer extends BlobContainer {
 
     public byte[] getImage(String id) {
         BlobClient blobClient = container.getBlobClient(id);
-
         BinaryData image = blobClient.downloadContent();
-
         return image.toBytes();
     }
 }

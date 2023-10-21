@@ -8,6 +8,8 @@ import jakarta.ws.rs.core.Response;
 import scc.data.RentalDAO;
 import scc.data.house.HouseDAO;
 import scc.db.CosmosDBLayer;
+import scc.db.HouseDB;
+import scc.db.blob.BlobLayer;
 import scc.utils.Constants;
 
 import java.net.URI;
@@ -30,6 +32,7 @@ public class HouseResource
 	@Consumes(MediaType.APPLICATION_JSON)
 	public Response postHouse(HouseDAO houseDAO) {
 		houseDAO.setId(UUID.randomUUID().toString());
+		houseDAO.setPhotoIDs(new String[0]);
 		CosmosItemResponse<HouseDAO> response = CosmosDBLayer.getInstance().houseDB.upsertHouse(houseDAO);
 
 		if (response.getStatusCode() == 201) {
@@ -213,4 +216,79 @@ public class HouseResource
 
 		return Response.status(response.getStatusCode()).build();
 	}
+
+	/////////////////// PHOTOS ENDPOINTS ///////////////////////
+	@POST
+	@Path("/{houseID}/photo")
+	@Consumes(MediaType.APPLICATION_OCTET_STREAM)
+	@Produces(MediaType.TEXT_PLAIN)
+	public Response uploadPhoto(@PathParam("houseID") String houseID, byte[] photo) {
+
+		CosmosDBLayer dbLayer = CosmosDBLayer.getInstance();
+        HouseDB dbHouse = dbLayer.houseDB;
+        if (!dbHouse.houseExists(houseID)) {
+            return Response.status(404).entity("House doesn't exist.").build();
+        }
+
+		BlobLayer blobLayer = BlobLayer.getInstance();
+
+		String photoID = UUID.randomUUID().toString();
+		blobLayer.housesContainer.uploadImage(photoID, photo);
+
+		// Update house photoIDs list by new photoID
+		HouseDAO house = dbHouse.getHouseByID(houseID).getItem();
+		
+		String[] photoIDs = house.getPhotoIDs();
+		String[] newPhotoIDs = new String[photoIDs.length + 1];
+		System.arraycopy(photoIDs, 0, newPhotoIDs, 0, photoIDs.length);
+		newPhotoIDs[photoIDs.length] = photoID;
+		house.setPhotoIDs(newPhotoIDs);
+		dbHouse.upsertHouse(house);
+
+		return Response.ok(houseID).entity("Photo with id " + photoID + " uploaded to house with id " + houseID).build();
+	}
+
+	@GET
+	@Path("/{houseID}/photo/{photoID}")
+	@Produces(MediaType.APPLICATION_OCTET_STREAM)
+	public Response getPhoto(@PathParam("houseID") String houseID, @PathParam("photoID") String photoID) {
+		BlobLayer blobLayer = BlobLayer.getInstance();
+
+		byte[] photo;
+		try {
+			photo = blobLayer.housesContainer.getImage(photoID);
+		} catch (Exception e) {
+			return Response.status(404).entity("No photo found").build();
+		}
+
+		return Response.ok(photo).build();
+	}
+
+	// Get list of all photos for a house
+	@GET
+	@Path("/{houseID}/photo")
+	@Produces(MediaType.APPLICATION_JSON)
+	public Response getPhotos(@PathParam("houseID") String houseID) {
+		CosmosDBLayer dbLayer = CosmosDBLayer.getInstance();
+		HouseDB dbHouse = dbLayer.houseDB;
+		if (!dbHouse.houseExists(houseID)) {
+			return Response.status(404).entity("House doesn't exist.").build();
+		}
+
+		HouseDAO house = dbHouse.getHouseByID(houseID).getItem();
+		String[] photoIDs = house.getPhotoIDs();
+
+		// Get actual photos from blob storage
+		BlobLayer blobLayer = BlobLayer.getInstance();
+		byte[][] photos = new byte[photoIDs.length][];
+		for (int i = 0; i < photoIDs.length; i++) {
+			try {
+				photos[i] = blobLayer.housesContainer.getImage(photoIDs[i]);
+			} catch (Exception e) {
+				return Response.status(404).entity("No photo found").build();
+			}
+		}
+		return Response.ok(photos).build();
+	}
+	
 }
