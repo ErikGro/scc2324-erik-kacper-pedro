@@ -48,7 +48,6 @@ public class UserResource
 		u.setId(id);
 		u.setName(data.getName());
 		u.setPwd(data.getPwd());
-		u.setPhotoId(data.getPhotoId());
 		u.setHouseIds(data.getHouseIds());
 
 		res = db.putUser(u);
@@ -194,7 +193,6 @@ public Response deleteAllUsers() {
 		u.setId(id);
 		u.setName(data.getName());
 		u.setPwd(data.getPwd());
-		u.setPhotoId(data.getPhotoId());
 		u.setHouseIds(data.getHouseIds());
 
 		 db.putUser(u);
