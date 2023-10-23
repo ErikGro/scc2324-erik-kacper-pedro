@@ -2,13 +2,12 @@ package scc.srv;
 
 import com.azure.cosmos.models.CosmosItemResponse;
 import com.azure.cosmos.util.CosmosPagedIterable;
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.ws.rs.*;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
-import redis.clients.jedis.Jedis;
+import scc.cache.HouseService;
 import scc.cache.RedisCache;
+import scc.cache.ServiceResponse;
 import scc.data.RentalDAO;
 import scc.data.house.AvailablePeriod;
 import scc.data.house.HouseDAO;
@@ -31,6 +30,8 @@ import java.util.UUID;
 @Path("/house")
 public class HouseResource
 {
+	private final HouseService houseService = new HouseService();
+
 	/**
 	 * Create a single house
 	 * @param houseDAO the house to be created
@@ -42,13 +43,14 @@ public class HouseResource
 	public Response postHouse(HouseDAO houseDAO) {
 		houseDAO.setId(UUID.randomUUID().toString());
 		houseDAO.setPhotoIDs(new String[0]);
-		CosmosItemResponse<HouseDAO> response = CosmosDBLayer.getInstance().houseDB.upsertHouse(houseDAO);
 
-		if (response.getStatusCode() == 201) {
+		ServiceResponse<HouseDAO> response = houseService.upsert(houseDAO);
+
+		if (response.getStatusCode() == 201 && response.getItem().isPresent()) {
 			try {
-				String id = response.getItem().getId();
-
+				String id = response.getItem().get().getId();
 				URI houseURL = new URI(Constants.getApplicationURL() + "/rest/house/" + id);
+
 				return Response.created(houseURL).build();
 			} catch (URISyntaxException e) {
 				return Response.status(500).build();
@@ -69,7 +71,7 @@ public class HouseResource
 	@Consumes(MediaType.APPLICATION_JSON)
 	public Response putHouse(@PathParam("id") String id, HouseDAO houseDAO) {
 		houseDAO.setId(id);
-		CosmosItemResponse<HouseDAO> response = CosmosDBLayer.getInstance().houseDB.upsertHouse(houseDAO);
+		ServiceResponse<HouseDAO> response = houseService.upsert(houseDAO);
 
 		return Response.status(response.getStatusCode()).build();
 	}
@@ -83,29 +85,10 @@ public class HouseResource
 	@Path("/{id}")
 	@Produces(MediaType.APPLICATION_JSON)
 	public Response getHouseByID(@PathParam("id") String id) {
-		ObjectMapper mapper = new ObjectMapper();
-		Jedis jedis = RedisCache.getCachePool().getResource();
+		ServiceResponse<HouseDAO> response = houseService.getByID(id);
 
-		try {
-			HouseDAO houseDAOcache = mapper.readValue(jedis.get("house:" + id), HouseDAO.class);
-			jedis.close();
-			return Response.accepted(houseDAOcache).build();
-		} catch (JsonProcessingException e) {
-			// Item not in cache
-		}
-
-		// Load house from database
-		CosmosItemResponse<HouseDAO> responseHouse = CosmosDBLayer.getInstance().houseDB.getHouseByID(id);
-		HouseDAO houseDAO = responseHouse.getItem();
-
-		try {
-			jedis.set("house:" + houseDAO.getId(), mapper.writeValueAsString(houseDAO));
-		} catch (JsonProcessingException e) {
-			
-        }
-
-        if (responseHouse.getStatusCode() < 300) {
-			return Response.accepted(houseDAO).build();
+        if (response.getItem().isPresent()) {
+			return Response.accepted(response.getItem().get()).build();
 		} else {
 			return Response.noContent().build();
 		}
@@ -119,7 +102,8 @@ public class HouseResource
 	@DELETE
 	@Path("/{id}")
 	public Response deleteHouse(@PathParam("id") String id) {
-		CosmosItemResponse<Object> response = CosmosDBLayer.getInstance().houseDB.deleteHouse(id);
+		ServiceResponse<HouseDAO> response = houseService.deleteByID(id);
+
 		return Response.status(response.getStatusCode()).build();
 	}
 
@@ -184,7 +168,7 @@ public class HouseResource
 		rentalDAO.setId(rentalID);
 		rentalDAO.setHouseID(houseID);
 
-		CosmosItemResponse<HouseDAO> responseHouse = CosmosDBLayer.getInstance().houseDB.getHouseByID(houseID);
+		CosmosItemResponse<HouseDAO> responseHouse = CosmosDBLayer.getInstance().houseDB.getByID(houseID);
 		HouseDAO houseDAO = responseHouse.getItem();
 
 		// TODO catch Exception
@@ -206,14 +190,14 @@ public class HouseResource
 		Set<AvailablePeriod> newPeriods = period.get().subtract(start, end);
 		houseDAO.getAvailablePeriods().remove(period.get());
 		houseDAO.getAvailablePeriods().addAll(newPeriods);
-		CosmosDBLayer.getInstance().houseDB.upsertHouse(houseDAO);
+		CosmosDBLayer.getInstance().houseDB.upsert(houseDAO);
 
 		// Compute price of the rental
 		long daysBetween = start.until(end, ChronoUnit.DAYS);
 		Float price = daysBetween * period.get().getNormalPricePerDay();
 		rentalDAO.setPrice(price);
 
-		CosmosItemResponse<RentalDAO> response = CosmosDBLayer.getInstance().rentalDB.upsertRental(rentalDAO);
+		CosmosItemResponse<RentalDAO> response = CosmosDBLayer.getInstance().rentalDB.upsert(rentalDAO);
 
 		if (response.getStatusCode() == 201) {
 			try {
@@ -241,7 +225,7 @@ public class HouseResource
 	public Response putRental(@PathParam("houseID") String houseID, @PathParam("rentalID") String rentalID, RentalDAO rentalDAO) {
 		rentalDAO.setId(rentalID);
 		rentalDAO.setHouseID(houseID);
-		CosmosItemResponse<RentalDAO> response = CosmosDBLayer.getInstance().rentalDB.upsertRental(rentalDAO);
+		CosmosItemResponse<RentalDAO> response = CosmosDBLayer.getInstance().rentalDB.upsert(rentalDAO);
 
 		return Response.status(response.getStatusCode()).build();
 	}
@@ -256,7 +240,7 @@ public class HouseResource
 	@Path("/{houseID}/rental/{rentalID}")
 	@Produces(MediaType.APPLICATION_JSON)
 	public Response getRentalByID(@PathParam("houseID") String houseID, @PathParam("rentalID") String rentalID) {
-		CosmosItemResponse<RentalDAO> response = CosmosDBLayer.getInstance().rentalDB.getRentalByID(rentalID);
+		CosmosItemResponse<RentalDAO> response = CosmosDBLayer.getInstance().rentalDB.getByID(rentalID);
 
 		return Response.accepted(response.getItem()).build();
 	}
@@ -269,7 +253,7 @@ public class HouseResource
 	@DELETE
 	@Path("/{houseID}/rental/{rentalID}")
 	public Response deleteRental(@PathParam("houseID") String houseID, @PathParam("rentalID") String rentalID) {
-		CosmosItemResponse<Object> response = CosmosDBLayer.getInstance().rentalDB.deleteRental(rentalID);
+		CosmosItemResponse<Object> response = CosmosDBLayer.getInstance().rentalDB.deleteByID(rentalID);
 
 		return Response.status(response.getStatusCode()).build();
 	}
@@ -281,9 +265,8 @@ public class HouseResource
 	@Produces(MediaType.TEXT_PLAIN)
 	public Response uploadPhoto(@PathParam("houseID") String houseID, byte[] photo) {
 
-		CosmosDBLayer dbLayer = CosmosDBLayer.getInstance();
-        HouseDB dbHouse = dbLayer.houseDB;
-        if (!dbHouse.houseExists(houseID)) {
+		HouseDB<HouseDAO> db = CosmosDBLayer.getInstance().houseDB;
+        if (!db.houseExists(houseID)) {
             return Response.status(404).entity("House doesn't exist.").build();
         }
 
@@ -293,14 +276,14 @@ public class HouseResource
 		blobLayer.housesContainer.uploadImage(photoID, photo);
 
 		// Update house photoIDs list by new photoID
-		HouseDAO house = dbHouse.getHouseByID(houseID).getItem();
+		HouseDAO house = db.getByID(houseID).getItem();
 		
 		String[] photoIDs = house.getPhotoIDs();
 		String[] newPhotoIDs = new String[photoIDs.length + 1];
 		System.arraycopy(photoIDs, 0, newPhotoIDs, 0, photoIDs.length);
 		newPhotoIDs[photoIDs.length] = photoID;
 		house.setPhotoIDs(newPhotoIDs);
-		dbHouse.upsertHouse(house);
+		db.upsert(house);
 
 		return Response.ok(houseID).entity("Photo with id " + photoID + " uploaded to house with id " + houseID).build();
 	}
@@ -310,9 +293,8 @@ public class HouseResource
 	@Produces(MediaType.APPLICATION_OCTET_STREAM)
 	public Response getPhoto(@PathParam("houseID") String houseID, @PathParam("photoID") String photoID) {
 
-		CosmosDBLayer dbLayer = CosmosDBLayer.getInstance();
-		HouseDB dbHouse = dbLayer.houseDB;
-		if (!dbHouse.houseExists(houseID)) {
+		HouseDB<HouseDAO> db = CosmosDBLayer.getInstance().houseDB;
+		if (!db.houseExists(houseID)) {
 			return Response.status(404).entity("House doesn't exist.").build();
 		}
 		
@@ -333,13 +315,12 @@ public class HouseResource
 	@Path("/{houseID}/photo")
 	@Produces(MediaType.APPLICATION_JSON)
 	public Response getPhotos(@PathParam("houseID") String houseID) {
-		CosmosDBLayer dbLayer = CosmosDBLayer.getInstance();
-		HouseDB dbHouse = dbLayer.houseDB;
-		if (!dbHouse.houseExists(houseID)) {
+		HouseDB<HouseDAO> db = CosmosDBLayer.getInstance().houseDB;
+		if (!db.houseExists(houseID)) {
 			return Response.status(404).entity("House doesn't exist.").build();
 		}
 
-		HouseDAO house = dbHouse.getHouseByID(houseID).getItem();
+		HouseDAO house = db.getByID(houseID).getItem();
 		String[] photoIDs = house.getPhotoIDs();
 
 		// Get actual photos from blob storage

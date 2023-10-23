@@ -1,10 +1,7 @@
 package scc.db;
 
 import com.azure.cosmos.CosmosContainer;
-import com.azure.cosmos.models.CosmosItemRequestOptions;
-import com.azure.cosmos.models.CosmosItemResponse;
 import com.azure.cosmos.models.CosmosQueryRequestOptions;
-import com.azure.cosmos.models.PartitionKey;
 import com.azure.cosmos.util.CosmosPagedIterable;
 import scc.data.house.HouseDAO;
 
@@ -12,13 +9,10 @@ import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 
-public class HouseDB extends DBContainer {
-    HouseDB(CosmosContainer container) {
-        super(container);
-    }
+public class HouseDB extends AbstractDB<HouseDAO> {
 
-    public CosmosItemResponse<HouseDAO> upsertHouse(HouseDAO house) {
-        return container.upsertItem(house);
+    public HouseDB(CosmosContainer container) {
+        super(container, HouseDAO.class);
     }
 
     public CosmosPagedIterable<HouseDAO> getHousesByUserID(String id) {
@@ -48,15 +42,6 @@ public class HouseDB extends DBContainer {
         String query = "SELECT * FROM houses WHERE EXISTS (SELECT VALUE p FROM p IN houses.availablePeriods WHERE p.startDate >= \"" + startDate + "\" AND p.startDate <= \"" + endDate + "\" AND IS_DEFINED(p.promotionPrice))";
 
         return container.queryItems(query, new CosmosQueryRequestOptions(), HouseDAO.class);
-    }
-
-    public CosmosItemResponse<HouseDAO> getHouseByID(String id) {
-        return container.readItem(id, new PartitionKey(id), HouseDAO.class);
-    }
-
-
-    public CosmosItemResponse<Object> deleteHouse(String id) {
-        return container.deleteItem(id, new PartitionKey(id), new CosmosItemRequestOptions());
     }
 
     public boolean hasHouse(String id) {

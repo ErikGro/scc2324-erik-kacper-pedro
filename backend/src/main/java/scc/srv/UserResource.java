@@ -41,7 +41,7 @@ public class UserResource
 		ObjectMapper mapper = new ObjectMapper();
 		Locale.setDefault(Locale.US);
 		CosmosDBLayer db0=CosmosDBLayer.getInstance();
-		UserDB db=db0.userDB;
+		UserDB<UserDAO> db=db0.userDB;
 		String id = Double.toString(Math.random());
 		CosmosItemResponse<UserDAO> res = null;
 		UserDAO u = new UserDAO();
@@ -50,7 +50,7 @@ public class UserResource
 		u.setPwd(data.getPwd());
 		u.setHouseIds(data.getHouseIds());
 
-		res = db.putUser(u);
+		res = db.upsert(u);
 		try (Jedis jedis = RedisCache.getCachePool().getResource()) {
 		    jedis.set("user:"+id, mapper.writeValueAsString(u));
 		    String res1 = jedis.get("user:"+id);
@@ -83,8 +83,8 @@ public class UserResource
 	public Response addHouseid(@QueryParam("id") String id, HouseIds house ) {
 		
 		CosmosDBLayer db0=CosmosDBLayer.getInstance();
-		UserDB db=db0.userDB;
-		UserDAO u=  db.getUserById(id).iterator().next();
+		UserDB<UserDAO> db=db0.userDB;
+		UserDAO u=  db.getByID(id).getItem();
 		u.getHouseIds();
 		
 		String[] combinedHouseIds = concatenate(u.getHouseIds(), house.getHouseIds());
@@ -93,7 +93,7 @@ public class UserResource
 		u.setHouseIds(combinedHouseIds);
 
 		// Assuming you have a method to update the user in the DB
-		db.updateUser(u);
+		db.upsert(u);
 
 		return Response.ok(u.getHouseIds()).build(); // Return appropriate response
 	}
@@ -111,7 +111,7 @@ public class UserResource
 		Locale.setDefault(Locale.UK);
 		CosmosDBLayer db0=CosmosDBLayer.getInstance();
 		UserDB db=db0.userDB;
-		return  db.getUserById(id)!=null;
+		return  db.getByID(id)!=null;
 	}
 	
 @Path("/secret")
@@ -155,7 +155,7 @@ public Response deleteAllUsers() {
 	        return Response.status(400).entity("No such user").build();
 	    
 	    CosmosDBLayer db0 = CosmosDBLayer.getInstance();
-	    UserDB db = db0.userDB;
+	    UserDB<UserDAO> db = db0.userDB;
 	    
 	    try (Jedis jedis = RedisCache.getCachePool().getResource()) {
 	        // Delete user from Redis
@@ -173,7 +173,7 @@ public Response deleteAllUsers() {
 	    }
 	    
 	    // Now delete from CosmosDB
-	    db.delUserById(id);
+	    db.deleteByID(id);
 	    return Response.ok("User " + id + " deleted.").build();
 	}
 
@@ -186,16 +186,16 @@ public Response deleteAllUsers() {
 			return Response.status(400).entity("No such user").build();
 		
 		CosmosDBLayer db0=CosmosDBLayer.getInstance();
-		UserDB db=db0.userDB;
+		UserDB<UserDAO> db=db0.userDB;
 		
-		db.delUserById(id);
+		db.deleteByID(id);
 		UserDAO u = new UserDAO();
 		u.setId(id);
 		u.setName(data.getName());
 		u.setPwd(data.getPwd());
 		u.setHouseIds(data.getHouseIds());
 
-		 db.putUser(u);
+		 db.upsert(u);
 		return Response.ok(id).build();
 	}
 
