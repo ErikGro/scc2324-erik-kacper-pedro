@@ -2,9 +2,12 @@ package scc.srv;
 
 import jakarta.ws.rs.core.Response;
 import scc.cache.HouseService;
+import scc.cache.QuestionsService;
+import scc.cache.ServiceResponse;
 import scc.data.Answer;
 import scc.data.AnswerDAO;
 import scc.data.QuestionDAO;
+import scc.data.QuestionsDAO;
 import scc.data.house.HouseDAO;
 import scc.db.AnswerDB;
 import scc.db.CosmosDBLayer;
@@ -13,6 +16,7 @@ import scc.db.QuestionDB;
 
 import java.text.SimpleDateFormat;
 import java.util.Optional;
+import java.util.UUID;
 
 import com.azure.cosmos.models.CosmosItemResponse;
 
@@ -28,26 +32,20 @@ import jakarta.ws.rs.core.MediaType;
 @Path("/house/{houseId}/question/{questionId}/answer")
 public class AnswerResource {
     private final HouseService houseService = new HouseService();
-
+    private final QuestionsService questionsService = new QuestionsService();
+    
     @Path("/")
     @POST
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
-    public Response createAnswer(@PathParam("houseId") String houseId, @PathParam("questionId") String questionId, Answer ans) {
+    public Response addAnswer(@PathParam("houseId") String houseId, @PathParam("questionId") String questionId, Answer ans) {
 
 
-        CosmosDBLayer dbLayer = CosmosDBLayer.getInstance();
+        Optional<QuestionsDAO> question = questionsService.getByID(questionId).getItem();
 
-        QuestionDB qdb = dbLayer.questionDB;
-        if (qdb.getByID(questionId).getItem() == null) {
+        if (question.isEmpty()) {
             return Response.status(404, "Question doesn't exist.").build();
         }
-        AnswerDB db = dbLayer.answerDB;
-
-
-        // TODO: Add checking if user replying the question is the owner of the house
-        // If not, return 403 Forbidden
-        
 
         // Get house from db
         Optional<HouseDAO> house = houseService.getByID(houseId).getItem();
@@ -60,23 +58,17 @@ public class AnswerResource {
             return Response.status(403, "Only the onwer of the house can respond to the question.").build();
         }
 
-        
-        if (db.answerExists(questionId)) {
+        if (!question.get().getAnswerText().isEmpty()) {
             return Response.status(409, "Answer already exists.").build();
         }
 
-    
-        String id = "a:" + System.currentTimeMillis();
-        String ts = new SimpleDateFormat("yyyy-MM-dd.HH-mm-ss").format(new java.util.Date());
-        
-        AnswerDAO aDAO = new AnswerDAO(id, questionId, ans.getUserId(), ans.getText(), ts);
 
-        CosmosItemResponse<AnswerDAO> res = db.upsert(aDAO);
-        ans.setId(id);
+        question.get().setAnswerTimestamp(new SimpleDateFormat("yyyy-MM-dd.HH-mm-ss").format(new java.util.Date()));
+        question.get().setAnswerText(ans.getText());
+        question.get().setAnswerUserId(ans.getUserId());
+
+        ServiceResponse<QuestionsDAO> res = questionsService.upsert(question.get());
         
         return Response.status(res.getStatusCode()).build();
     }
-
-    // TODO: Add listing all answers with questions text for a given house
-
 }
