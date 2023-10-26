@@ -3,6 +3,7 @@ package scc.data.house;
 import scc.cache.Cachable;
 
 import java.time.Month;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -12,19 +13,11 @@ public class HouseDAO implements Cachable {
     private String name;
     private Address address;
     private String description;
-    private String[] photoIDs;
+    private List<String> photoIDs;
 
     private Set<AvailablePeriod> availablePeriods;
 
     public HouseDAO() {}
-
-//    public HouseDAO(House house) {
-//        this.ownerID = house.getOwnerID();
-//        this.name = house.getName();
-//        this.address = house.getAddress();
-//        this.description = house.getDescription();
-//        this.photoIDs = house.getPhotoIDs();
-//    }
 
     public String getId() {
         return id;
@@ -66,11 +59,11 @@ public class HouseDAO implements Cachable {
         this.address = address;
     }
 
-    public String[] getPhotoIDs() {
+    public List<String> getPhotoIDs() {
         return photoIDs;
     }
 
-    public void setPhotoIDs(String[] photoIDs) {
+    public void setPhotoIDs(List<String> photoIDs) {
         this.photoIDs = photoIDs;
     }
 
