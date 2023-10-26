@@ -1,8 +1,11 @@
 package scc.srv;
 
 import jakarta.ws.rs.core.Response;
+import scc.cache.HouseService;
 import scc.data.Answer;
 import scc.data.AnswerDAO;
+import scc.data.QuestionDAO;
+import scc.data.house.HouseDAO;
 import scc.db.AnswerDB;
 import scc.db.CosmosDBLayer;
 import scc.db.HouseDB;
@@ -32,24 +35,25 @@ public class AnswerResource {
 
         CosmosDBLayer dbLayer = CosmosDBLayer.getInstance();
 
-        QuestionDB qdb = dbLayer.questionDB;
-        if (!qdb.questionExists(questionId)) {
+        QuestionDB<QuestionDAO> qdb = dbLayer.questionDB;
+        if (qdb.getByID(questionId).getItem() == null) {
             return Response.status(404, "Question doesn't exist.").build();
         }
-        AnswerDB db = dbLayer.answerDB;
+        AnswerDB<AnswerDAO> db = dbLayer.answerDB;
 
 
         // TODO: Add checking if user replying the question is the owner of the house
         // If not, return 403 Forbidden
-        HouseDB dbHouse = dbLayer.houseDB;
+        HouseDB<HouseDAO> dbHouse = dbLayer.houseDB;
         
         // Get house from db
         if (!dbHouse.houseExists(houseId)) {
             return Response.status(404, "House doesn't exist.").build();
         }
 
+        HouseService houseService = new HouseService();
         // Check if user is the owner of the house
-        if (!dbHouse.getHouseByID(houseId).getItem().getOwnerID().equals(ans.getUserId())) {
+        if (!houseService.getHouseByID(houseId).getItem().get().getOwnerID().equals(ans.getUserId())) {
             return Response.status(403, "Only the onwer of the house can respond to the question.").build();
         }
 
@@ -64,7 +68,7 @@ public class AnswerResource {
         
         AnswerDAO aDAO = new AnswerDAO(id, questionId, ans.getUserId(), ans.getText(), ts);
 
-        CosmosItemResponse<AnswerDAO> res = db.putAnswer(aDAO);
+        CosmosItemResponse<AnswerDAO> res = db.upsert(aDAO);
         ans.setId(id);
         
         return Response.status(res.getStatusCode()).build();

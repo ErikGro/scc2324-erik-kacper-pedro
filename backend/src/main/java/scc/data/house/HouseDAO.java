@@ -1,10 +1,12 @@
 package scc.data.house;
 
+import scc.cache.Cachable;
+
 import java.time.Month;
 import java.util.Map;
 import java.util.Set;
 
-public class HouseDAO {
+public class HouseDAO implements Cachable {
     private String id;
     private String ownerID;
     private String name;
@@ -78,5 +80,9 @@ public class HouseDAO {
 
     public void setAvailablePeriods(Set<AvailablePeriod> availablePeriods) {
         this.availablePeriods = availablePeriods;
+    }
+
+    public String getCachingKey() {
+        return id;
     }
 }
