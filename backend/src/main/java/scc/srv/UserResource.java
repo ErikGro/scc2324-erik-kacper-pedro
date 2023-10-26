@@ -41,7 +41,7 @@ public class UserResource
 		ObjectMapper mapper = new ObjectMapper();
 		Locale.setDefault(Locale.US);
 		CosmosDBLayer db0=CosmosDBLayer.getInstance();
-		UserDB<UserDAO> db=db0.userDB;
+		UserDB db=db0.userDB;
 		String id = Double.toString(Math.random());
 		CosmosItemResponse<UserDAO> res = null;
 		UserDAO u = new UserDAO();
@@ -83,7 +83,7 @@ public class UserResource
 	public Response addHouseid(@QueryParam("id") String id, HouseIds house ) {
 		
 		CosmosDBLayer db0=CosmosDBLayer.getInstance();
-		UserDB<UserDAO> db=db0.userDB;
+		UserDB db=db0.userDB;
 		UserDAO u=  db.getByID(id).getItem();
 		u.getHouseIds();
 		
@@ -155,7 +155,7 @@ public Response deleteAllUsers() {
 	        return Response.status(400).entity("No such user").build();
 	    
 	    CosmosDBLayer db0 = CosmosDBLayer.getInstance();
-	    UserDB<UserDAO> db = db0.userDB;
+	    UserDB db = db0.userDB;
 	    
 	    try (Jedis jedis = RedisCache.getCachePool().getResource()) {
 	        // Delete user from Redis
@@ -186,7 +186,7 @@ public Response deleteAllUsers() {
 			return Response.status(400).entity("No such user").build();
 		
 		CosmosDBLayer db0=CosmosDBLayer.getInstance();
-		UserDB<UserDAO> db=db0.userDB;
+		UserDB db=db0.userDB;
 		
 		db.deleteByID(id);
 		UserDAO u = new UserDAO();

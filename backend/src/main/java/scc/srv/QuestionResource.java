@@ -4,9 +4,11 @@ import jakarta.ws.rs.core.Response;
 import com.azure.cosmos.models.CosmosItemResponse;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Optional;
 
 import jakarta.ws.rs.*;
 import jakarta.ws.rs.core.MediaType;
+import scc.cache.HouseService;
 import scc.data.Question;
 import scc.data.QuestionDAO;
 import scc.data.house.HouseDAO;
@@ -26,6 +28,7 @@ import java.util.ArrayList;
 
 @Path("/house/{houseId}/question")
 public class QuestionResource {
+    private final HouseService houseService = new HouseService();
 
     @Path("/")
     @POST
@@ -34,14 +37,13 @@ public class QuestionResource {
     public Response createQuestion(@PathParam("houseId") String houseId,  Question q) {
 
         CosmosDBLayer dbLayer = CosmosDBLayer.getInstance();
-        HouseDB<HouseDAO> dbHouse = dbLayer.houseDB;
-        
-        // Get house from db
-        if (!dbHouse.houseExists(houseId)) {
+
+        Optional<HouseDAO> house = houseService.getByID(houseId).getItem();
+        if (house.isEmpty()) {
             return Response.status(404, "House doesn't exist.").build();
         }
     
-        QuestionDB<QuestionDAO> db = dbLayer.questionDB;
+        QuestionDB db = dbLayer.questionDB;
         
         String id = "q:" + System.currentTimeMillis();
         String ts = new SimpleDateFormat("yyyy-MM-dd.HH-mm-ss").format(new java.util.Date());
@@ -63,9 +65,8 @@ public class QuestionResource {
         CosmosDBLayer dbLayer = CosmosDBLayer.getInstance();
         QuestionDB db = dbLayer.questionDB;
         
-        HouseDB<HouseDAO> dbHouse = dbLayer.houseDB;
-        // Get house from db
-        if (!dbHouse.houseExists(houseId)) {
+        Optional<HouseDAO> house = houseService.getByID(houseId).getItem();
+        if (house.isEmpty()) {
             return Response.status(404, "House doesn't exist.").build();
         }
 
@@ -87,7 +88,7 @@ public class QuestionResource {
     public Response getQuestion(@PathParam("id") String id) {
 
         CosmosDBLayer dbLayer = CosmosDBLayer.getInstance();
-        QuestionDB<QuestionDAO> db = dbLayer.questionDB;
+        QuestionDB db = dbLayer.questionDB;
         
         CosmosItemResponse<QuestionDAO> res = db.getByID(id);
         if (res.getStatusCode() < 300) {

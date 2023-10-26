@@ -12,6 +12,7 @@ import scc.db.HouseDB;
 import scc.db.QuestionDB;
 
 import java.text.SimpleDateFormat;
+import java.util.Optional;
 
 import com.azure.cosmos.models.CosmosItemResponse;
 
@@ -26,6 +27,8 @@ import jakarta.ws.rs.core.MediaType;
  */
 @Path("/house/{houseId}/question/{questionId}/answer")
 public class AnswerResource {
+    private final HouseService houseService = new HouseService();
+
     @Path("/")
     @POST
     @Consumes(MediaType.APPLICATION_JSON)
@@ -35,25 +38,25 @@ public class AnswerResource {
 
         CosmosDBLayer dbLayer = CosmosDBLayer.getInstance();
 
-        QuestionDB<QuestionDAO> qdb = dbLayer.questionDB;
+        QuestionDB qdb = dbLayer.questionDB;
         if (qdb.getByID(questionId).getItem() == null) {
             return Response.status(404, "Question doesn't exist.").build();
         }
-        AnswerDB<AnswerDAO> db = dbLayer.answerDB;
+        AnswerDB db = dbLayer.answerDB;
 
 
         // TODO: Add checking if user replying the question is the owner of the house
         // If not, return 403 Forbidden
-        HouseDB<HouseDAO> dbHouse = dbLayer.houseDB;
         
+
         // Get house from db
-        if (!dbHouse.houseExists(houseId)) {
+        Optional<HouseDAO> house = houseService.getByID(houseId).getItem();
+        if (house.isEmpty()) {
             return Response.status(404, "House doesn't exist.").build();
         }
 
-        HouseService houseService = new HouseService();
         // Check if user is the owner of the house
-        if (!houseService.getHouseByID(houseId).getItem().get().getOwnerID().equals(ans.getUserId())) {
+        if (!house.get().getOwnerID().equals(ans.getUserId())) {
             return Response.status(403, "Only the onwer of the house can respond to the question.").build();
         }
 
