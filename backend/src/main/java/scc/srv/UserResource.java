@@ -5,6 +5,8 @@ import scc.db.blob.BlobLayer;
 
 import java.util.List;
 import java.util.Locale;
+import java.util.UUID;
+
 import com.azure.cosmos.models.CosmosItemResponse;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
@@ -14,7 +16,9 @@ import jakarta.ws.rs.core.Response;
 import redis.clients.jedis.Jedis;
 import redis.clients.jedis.params.ScanParams;
 import redis.clients.jedis.resps.ScanResult;
+import scc.cache.UserService;
 import scc.cache.RedisCache;
+import scc.cache.ServiceResponse;
 import scc.data.HouseIds;
 import scc.data.User;
 import scc.data.UserDAO;
@@ -25,6 +29,8 @@ import scc.data.UserDAO;
 @Path("/user")
 public class UserResource
 {
+
+	private final UserService UserService = new UserService();
 
 	/**
 	 * This methods just prints a string. It may be useful to check if the current 
@@ -38,41 +44,18 @@ public class UserResource
 	public Response createUser(User data) {
 		if(!data.isValid())
 			return Response.status(400).entity("Incorrect registration data").build();
-		ObjectMapper mapper = new ObjectMapper();
-		Locale.setDefault(Locale.US);
-		CosmosDBLayer db0=CosmosDBLayer.getInstance();
-		UserDB db=db0.userDB;
-		String id = Double.toString(Math.random());
-		CosmosItemResponse<UserDAO> res = null;
+		
+		
+		String id = UUID.randomUUID().toString();
+		ServiceResponse<UserDAO> res = null;
 		UserDAO u = new UserDAO();
 		u.setId(id);
 		u.setName(data.getName());
 		u.setPwd(data.getPwd());
 		u.setHouseIds(data.getHouseIds());
 
-		res = db.upsert(u);
-		try (Jedis jedis = RedisCache.getCachePool().getResource()) {
-		    jedis.set("user:"+id, mapper.writeValueAsString(u));
-		    String res1 = jedis.get("user:"+id);
-		    	// How to convert string to object
-		    UserDAO uread = mapper.readValue(res1, UserDAO.class);
-	    	System.out.println("GET value = " + res1);
-	    					
-		    Long cnt = jedis.lpush("MostRecentUsers", mapper.writeValueAsString(u));
-		    if (cnt > 5)
-		        jedis.ltrim("MostRecentUsers", 0, 4);
-		    
-		    List<String> lst = jedis.lrange("MostRecentUsers", 0, -1);
-	    	System.out.println("MostRecentUsers");
-		    for( String s : lst)
-		    	System.out.println(s);
-		   
-		    cnt = jedis.incr("NumUsers");
-		    System.out.println( "Num users : " + cnt);
-		}
-	 catch (Exception e) {
-		e.printStackTrace();
-	}
+		res = UserService.upsert(u);
+		
 		data.setId(id);
 		return Response.ok(data.getId()).build();
 	}
@@ -82,9 +65,8 @@ public class UserResource
 	@Produces(MediaType.APPLICATION_JSON)
 	public Response addHouseid(@QueryParam("id") String id, HouseIds house ) {
 		
-		CosmosDBLayer db0=CosmosDBLayer.getInstance();
-		UserDB db=db0.userDB;
-		UserDAO u=  db.getByID(id).getItem();
+		
+		UserDAO u=  UserService.getByID(id).getItem().get();
 		u.getHouseIds();
 		
 		String[] combinedHouseIds = concatenate(u.getHouseIds(), house.getHouseIds());
@@ -93,7 +75,7 @@ public class UserResource
 		u.setHouseIds(combinedHouseIds);
 
 		// Assuming you have a method to update the user in the DB
-		db.upsert(u);
+		UserService.upsert(u);
 
 		return Response.ok(u.getHouseIds()).build(); // Return appropriate response
 	}
@@ -153,27 +135,7 @@ public Response deleteAllUsers() {
 	public Response deleteUser(@QueryParam("id") String id) {
 	    if (!userExists(id))
 	        return Response.status(400).entity("No such user").build();
-	    
-	    CosmosDBLayer db0 = CosmosDBLayer.getInstance();
-	    UserDB db = db0.userDB;
-	    
-	    try (Jedis jedis = RedisCache.getCachePool().getResource()) {
-	        // Delete user from Redis
-	        jedis.del("user:" + id);
-	        
-	        // Update other Redis values if necessary. For example, if you want to decrement NumUsers:
-	        jedis.decr("NumUsers");
-	        
-	        // You can also remove the user from the "MostRecentUsers" list if they exist there:
-	        String userString = jedis.get("user:" + id);
-	        if (userString != null)
-	        	jedis.lrem("MostRecentUsers", 1, userString);
-	    } catch (Exception e) {
-	        e.printStackTrace();
-	    }
-	    
-	    // Now delete from CosmosDB
-	    db.deleteByID(id);
+	    UserService.deleteByID(id);
 	    return Response.ok("User " + id + " deleted.").build();
 	}
 
@@ -184,18 +146,14 @@ public Response deleteAllUsers() {
 	public Response updateUser(@QueryParam("id") String id, User data){
 		if(!userExists(id))
 			return Response.status(400).entity("No such user").build();
-		
-		CosmosDBLayer db0=CosmosDBLayer.getInstance();
-		UserDB db=db0.userDB;
-		
-		db.deleteByID(id);
+	
 		UserDAO u = new UserDAO();
 		u.setId(id);
 		u.setName(data.getName());
 		u.setPwd(data.getPwd());
 		u.setHouseIds(data.getHouseIds());
-
-		 db.upsert(u);
+		
+		 UserService.upsert(u);
 		return Response.ok(id).build();
 	}
 

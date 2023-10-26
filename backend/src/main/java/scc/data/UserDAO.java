@@ -2,10 +2,12 @@ package scc.data;
 
 import java.util.Arrays;
 
+import scc.cache.Cachable;
+
 /**
  * Represents a User, as stored in the database
  */
-public class UserDAO {
+public class UserDAO  implements Cachable{
 	private String _rid;
 	private String _ts;
 	private String id;
@@ -69,6 +71,11 @@ public class UserDAO {
 	public String toString() {
 		return "UserDAO [_rid=" + _rid + ", _ts=" + _ts + ", id=" + id + ", name=" + name + ", pwd=" + pwd
 				+ ", houseIds=" + Arrays.toString(houseIds) + "]";
+	}
+	@Override
+	public String getCachingKey() {
+		// TODO Auto-generated method stub
+		return id;
 	}
 
 }
