@@ -90,10 +90,8 @@ public class UserResource
 	}
 	//Public method to use when checking that the id belongs to a user
 	public Boolean userExists(String id) {
-		Locale.setDefault(Locale.UK);
-		CosmosDBLayer db0=CosmosDBLayer.getInstance();
-		UserDB db=db0.userDB;
-		return  db.getByID(id)!=null;
+		
+		return  UserService.getByID(id).getItem().isEmpty();
 	}
 	
 @Path("/secret")
@@ -189,5 +187,11 @@ public Response deleteAllUsers() {
 		}
 		
 		return Response.ok(photo).build();
+	}
+	
+	public UserDAO getUser(String id) {
+		if(!userExists(id))
+			return null;
+		return UserService.getByID(id).getItem().get();
 	}
 }
