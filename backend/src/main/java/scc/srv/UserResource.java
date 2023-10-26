@@ -1,6 +1,7 @@
 package scc.srv;
 
 import scc.db.*;
+import scc.db.blob.BlobLayer;
 
 import java.util.List;
 import java.util.Locale;
@@ -47,7 +48,6 @@ public class UserResource
 		u.setId(id);
 		u.setName(data.getName());
 		u.setPwd(data.getPwd());
-		u.setPhotoId(data.getPhotoId());
 		u.setHouseIds(data.getHouseIds());
 
 		res = db.putUser(u);
@@ -193,11 +193,43 @@ public Response deleteAllUsers() {
 		u.setId(id);
 		u.setName(data.getName());
 		u.setPwd(data.getPwd());
-		u.setPhotoId(data.getPhotoId());
 		u.setHouseIds(data.getHouseIds());
 
 		 db.putUser(u);
 		return Response.ok(id).build();
 	}
 
+	@Path("/{id}/photo")
+	@POST
+	@Consumes(MediaType.APPLICATION_OCTET_STREAM)
+	@Produces(MediaType.TEXT_PLAIN)
+	public Response uploadPhoto(@PathParam("id") String id, byte[] photo) {
+		if(!userExists(id))
+			return Response.status(400).entity("No such user").build();
+		
+		BlobLayer blobLayer = BlobLayer.getInstance();
+		blobLayer.usersContainer.uploadImage(id, photo);
+		
+		return Response.ok(id).build();
+	}
+
+	@Path("/{id}/photo")
+	@GET
+	@Produces(MediaType.APPLICATION_OCTET_STREAM)
+	public Response getPhoto(@PathParam("id") String id) {
+		if(!userExists(id))
+			return Response.status(400).entity("No such user").build();
+		
+
+		BlobLayer blobLayer = BlobLayer.getInstance();
+
+		byte[] photo;
+		try {
+			photo = blobLayer.usersContainer.getImage(id);
+		} catch (Exception e) {
+			return Response.status(404).entity("No photo found").build();
+		}
+		
+		return Response.ok(photo).build();
+	}
 }

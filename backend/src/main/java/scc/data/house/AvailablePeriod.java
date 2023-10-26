@@ -1,20 +1,26 @@
 package scc.data.house;
 
-import java.time.Month;
+import scc.utils.Constants;
+
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
+import java.util.HashSet;
+import java.util.Set;
 
 public class AvailablePeriod {
     private String startDate;
     private String endDate;
-    private Float normalPrice;
-    private Float promotionPrice;
+    private Float normalPricePerDay;
+    private Float promotionPricePerDay;
 
-    public AvailablePeriod() {}
+    public AvailablePeriod() {
+    }
 
-    public AvailablePeriod(String startDate, String endDate, Float normalPrice, Float promotionPrice) {
+    public AvailablePeriod(String startDate, String endDate, Float normalPricePerDay, Float promotionPricePerDay) {
         this.startDate = startDate;
         this.endDate = endDate;
-        this.normalPrice = normalPrice;
-        this.promotionPrice = promotionPrice;
+        this.normalPricePerDay = normalPricePerDay;
+        this.promotionPricePerDay = promotionPricePerDay;
     }
 
     public String getStartDate() {
@@ -33,19 +39,50 @@ public class AvailablePeriod {
         this.endDate = endDate;
     }
 
-    public Float getNormalPrice() {
-        return normalPrice;
+    public Float getNormalPricePerDay() {
+        return normalPricePerDay;
     }
 
-    public void setNormalPrice(Float normalPrice) {
-        this.normalPrice = normalPrice;
+    public void setNormalPricePerDay(Float normalPricePerDay) {
+        this.normalPricePerDay = normalPricePerDay;
     }
 
-    public Float getPromotionPrice() {
-        return promotionPrice;
+    public Float getPromotionPricePerDay() {
+        return promotionPricePerDay;
     }
 
-    public void setPromotionPrice(Float promotionPrice) {
-        this.promotionPrice = promotionPrice;
+    public void setPromotionPricePerDay(Float promotionPricePerDay) {
+        this.promotionPricePerDay = promotionPricePerDay;
+    }
+
+    // [Period]
+    public boolean containsPeriod(LocalDate start, LocalDate end) {
+        DateTimeFormatter f = Constants.dateFormat;
+        LocalDate periodStart = LocalDate.parse(this.startDate, f);
+        LocalDate periodEnd = LocalDate.parse(this.endDate, f);
+
+        return (periodStart.isBefore(start) || periodStart.isEqual(start)) && (periodEnd.isAfter(end) || periodEnd.isEqual(end));
+    }
+
+    // the startDate and EndDate are expected to be within the range of the period
+    public Set<AvailablePeriod> subtract(LocalDate start, LocalDate end) {
+        DateTimeFormatter f = Constants.dateFormat;
+        LocalDate periodStart = LocalDate.parse(this.startDate, f);
+        LocalDate periodEnd = LocalDate.parse(this.endDate, f);
+
+        HashSet<AvailablePeriod> newPeriods = new HashSet<>();
+        
+        if (periodStart.isEqual(start)) {
+            if (!periodEnd.isEqual(end)) {
+                newPeriods.add(new AvailablePeriod(end.toString(), periodEnd.toString(), getNormalPricePerDay(), getPromotionPricePerDay()));
+            }
+        } else { // periodStart before start
+            newPeriods.add(new AvailablePeriod(periodStart.toString(), start.toString(), getNormalPricePerDay(), getPromotionPricePerDay()));
+            if (!periodEnd.isEqual(end)) { // periodEnd after end
+                newPeriods.add(new AvailablePeriod(end.toString(), periodEnd.toString(), getNormalPricePerDay(), getPromotionPricePerDay()));
+            }
+        }
+
+        return newPeriods;
     }
 }

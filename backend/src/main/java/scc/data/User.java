@@ -12,18 +12,16 @@ public class User {
 	private String id;
 	private String name;
 	private String pwd;
-	private String photoId;
 	private String[] houseIds;
 	public User() {
 	}
 
 	
-	public User(String id, String name, String pwd, String photoId, String[] houseIds) {
+	public User(String id, String name, String pwd, String[] houseIds) {
 		super();
 		this.id = id;
 		this.name = name;
 		this.pwd = pwd;
-		this.photoId = photoId;
 		this.houseIds = houseIds;
 	}
 	public String getId() {
@@ -47,13 +45,6 @@ public class User {
 		this.pwd = Hash.of(pwd);//password is now hashed to compare paswwords just hash the given before comparing
 	}
 	
-
-	public String getPhotoId() {
-		return photoId;
-	}
-	public void setPhotoId(String photoId) {
-		this.photoId = photoId;
-	}
 	public String[] getHouseIds() {
 		return houseIds == null ? new String[0] : houseIds ;
 	}
@@ -62,7 +53,7 @@ public class User {
 	}
 	@Override
 	public String toString() {
-		return "User [id=" + id + ", name=" + name + ", pwd=" + pwd + ", photoId=" + photoId + ", houseIds="
+		return "User [id=" + id + ", name=" + name + ", pwd=" + pwd + ", houseIds="
 				+ Arrays.toString(houseIds) + "]";
 	}
 	public boolean isValid() {
