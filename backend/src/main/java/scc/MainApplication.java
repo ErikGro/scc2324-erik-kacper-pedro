@@ -2,19 +2,15 @@ package scc;
 
 import java.util.HashSet;
 import java.util.Set;
-
 import jakarta.ws.rs.core.Application;
-import scc.srv.AnswerResource;
-import scc.srv.HouseResource;
-import scc.srv.MediaResource;
-import scc.srv.QuestionResource;
-import scc.srv.UserResource;
+import scc.srv.*;
 
 public class MainApplication extends Application {
 	private final Set<Class<?>> resources = new HashSet<Class<?>>();
 
 	public MainApplication() {
 		resources.add(HouseResource.class);
+		resources.add(RentalResource.class);
 		resources.add(QuestionResource.class);
 		resources.add(AnswerResource.class);
 		resources.add(MediaResource.class);

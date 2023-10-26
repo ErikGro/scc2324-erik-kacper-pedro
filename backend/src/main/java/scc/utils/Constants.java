@@ -9,4 +9,7 @@ public class Constants {
     }
 
     public static DateTimeFormatter dateFormat = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+
+    public static boolean cachingEnabled = true;
+    public static boolean azureFunctions = true;
 }

@@ -1,19 +1,15 @@
 package scc.db;
 
 import com.azure.cosmos.CosmosContainer;
-import com.azure.cosmos.models.CosmosItemResponse;
 import com.azure.cosmos.models.CosmosQueryRequestOptions;
 import com.azure.cosmos.util.CosmosPagedIterable;
 
 import scc.data.AnswerDAO;
 
-public class AnswerDB extends DBContainer {
-    public AnswerDB(CosmosContainer container) {
-        super(container);
-    }
+public class AnswerDB extends AbstractDB<AnswerDAO> {
 
-    public CosmosItemResponse<AnswerDAO> putAnswer(AnswerDAO a) {
-        return container.createItem(a);
+    public AnswerDB(CosmosContainer container) {
+        super(container, AnswerDAO.class);
     }
 
     public boolean answerExists(String questionId) {

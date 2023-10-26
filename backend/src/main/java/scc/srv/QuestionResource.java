@@ -9,6 +9,7 @@ import jakarta.ws.rs.*;
 import jakarta.ws.rs.core.MediaType;
 import scc.data.Question;
 import scc.data.QuestionDAO;
+import scc.data.house.HouseDAO;
 import scc.db.CosmosDBLayer;
 import scc.db.HouseDB;
 import scc.db.QuestionDB;
@@ -33,21 +34,21 @@ public class QuestionResource {
     public Response createQuestion(@PathParam("houseId") String houseId,  Question q) {
 
         CosmosDBLayer dbLayer = CosmosDBLayer.getInstance();
-        HouseDB dbHouse = dbLayer.houseDB;
+        HouseDB<HouseDAO> dbHouse = dbLayer.houseDB;
         
         // Get house from db
         if (!dbHouse.houseExists(houseId)) {
             return Response.status(404, "House doesn't exist.").build();
         }
     
-        QuestionDB db = dbLayer.questionDB;
+        QuestionDB<QuestionDAO> db = dbLayer.questionDB;
         
         String id = "q:" + System.currentTimeMillis();
         String ts = new SimpleDateFormat("yyyy-MM-dd.HH-mm-ss").format(new java.util.Date());
 
         QuestionDAO qDAO = new QuestionDAO(id, houseId, q.getUserId(), q.getText(), ts);
 
-        CosmosItemResponse<QuestionDAO> res = db.putQuestion(qDAO);
+        CosmosItemResponse<QuestionDAO> res = db.upsert(qDAO);
         q.setId(id);
         
         return Response.status(res.getStatusCode()).build();
@@ -62,7 +63,7 @@ public class QuestionResource {
         CosmosDBLayer dbLayer = CosmosDBLayer.getInstance();
         QuestionDB db = dbLayer.questionDB;
         
-        HouseDB dbHouse = dbLayer.houseDB;
+        HouseDB<HouseDAO> dbHouse = dbLayer.houseDB;
         // Get house from db
         if (!dbHouse.houseExists(houseId)) {
             return Response.status(404, "House doesn't exist.").build();
@@ -86,17 +87,13 @@ public class QuestionResource {
     public Response getQuestion(@PathParam("id") String id) {
 
         CosmosDBLayer dbLayer = CosmosDBLayer.getInstance();
-        QuestionDB db = dbLayer.questionDB;
+        QuestionDB<QuestionDAO> db = dbLayer.questionDB;
         
-        Iterator<QuestionDAO> res = db.getQuestion(id).iterator();
-        // Get all questions from a house using getQuestions from QuestionDB
-        List<String> questions = new ArrayList<String>();
-        while (res.hasNext()) {
-            QuestionDAO q = res.next();
-            questions.add(q.toString());
+        CosmosItemResponse<QuestionDAO> res = db.getByID(id);
+        if (res.getStatusCode() < 300) {
+            return Response.ok(res.getItem()).build();
+        } else {
+            return Response.noContent().build();
         }
-        
-        return Response.ok(questions).build();
     }
-    
 }
