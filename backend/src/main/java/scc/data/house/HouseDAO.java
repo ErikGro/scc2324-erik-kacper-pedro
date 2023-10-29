@@ -14,7 +14,6 @@ public class HouseDAO implements Cachable {
     private Address address;
     private String description;
     private List<String> photoIDs;
-
     private Set<AvailablePeriod> availablePeriods;
 
     public HouseDAO() {}

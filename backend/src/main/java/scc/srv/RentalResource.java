@@ -4,10 +4,12 @@ import com.azure.cosmos.models.CosmosItemResponse;
 import jakarta.ws.rs.*;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
+import scc.cache.HouseService;
+import scc.cache.RentalService;
+import scc.cache.ServiceResponse;
 import scc.data.RentalDAO;
 import scc.data.house.AvailablePeriod;
 import scc.data.house.HouseDAO;
-import scc.db.CosmosDBLayer;
 import scc.utils.Constants;
 
 import java.net.URI;
@@ -23,6 +25,9 @@ import java.util.UUID;
  */
 @Path("/house/{houseID}/rental")
 public class RentalResource {
+    private final HouseService houseService = new HouseService();
+    private final RentalService rentalService = new RentalService();
+
     @POST
     @Path("/")
     @Consumes(MediaType.APPLICATION_JSON)
@@ -31,15 +36,17 @@ public class RentalResource {
         rentalDAO.setId(rentalID);
         rentalDAO.setHouseID(houseID);
 
-        CosmosItemResponse<HouseDAO> responseHouse = CosmosDBLayer.getInstance().houseDB.getByID(houseID);
-        HouseDAO houseDAO = responseHouse.getItem();
+        Optional<HouseDAO> house = houseService.getByID(houseID).getItem();
+        if (house.isEmpty()) {
+            return Response.noContent().build();
+        }
 
         // TODO catch Exception
         LocalDate start = LocalDate.parse(rentalDAO.getStartDate(), Constants.dateFormat);
         LocalDate end = LocalDate.parse(rentalDAO.getEndDate(), Constants.dateFormat);
 
         // Check if there is an available period which contains the wanted rental period
-        Optional<AvailablePeriod> period = houseDAO
+        Optional<AvailablePeriod> period = house.get()
                 .getAvailablePeriods()
                 .stream()
                 .filter(p -> p.containsPeriod(start, end))
@@ -51,16 +58,15 @@ public class RentalResource {
 
         // Update house available periods
         Set<AvailablePeriod> newPeriods = period.get().subtract(start, end);
-        houseDAO.getAvailablePeriods().remove(period.get());
-        houseDAO.getAvailablePeriods().addAll(newPeriods);
-        CosmosDBLayer.getInstance().houseDB.upsert(houseDAO);
+        house.get().getAvailablePeriods().remove(period.get());
+        house.get().getAvailablePeriods().addAll(newPeriods);
+        houseService.upsert(house.get());
 
         // Compute price of the rental
         long daysBetween = start.until(end, ChronoUnit.DAYS);
         Float price = daysBetween * period.get().getNormalPricePerDay();
         rentalDAO.setPrice(price);
-
-        CosmosItemResponse<RentalDAO> response = CosmosDBLayer.getInstance().rentalDB.upsert(rentalDAO);
+        ServiceResponse<RentalDAO> response = rentalService.upsert(rentalDAO);
 
         if (response.getStatusCode() == 201) {
             try {
@@ -88,7 +94,7 @@ public class RentalResource {
     public Response putRental(@PathParam("houseID") String houseID, @PathParam("rentalID") String rentalID, RentalDAO rentalDAO) {
         rentalDAO.setId(rentalID);
         rentalDAO.setHouseID(houseID);
-        CosmosItemResponse<RentalDAO> response = CosmosDBLayer.getInstance().rentalDB.upsert(rentalDAO);
+        ServiceResponse<RentalDAO> response = rentalService.upsert(rentalDAO);
 
         return Response.status(response.getStatusCode()).build();
     }
@@ -103,7 +109,7 @@ public class RentalResource {
     @Path("/{rentalID}")
     @Produces(MediaType.APPLICATION_JSON)
     public Response getRentalByID(@PathParam("houseID") String houseID, @PathParam("rentalID") String rentalID) {
-        CosmosItemResponse<RentalDAO> response = CosmosDBLayer.getInstance().rentalDB.getByID(rentalID);
+        ServiceResponse<RentalDAO> response = rentalService.getByID(rentalID);
 
         return Response.accepted(response.getItem()).build();
     }
@@ -116,7 +122,7 @@ public class RentalResource {
     @DELETE
     @Path("/{rentalID}")
     public Response deleteRental(@PathParam("houseID") String houseID, @PathParam("rentalID") String rentalID) {
-        CosmosItemResponse<Object> response = CosmosDBLayer.getInstance().rentalDB.deleteByID(rentalID);
+        ServiceResponse<RentalDAO> response = rentalService.deleteByID(rentalID);
 
         return Response.status(response.getStatusCode()).build();
     }
