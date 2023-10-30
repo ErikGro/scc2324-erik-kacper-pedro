@@ -40,32 +40,13 @@ public class UserResource
 		ServiceResponse<UserDAO> res = userService.upsert(u);
 
 		return Response.status(res.getStatusCode()).build();
-	}
+	}	
 
-	@Path("/add")
-	@POST
-	@Consumes(MediaType.APPLICATION_JSON)
-	@Produces(MediaType.APPLICATION_JSON)
-	public Response addHouseid(@QueryParam("id") String id, HouseIds house ) {
-		
-		Optional<UserDAO> user =  userService.getByID(id).getItem();
-		if(user.isEmpty())
-			return Response.status(400).entity("No such user").build();
-
-		ArrayList<String> combinedHouseIds = user.get().getHouseIds();
-		combinedHouseIds.addAll(house.getHouseIds());
-
-		user.get().setHouseIds(combinedHouseIds);
-		userService.upsert(user.get());
-
-		return Response.ok(user.get().getHouseIds()).build(); 
-	}
-	
-
+	@Path("/{id}/")
 	@DELETE
 	@Consumes(MediaType.APPLICATION_JSON)
 	@Produces(MediaType.APPLICATION_JSON)
-	public Response deleteUser(@QueryParam("id") String id) {
+	public Response deleteUser(@PathParam("id") String id) {
 
 		Optional<UserDAO> user =  userService.getByID(id).getItem();
 		if(user.isEmpty())
@@ -79,10 +60,11 @@ public class UserResource
 	}
 
 	//TODO: transactions
+	@Path("/{id}/")
 	@PUT
 	@Consumes(MediaType.APPLICATION_JSON)
 	@Produces(MediaType.APPLICATION_JSON)
-	public Response updateUser(@QueryParam("id") String id, UserDAO data){
+	public Response updateUser(@PathParam("id") String id, UserDAO data){
 
 		data.setId(id);
 		ServiceResponse<UserDAO> res = userService.upsert(data);
