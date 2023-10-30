@@ -5,6 +5,7 @@ import scc.data.Questions;
 import scc.data.RentalDAO;
 import scc.data.UserDAO;
 import scc.data.house.HouseDAO;
+import scc.utils.Constants;
 
 public class CosmosDBLayer {
 	private static CosmosDBLayer instance;
@@ -25,8 +26,8 @@ public class CosmosDBLayer {
 
 	private CosmosDBLayer() {
 		client = new CosmosClientBuilder()
-				.endpoint(System.getenv("DB_CONNECTION_URL"))
-				.key(System.getenv("DB_KEY"))
+				.endpoint(Constants.getDBConnectionURL())
+				.key(Constants.getDBKey())
 				//.directMode()
 				.gatewayMode()
 				// replace by .directMode() for better performance
@@ -35,7 +36,7 @@ public class CosmosDBLayer {
 				.contentResponseOnWriteEnabled(true)
 				.buildClient();
 
-		CosmosDatabase db = client.getDatabase(System.getenv("DB_NAME"));
+		CosmosDatabase db = client.getDatabase(Constants.getDBName());
 
 		questionsDB = new QuestionsDB(db.getContainer("questions"));
 		userDB = new UserDB(db.getContainer("users"));

@@ -1,29 +1,19 @@
 package scc.srv;
 
-import com.azure.cosmos.models.CosmosItemResponse;
 import com.azure.cosmos.util.CosmosPagedIterable;
 import jakarta.ws.rs.*;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
 import scc.cache.HouseService;
-import scc.cache.RedisCache;
 import scc.cache.ServiceResponse;
-import scc.data.RentalDAO;
-import scc.data.house.AvailablePeriod;
 import scc.data.house.HouseDAO;
 import scc.db.CosmosDBLayer;
-import scc.db.HouseDB;
 import scc.db.blob.BlobLayer;
-import scc.utils.Constants;
 
 import java.net.URI;
 import java.net.URISyntaxException;
-import java.time.LocalDate;
-import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
-import java.util.List;
 import java.util.Optional;
-import java.util.Set;
 import java.util.UUID;
 
 /**
@@ -52,7 +42,7 @@ public class HouseResource
 		if (response.getStatusCode() == 201 && response.getItem().isPresent()) {
 			try {
 				String id = response.getItem().get().getId();
-				URI houseURL = new URI(Constants.getApplicationURL() + "/rest/house/" + id);
+				URI houseURL = new URI("/rest/house/" + id);
 
 				return Response.created(houseURL).build();
 			} catch (URISyntaxException e) {
@@ -167,10 +157,12 @@ public class HouseResource
 	@Consumes(MediaType.APPLICATION_OCTET_STREAM)
 	@Produces(MediaType.TEXT_PLAIN)
 	public Response uploadPhoto(@PathParam("houseID") String houseID, byte[] photo) {
-		Optional<HouseDAO> house = houseService.getByID(houseID).getItem();
-        if (house.isEmpty()) {
+		Optional<HouseDAO> optionalHouse = houseService.getByID(houseID).getItem();
+        if (optionalHouse.isEmpty()) {
             return Response.status(404).entity("House doesn't exist.").build();
         }
+
+		HouseDAO house = optionalHouse.get();
 
 		BlobLayer blobLayer = BlobLayer.getInstance();
 
@@ -178,11 +170,11 @@ public class HouseResource
 		blobLayer.housesContainer.uploadImage(photoID, photo);
 
 		// Update house photoIDs list by new photoID		
-		ArrayList<String> photoIDs = new ArrayList<String>(house.get().getPhotoIDs());
+		ArrayList<String> photoIDs = new ArrayList<>(house.getPhotoIDs());
 		photoIDs.add(houseID);
-		house.get().setPhotoIDs(photoIDs);
+		house.setPhotoIDs(photoIDs);
 
-		houseService.upsert(house.get());
+		houseService.upsert(house);
 
 		return Response.ok(houseID).entity("Photo with id " + photoID + " uploaded to house with id " + houseID).build();
 	}
