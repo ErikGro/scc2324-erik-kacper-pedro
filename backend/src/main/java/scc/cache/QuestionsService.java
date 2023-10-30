@@ -3,7 +3,6 @@ package scc.cache;
 
 import com.azure.cosmos.util.CosmosPagedIterable;
 
-import scc.data.QuestionDAO;
 import scc.data.QuestionsDAO;
 import scc.db.CosmosDBLayer;
 import scc.db.QuestionsDB;

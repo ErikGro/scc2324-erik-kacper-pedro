@@ -4,21 +4,13 @@ import jakarta.ws.rs.core.Response;
 import scc.cache.HouseService;
 import scc.cache.QuestionsService;
 import scc.cache.ServiceResponse;
-import scc.data.Answer;
-import scc.data.AnswerDAO;
-import scc.data.QuestionDAO;
+import scc.data.Questions;
 import scc.data.QuestionsDAO;
 import scc.data.house.HouseDAO;
-import scc.db.AnswerDB;
-import scc.db.CosmosDBLayer;
-import scc.db.HouseDB;
-import scc.db.QuestionDB;
 
 import java.text.SimpleDateFormat;
 import java.util.Optional;
-import java.util.UUID;
 
-import com.azure.cosmos.models.CosmosItemResponse;
 
 import jakarta.ws.rs.*;
 import jakarta.ws.rs.core.MediaType;
@@ -38,16 +30,15 @@ public class AnswerResource {
     @POST
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
-    public Response addAnswer(@PathParam("houseId") String houseId, @PathParam("questionId") String questionId, Answer ans) {
+    public Response addAnswer(@PathParam("houseId") String houseId, @PathParam("questionId") String questionId, Questions ans) {
 
 
         Optional<QuestionsDAO> question = questionsService.getByID(questionId).getItem();
-
+        
         if (question.isEmpty()) {
             return Response.status(404, "Question doesn't exist.").build();
         }
 
-        // Get house from db
         Optional<HouseDAO> house = houseService.getByID(houseId).getItem();
         if (house.isEmpty()) {
             return Response.status(404, "House doesn't exist.").build();

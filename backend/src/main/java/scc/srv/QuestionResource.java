@@ -1,7 +1,7 @@
 package scc.srv;
 
 import jakarta.ws.rs.core.Response;
-import com.azure.cosmos.models.CosmosItemResponse;
+
 import java.util.Iterator;
 import java.util.List;
 import java.util.Optional;
@@ -11,18 +11,16 @@ import jakarta.ws.rs.core.MediaType;
 import scc.cache.HouseService;
 import scc.cache.QuestionsService;
 import scc.cache.ServiceResponse;
-import scc.data.Question;
-import scc.data.QuestionDAO;
+import scc.data.Questions;
 import scc.data.QuestionsDAO;
 import scc.data.house.HouseDAO;
-import scc.db.CosmosDBLayer;
-import scc.db.HouseDB;
-import scc.db.QuestionDB;
+
+
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 
-
+import java.util.UUID;
 
 /**
  * Class with control endpoints.
@@ -38,7 +36,7 @@ public class QuestionResource {
     @POST
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
-    public Response createQuestion(@PathParam("houseId") String houseId,  Question q) {
+    public Response createQuestion(@PathParam("houseId") String houseId,  Questions q) {
 
         Optional<HouseDAO> house = houseService.getByID(houseId).getItem();
         if (house.isEmpty()) {
@@ -46,7 +44,7 @@ public class QuestionResource {
         }
         
         
-        String id = "q:" + System.currentTimeMillis();
+        String id = UUID.randomUUID().toString();
         String ts = new SimpleDateFormat("yyyy-MM-dd.HH-mm-ss").format(new java.util.Date());
 
         QuestionsDAO qDAO = new QuestionsDAO(id, houseId, q.getUserId(), q.getText(), ts, "", "", "");
@@ -88,7 +86,7 @@ public class QuestionResource {
         
         ServiceResponse<QuestionsDAO> res = questionsService.getByID(id);
         if (res.getStatusCode() < 300) {
-            return Response.ok(res.getItem()).build();
+            return Response.ok(res.getItem().get().toString()).build();
         } else {
             return Response.noContent().build();
         }

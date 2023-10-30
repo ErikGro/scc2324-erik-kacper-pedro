@@ -85,8 +85,8 @@ public class QuestionsDAO implements Cachable {
         this.timestamp = timestamp;
     }
 
-    public Question toQuestion() {
-        return new Question(id, houseId, userId, text, timestamp);
+    public Questions toQuestion() {
+        return new Questions(id, houseId, userId, text, timestamp, answerUserId, answerText, answerTimestamp);
     }
 
     public String getAnswerUserId() {

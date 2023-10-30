@@ -1,8 +1,6 @@
 package scc.db;
 
 import com.azure.cosmos.*;
-import scc.data.AnswerDAO;
-import scc.data.QuestionDAO;
 import scc.data.Questions;
 import scc.data.RentalDAO;
 import scc.data.UserDAO;
@@ -13,8 +11,6 @@ public class CosmosDBLayer {
 	private final CosmosClient client;
 	public UserDB userDB;
 	public HouseDB houseDB;
-	public QuestionDB questionDB;
-	public AnswerDB answerDB;
 	public RentalDB rentalDB;
 	public QuestionsDB questionsDB;
 	
@@ -41,8 +37,6 @@ public class CosmosDBLayer {
 
 		CosmosDatabase db = client.getDatabase(System.getenv("DB_NAME"));
 
-		questionDB = new QuestionDB(db.getContainer("questions"));
-		answerDB = new AnswerDB(db.getContainer("answers"));
 		questionsDB = new QuestionsDB(db.getContainer("questions"));
 		userDB = new UserDB(db.getContainer("users"));
 		houseDB = new HouseDB(db.getContainer("houses"));
