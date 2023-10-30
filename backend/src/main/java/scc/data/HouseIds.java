@@ -1,21 +1,23 @@
 package scc.data;
 
+import java.util.ArrayList;
+
 public class HouseIds {
-	String houseids[];
+	ArrayList<String> houseids;
 	
 	public HouseIds() {
 		
 	}
 
-	public HouseIds(String[] houseIds){
+	public HouseIds(ArrayList<String> houseIds){
 		this.houseids=houseIds;
 	}
-	public String[] getHouseIds() {
+	public ArrayList<String> getHouseIds() {
 		// TODO Auto-generated method stub
 		return houseids;
 	}
 	
-	public void setHouseIds(String[] houseIds) {
+	public void setHouseIds(ArrayList<String> houseIds) {
 		this.houseids=houseIds;
 	}
 	

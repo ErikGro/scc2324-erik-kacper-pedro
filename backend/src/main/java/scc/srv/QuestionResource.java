@@ -91,4 +91,18 @@ public class QuestionResource {
             return Response.noContent().build();
         }
     }
+
+    @Path("/{id}/")
+    @DELETE
+    @Consumes(MediaType.APPLICATION_JSON)
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response deleteQuestion(@PathParam("id") String id) {
+        
+        ServiceResponse<QuestionsDAO> res = questionsService.deleteByID(id);
+        if (res.getStatusCode() < 300) {
+            return Response.ok(res.getItem().get().toString()).build();
+        } else {
+            return Response.noContent().build();
+        }
+    }
 }

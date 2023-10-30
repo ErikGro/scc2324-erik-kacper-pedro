@@ -47,7 +47,8 @@ public class HouseResource
 		houseDAO.setPhotoIDs(new ArrayList<String>());
 
 		ServiceResponse<HouseDAO> response = houseService.upsert(houseDAO);
-
+		// TODO: add houseID to owner's houseIDs list
+		
 		if (response.getStatusCode() == 201 && response.getItem().isPresent()) {
 			try {
 				String id = response.getItem().get().getId();

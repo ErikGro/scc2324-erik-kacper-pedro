@@ -1,5 +1,5 @@
 package scc.data;
-import java.util.Arrays;
+import java.util.ArrayList;
 import scc.utils.Hash;
 /**
  * Represents a User, as returned to the clients
@@ -12,12 +12,12 @@ public class User {
 	private String id;
 	private String name;
 	private String pwd;
-	private String[] houseIds;
+	private ArrayList<String> houseIds;
 	public User() {
 	}
 
 	
-	public User(String id, String name, String pwd, String[] houseIds) {
+	public User(String id, String name, String pwd, ArrayList<String> houseIds) {
 		super();
 		this.id = id;
 		this.name = name;
@@ -45,16 +45,16 @@ public class User {
 		this.pwd = Hash.of(pwd);//password is now hashed to compare paswwords just hash the given before comparing
 	}
 	
-	public String[] getHouseIds() {
-		return houseIds == null ? new String[0] : houseIds ;
+	public ArrayList<String> getHouseIds() {
+		return houseIds;
 	}
-	public void setHouseIds(String[] houseIds) {
+	public void setHouseIds(ArrayList<String> houseIds) {
 		this.houseIds = houseIds;
 	}
 	@Override
 	public String toString() {
 		return "User [id=" + id + ", name=" + name + ", pwd=" + pwd + ", houseIds="
-				+ Arrays.toString(houseIds) + "]";
+				+ houseIds + "]";
 	}
 	public boolean isValid() {
 		return !(id.isEmpty()&&pwd.isEmpty()&&name.isEmpty());
