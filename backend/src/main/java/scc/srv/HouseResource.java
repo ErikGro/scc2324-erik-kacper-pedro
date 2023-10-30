@@ -51,7 +51,7 @@ public class HouseResource
 		if (response.getStatusCode() == 201 && response.getItem().isPresent()) {
 			try {
 				String id = response.getItem().get().getId();
-				URI houseURL = new URI(Constants.getApplicationURL() + "/rest/house/" + id);
+				URI houseURL = new URI("/rest/house/" + id);
 
 				return Response.created(houseURL).build();
 			} catch (URISyntaxException e) {

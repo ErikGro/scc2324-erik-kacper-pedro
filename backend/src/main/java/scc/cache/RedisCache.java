@@ -2,6 +2,7 @@ package scc.cache;
 
 import redis.clients.jedis.JedisPool;
 import redis.clients.jedis.JedisPoolConfig;
+import scc.utils.Constants;
 
 public class RedisCache {
 	private static JedisPool instance;
@@ -18,7 +19,7 @@ public class RedisCache {
 		poolConfig.setTestWhileIdle(true);
 		poolConfig.setNumTestsPerEvictionRun(3);
 		poolConfig.setBlockWhenExhausted(true);
-		instance = new JedisPool(poolConfig, System.getenv("REDIS_HOSTNAME"), 6380, 1000, System.getenv("REDIS_KEY"), true);
+		instance = new JedisPool(poolConfig, Constants.getRedisHostname(), 6380, 1000, Constants.getRedisKey(), true);
 
 		return instance;
 	}
