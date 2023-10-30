@@ -68,7 +68,7 @@ public class QuestionResource {
 
         Iterator<QuestionsDAO> res = questionsService.getQuestions(houseId).getItem().get().iterator();
         // Get all questions from a house using getQuestions from QuestionDB
-        List<String> questions = new ArrayList<String>();
+        List<String> questions = new ArrayList<>();
         while (res.hasNext()) {
             QuestionsDAO q = res.next();
             questions.add(q.toString());

@@ -1,6 +1,5 @@
 package scc.srv;
 
-import com.azure.cosmos.models.CosmosItemResponse;
 import jakarta.ws.rs.*;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
@@ -16,6 +15,7 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.time.LocalDate;
 import java.time.temporal.ChronoUnit;
+import java.util.HashSet;
 import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
@@ -36,42 +36,46 @@ public class RentalResource {
         rentalDAO.setId(rentalID);
         rentalDAO.setHouseID(houseID);
 
-        Optional<HouseDAO> house = houseService.getByID(houseID).getItem();
-        if (house.isEmpty()) {
+        Optional<HouseDAO> optionalHouse = houseService.getByID(houseID).getItem();
+        if (optionalHouse.isEmpty()) {
             return Response.noContent().build();
         }
+
+        HouseDAO house = optionalHouse.get();
 
         // TODO catch Exception
         LocalDate start = LocalDate.parse(rentalDAO.getStartDate(), Constants.dateFormat);
         LocalDate end = LocalDate.parse(rentalDAO.getEndDate(), Constants.dateFormat);
 
         // Check if there is an available period which contains the wanted rental period
-        Optional<AvailablePeriod> period = house.get()
+        Optional<AvailablePeriod> optionalPeriod = house
                 .getAvailablePeriods()
                 .stream()
                 .filter(p -> p.containsPeriod(start, end))
                 .findFirst();
 
-        if (period.isEmpty()) {
+        if (optionalPeriod.isEmpty()) {
             return Response.noContent().build();
         }
 
+        AvailablePeriod period = optionalPeriod.get();
+
         // Update house available periods
-        Set<AvailablePeriod> newPeriods = period.get().subtract(start, end);
-        house.get().getAvailablePeriods().remove(period.get());
-        house.get().getAvailablePeriods().addAll(newPeriods);
-        houseService.upsert(house.get());
+        Set<AvailablePeriod> newPeriods = new HashSet<>(house.getAvailablePeriods());
+        newPeriods.remove(period);
+        newPeriods.addAll(period.subtract(start, end));
+        house.setAvailablePeriods(newPeriods);
+        houseService.upsert(house);
 
         // Compute price of the rental
         long daysBetween = start.until(end, ChronoUnit.DAYS);
-        Float price = daysBetween * period.get().getNormalPricePerDay();
+        Float price = daysBetween * period.getNormalPricePerDay();
         rentalDAO.setPrice(price);
         ServiceResponse<RentalDAO> response = rentalService.upsert(rentalDAO);
 
         if (response.getStatusCode() == 201) {
             try {
-                String path = "/rest/house/" + houseID + "/rental/" + rentalID;
-                URI rentalURL = new URI(path);
+                URI rentalURL = new URI("/rest/house/" + houseID + "/rental/" + rentalID);
                 return Response.created(rentalURL).build();
             } catch (URISyntaxException e) {
                 return Response.status(500).build();

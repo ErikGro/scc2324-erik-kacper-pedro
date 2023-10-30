@@ -57,18 +57,16 @@ public class AvailablePeriod {
 
     // [Period]
     public boolean containsPeriod(LocalDate start, LocalDate end) {
-        DateTimeFormatter f = Constants.dateFormat;
-        LocalDate periodStart = LocalDate.parse(this.startDate, f);
-        LocalDate periodEnd = LocalDate.parse(this.endDate, f);
+        LocalDate periodStart = getPeriodStart();
+        LocalDate periodEnd = getPeriodEnd();
 
         return (periodStart.isBefore(start) || periodStart.isEqual(start)) && (periodEnd.isAfter(end) || periodEnd.isEqual(end));
     }
 
     // the startDate and EndDate are expected to be within the range of the period
     public Set<AvailablePeriod> subtract(LocalDate start, LocalDate end) {
-        DateTimeFormatter f = Constants.dateFormat;
-        LocalDate periodStart = LocalDate.parse(this.startDate, f);
-        LocalDate periodEnd = LocalDate.parse(this.endDate, f);
+        LocalDate periodStart = getPeriodStart();
+        LocalDate periodEnd = getPeriodEnd();
 
         HashSet<AvailablePeriod> newPeriods = new HashSet<>();
         
@@ -84,5 +82,13 @@ public class AvailablePeriod {
         }
 
         return newPeriods;
+    }
+
+    private LocalDate getPeriodStart() {
+        return LocalDate.parse(this.startDate, Constants.dateFormat);
+    }
+
+    private LocalDate getPeriodEnd() {
+        return LocalDate.parse(this.endDate, Constants.dateFormat);
     }
 }
