@@ -17,95 +17,87 @@ import scc.data.HouseIds;
 
 import scc.data.UserDAO;
 
-/**
- * Class with control endpoints.
- */
 @Path("/user")
-public class UserResource
-{
-	/**
-	 * This methods just prints a string. It may be useful to check if the current 
-	 * version is running on Azure.
-	 */
-	private final UserService userService = new UserService();
-	@Path("/")
-	@POST
-	@Consumes(MediaType.APPLICATION_JSON)
-	@Produces(MediaType.APPLICATION_JSON)
-	public Response createUser(UserDAO data) {
+public class UserResource {
+    private final UserService userService = new UserService();
 
-		String id = UUID.randomUUID().toString();
-		UserDAO u = new UserDAO(id, data.getName(), data.getPwd(), data.getHouseIds());
+    @Path("/")
+    @POST
+    @Consumes(MediaType.APPLICATION_JSON)
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response createUser(UserDAO data) {
 
-		ServiceResponse<UserDAO> res = userService.upsert(u);
+        String id = UUID.randomUUID().toString();
+        UserDAO u = new UserDAO(id, data.getName(), data.getPwd(), data.getHouseIds());
 
-		return Response.status(res.getStatusCode()).build();
-	}	
+        ServiceResponse<UserDAO> res = userService.upsert(u);
 
-	@Path("/{id}/")
-	@DELETE
-	@Consumes(MediaType.APPLICATION_JSON)
-	@Produces(MediaType.APPLICATION_JSON)
-	public Response deleteUser(@PathParam("id") String id) {
+        return Response.status(res.getStatusCode()).build();
+    }
 
-		Optional<UserDAO> user =  userService.getByID(id).getItem();
-		if(user.isEmpty())
-			return Response.status(400).entity("No such user").build();
+    @Path("/{id}")
+    @DELETE
+    @Consumes(MediaType.APPLICATION_JSON)
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response deleteUser(@PathParam("id") String id) {
 
-		//TODO: add compatibility with houses to show that the user has been deleted
-		userService.deleteByID(id);
-		return Response.ok(id).build();
-		//throw new ServiceUnavailableException();
+        Optional<UserDAO> user = userService.getByID(id).getItem();
+        if (user.isEmpty())
+            return Response.status(400).entity("No such user").build();
 
-	}
-
-	//TODO: transactions
-	@Path("/{id}/")
-	@PUT
-	@Consumes(MediaType.APPLICATION_JSON)
-	@Produces(MediaType.APPLICATION_JSON)
-	public Response updateUser(@PathParam("id") String id, UserDAO data){
-
-		data.setId(id);
-		ServiceResponse<UserDAO> res = userService.upsert(data);
-
-		return Response.status(res.getStatusCode()).build();
-	}
-
-	@Path("/{id}/photo")
-	@POST
-	@Consumes(MediaType.APPLICATION_OCTET_STREAM)
-	@Produces(MediaType.TEXT_PLAIN)
-	public Response uploadPhoto(@PathParam("id") String id, byte[] photo) {
-
-		Optional<UserDAO> user =  userService.getByID(id).getItem();
-		if(user.isEmpty())
-			return Response.status(400).entity("No such user").build();
+        //TODO: add compatibility with houses to show that the user has been deleted
+        userService.deleteByID(id);
 		
-		BlobLayer blobLayer = BlobLayer.getInstance();
-		blobLayer.usersContainer.uploadImage(id, photo);
-		
-		return Response.ok(id).build();
-	}
+        return Response.ok(id).build();
+    }
 
-	@Path("/{id}/photo")
-	@GET
-	@Produces(MediaType.APPLICATION_OCTET_STREAM)
-	public Response getPhoto(@PathParam("id") String id) {
-		
-		Optional<UserDAO> user =  userService.getByID(id).getItem();
-		if(user.isEmpty())
-			return Response.status(400).entity("No such user").build();
-		
-		BlobLayer blobLayer = BlobLayer.getInstance();
+    //TODO: transactions
+    @Path("/{id}/")
+    @PUT
+    @Consumes(MediaType.APPLICATION_JSON)
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response updateUser(@PathParam("id") String id, UserDAO data) {
 
-		byte[] photo;
-		try {
-			photo = blobLayer.usersContainer.getImage(id);
-		} catch (Exception e) {
-			return Response.status(404).entity("No photo found").build();
-		}
-		
-		return Response.ok(photo).build();
-	}
+        data.setId(id);
+        ServiceResponse<UserDAO> res = userService.upsert(data);
+
+        return Response.status(res.getStatusCode()).build();
+    }
+
+    @Path("/{id}/photo")
+    @POST
+    @Consumes(MediaType.APPLICATION_OCTET_STREAM)
+    @Produces(MediaType.TEXT_PLAIN)
+    public Response uploadPhoto(@PathParam("id") String id, byte[] photo) {
+
+        Optional<UserDAO> user = userService.getByID(id).getItem();
+        if (user.isEmpty())
+            return Response.status(400).entity("No such user").build();
+
+        BlobLayer blobLayer = BlobLayer.getInstance();
+        blobLayer.usersContainer.uploadImage(id, photo);
+
+        return Response.ok(id).build();
+    }
+
+    @Path("/{id}/photo")
+    @GET
+    @Produces(MediaType.APPLICATION_OCTET_STREAM)
+    public Response getPhoto(@PathParam("id") String id) {
+
+        Optional<UserDAO> user = userService.getByID(id).getItem();
+        if (user.isEmpty())
+            return Response.status(400).entity("No such user").build();
+
+        BlobLayer blobLayer = BlobLayer.getInstance();
+
+        byte[] photo;
+        try {
+            photo = blobLayer.usersContainer.getImage(id);
+        } catch (Exception e) {
+            return Response.status(404).entity("No photo found").build();
+        }
+
+        return Response.ok(photo).build();
+    }
 }

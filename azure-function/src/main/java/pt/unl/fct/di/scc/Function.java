@@ -36,11 +36,11 @@ public class Function {
 
     @FunctionName("periodic-compute")
     public void updateDiscountedNearFuture(
-            @TimerTrigger(name ="periodicSetTime", schedule = "0 * * * *")
+            @TimerTrigger(name = "periodicSetTime", schedule = "0 * * * *")
                                 String timerInfo,
                                 ExecutionContext context) {
         CosmosPagedIterable<HouseDAO> houses = getDiscountedHousesNearFuture();
-        
+
 
     }
 
