@@ -38,19 +38,12 @@ public class HouseResource
 
 		ServiceResponse<HouseDAO> response = houseService.upsert(houseDAO);
 		// TODO: add houseID to owner's houseIDs list
-		
-		if (response.getStatusCode() == 201 && response.getItem().isPresent()) {
-			try {
-				String id = response.getItem().get().getId();
-				URI houseURL = new URI("/rest/house/" + id);
 
-				return Response.created(houseURL).build();
-			} catch (URISyntaxException e) {
-				return Response.status(500).build();
-			}
-        }
+		if (response.getStatusCode() != 201 || response.getItem().isEmpty()) {
+			return Response.status(response.getStatusCode()).build();
+		}
 
-		return Response.status(response.getStatusCode()).build();
+		return Response.created(URI.create("/house/" + response.getItem().get().getId())).build();
 	}
 
 	/**

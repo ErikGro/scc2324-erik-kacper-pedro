@@ -73,16 +73,11 @@ public class RentalResource {
         rentalDAO.setPrice(price);
         ServiceResponse<RentalDAO> response = rentalService.upsert(rentalDAO);
 
-        if (response.getStatusCode() == 201) {
-            try {
-                URI rentalURL = new URI("/rest/house/" + houseID + "/rental/" + rentalID);
-                return Response.created(rentalURL).build();
-            } catch (URISyntaxException e) {
-                return Response.status(500).build();
-            }
-        }
+        if (response.getStatusCode() != 201)
+            return Response.status(response.getStatusCode()).build();
 
-        return Response.status(response.getStatusCode()).build();
+        URI rentalPath = URI.create("/rest/house/" + houseID + "/rental/" + rentalID);
+        return Response.created(rentalPath).build();
     }
 
     /**
