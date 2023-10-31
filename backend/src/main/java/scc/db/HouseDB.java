@@ -19,7 +19,15 @@ public class HouseDB extends AbstractDB<HouseDAO> {
         String query = "SELECT * FROM houses WHERE houses.ownerID=\"" + id + "\"";
         return container.queryItems(query, new CosmosQueryRequestOptions(), HouseDAO.class);
     }
-
+    
+    public void deleteUserID(String id) {
+        CosmosPagedIterable<HouseDAO> houses = getHousesByUserID(id);
+        for (HouseDAO house : houses) {
+            house.setOwnerID("DeletedUser");
+            upsert(house);
+        }
+    }
+    
     public CosmosPagedIterable<HouseDAO> getHousesByCity(String name) {
         String query = "SELECT * FROM houses WHERE houses.address.city=\"" + name + "\"";
         return container.queryItems(query, new CosmosQueryRequestOptions(), HouseDAO.class);

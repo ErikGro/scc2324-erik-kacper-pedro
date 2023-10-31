@@ -10,4 +10,8 @@ public class RentalService extends AbstractService<RentalDAO, RentalDB> {
     public RentalService() {
         super(RentalDAO.class, "rental:", CosmosDBLayer.getInstance().rentalDB);
     }
+
+    public void deleteUserID(String id) {
+        db.deleteUserID(id);
+    }
 }
