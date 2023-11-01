@@ -14,8 +14,6 @@ public class Constants {
 
     public static boolean cachingEnabled = true;
 
-    public static boolean azureFunctionsEnabled = true;
-
     ///////////////////////////////// DB Env /////////////////////////////////
 
     public static String getDBConnectionURL() {

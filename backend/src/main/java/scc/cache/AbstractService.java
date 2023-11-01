@@ -42,7 +42,7 @@ public class AbstractService<T extends Identifiable, DBType extends AbstractDB<T
         CosmosItemResponse<T> response = db.upsert(object);
 
         if (response.getStatusCode() < 300) {
-            writeToCache(object);
+            writeToCache(response.getItem());
         }
 
         return new ServiceResponse<>(response.getStatusCode(), response.getItem());
@@ -63,7 +63,7 @@ public class AbstractService<T extends Identifiable, DBType extends AbstractDB<T
         try (Jedis jedis = RedisCache.getCachePool().getResource()) {
             jedis.set(cachingPrefix + object.getId(), mapper.writeValueAsString(object));
         } catch (JsonProcessingException ignored) {
-
+            // Do nothing
         }
     }
 
@@ -84,7 +84,7 @@ public class AbstractService<T extends Identifiable, DBType extends AbstractDB<T
 
             return Optional.of(object);
         } catch (JsonProcessingException ignored) {
-
+            // Return empty optional
         }
 
         return Optional.empty();
