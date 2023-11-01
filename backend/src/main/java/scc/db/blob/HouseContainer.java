@@ -13,19 +13,11 @@ public class HouseContainer extends BlobContainer {
         super(container);
     }
 
-    // TODO: What to return?
-    public String uploadImage(String id, byte[] image) {
-        
+    public void uploadImage(String id, byte[] image) {
         BlobClient blobClient = container.getBlobClient(id);
         
         blobClient.upload(new ByteArrayInputStream(image), image.length, true);
-
-        BlobHttpHeaders headers = new BlobHttpHeaders().setContentType("image/jpeg");
-        blobClient.setHttpHeaders(headers);
-
-        return "File uploaded successfully ";
     }
-
 
     public byte[] getImage(String id) {
         BlobClient blobClient = container.getBlobClient(id);

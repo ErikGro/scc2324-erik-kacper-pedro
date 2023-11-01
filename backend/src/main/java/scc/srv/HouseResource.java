@@ -182,7 +182,8 @@ public class HouseResource {
 	@Consumes(MediaType.APPLICATION_OCTET_STREAM)
 	@Produces(MediaType.TEXT_PLAIN)
 	public Response uploadPhoto(@CookieParam("scc:session") Cookie session,
-								@PathParam("houseID") String houseID, byte[] photo) {
+								@PathParam("houseID") String houseID,
+								byte[] photo) {
 		Optional<HouseDAO> optionalHouse = houseService.getByID(houseID).getItem();
 
         if (optionalHouse.isEmpty())
@@ -206,7 +207,7 @@ public class HouseResource {
 
 		houseService.upsert(house);
 
-		return Response.ok(houseID).entity("Photo with id " + photoID + " uploaded to house with id " + houseID).build();
+		return Response.ok().build();
 	}
 
 	@GET
