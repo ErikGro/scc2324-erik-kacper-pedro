@@ -33,7 +33,17 @@ public class HouseResource {
 	@POST
 	@Path("/")
 	@Consumes(MediaType.APPLICATION_JSON)
-	public Response postHouse(HouseDAO houseDAO) {
+	public Response postHouse(@CookieParam("scc:session") Cookie session,
+							  HouseDAO houseDAO) {
+		if (session == null || session.getValue() == null)
+			return Response.status(401).build();
+
+		Optional<String> userID = userService.getUserIDBySession(session.getValue());
+
+		if (userID.isEmpty())
+			return Response.status(401).build();
+
+		houseDAO.setOwnerID(userID.get());
 		houseDAO.setId(UUID.randomUUID().toString());
 
 		ServiceResponse<HouseDAO> response = houseService.upsert(houseDAO);

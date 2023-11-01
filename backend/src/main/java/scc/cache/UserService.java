@@ -6,6 +6,8 @@ import scc.data.UserDAO;
 import scc.db.CosmosDBLayer;
 import scc.db.UserDB;
 
+import java.util.Optional;
+
 public class UserService extends AbstractService<UserDAO, UserDB> {
     private final HouseService houseService = new HouseService();
     private final RentalService rentalService = new RentalService();
@@ -24,19 +26,6 @@ public class UserService extends AbstractService<UserDAO, UserDB> {
         return new ServiceResponse<>(200, response.iterator().next());
     }
 
-    public void putSession(String sessionID, String userID) {
-        try (Jedis jedis = RedisCache.getCachePool().getResource()) {
-            jedis.set("session:" + sessionID, userID);
-        }
-    }
-
-    public boolean userSessionInvalid(String sessionID, String userID) {
-        try (Jedis jedis = RedisCache.getCachePool().getResource()) {
-            String sessionUserID = jedis.get("session:" + sessionID);
-            return !userID.equals(sessionUserID);
-        }
-    }
-
     @Override
     public ServiceResponse<UserDAO> deleteByID(String id) {
         ServiceResponse<UserDAO> response = super.deleteByID(id);
@@ -46,5 +35,26 @@ public class UserService extends AbstractService<UserDAO, UserDB> {
         rentalService.deleteUserID(id);
 
         return response;
+    }
+
+    ////////////////// SESSION HANDLING //////////////////
+
+    public void putSession(String sessionID, String userID) {
+        try (Jedis jedis = RedisCache.getCachePool().getResource()) {
+            jedis.set("session:" + sessionID, userID);
+        }
+    }
+
+    public Optional<String> getUserIDBySession(String sessionID) {
+        try (Jedis jedis = RedisCache.getCachePool().getResource()) {
+            return Optional.ofNullable(jedis.get("session:" + sessionID));
+        }
+    }
+
+    public boolean userSessionInvalid(String sessionID, String userID) {
+        try (Jedis jedis = RedisCache.getCachePool().getResource()) {
+            String sessionUserID = jedis.get("session:" + sessionID);
+            return !userID.equals(sessionUserID);
+        }
     }
 }
