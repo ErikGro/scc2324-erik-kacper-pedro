@@ -13,7 +13,6 @@ public class MainApplication extends Application {
 		resources.add(RentalResource.class);
 		resources.add(QuestionResource.class);
 		resources.add(AnswerResource.class);
-		resources.add(MediaResource.class);
 		resources.add(UserResource.class);
 	}
 

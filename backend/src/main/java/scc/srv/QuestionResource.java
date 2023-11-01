@@ -1,5 +1,6 @@
 package scc.srv;
 
+import jakarta.ws.rs.core.Cookie;
 import jakarta.ws.rs.core.Response;
 
 import java.util.Iterator;
@@ -11,6 +12,7 @@ import jakarta.ws.rs.core.MediaType;
 import scc.cache.HouseService;
 import scc.cache.QuestionsService;
 import scc.cache.ServiceResponse;
+import scc.cache.UserService;
 import scc.data.Questions;
 import scc.data.QuestionsDAO;
 import scc.data.house.HouseDAO;
@@ -31,6 +33,7 @@ import java.util.UUID;
 public class QuestionResource {
     private final HouseService houseService = new HouseService();
     private final QuestionsService questionsService = new QuestionsService();
+    private final UserService userService = new UserService();
 
     @Path("/")
     @POST
@@ -42,7 +45,6 @@ public class QuestionResource {
         if (house.isEmpty()) {
             return Response.status(404, "House doesn't exist.").build();
         }
-        
         
         String id = UUID.randomUUID().toString();
         String ts = new SimpleDateFormat("yyyy-MM-dd.HH-mm-ss").format(new java.util.Date());
@@ -96,11 +98,21 @@ public class QuestionResource {
     @DELETE
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
-    public Response deleteQuestion(@PathParam("id") String id) {
-        
-        ServiceResponse<QuestionsDAO> res = questionsService.deleteByID(id);
-        if (res.getStatusCode() < 300) {
-            return Response.ok(res.getItem().get().toString()).build();
+    public Response deleteQuestion(@CookieParam("scc:session") Cookie session,
+                                   @PathParam("id") String id) {
+        ServiceResponse<QuestionsDAO> questionResponse = questionsService.getByID(id);
+
+        if (questionResponse.getItem().isEmpty())
+            return Response.status(404).build();
+
+        if (session == null || session.getValue() == null ||
+                userService.userSessionInvalid(session.getValue(), questionResponse.getItem().get().getUserId()))
+            return Response.status(401).build();
+
+        ServiceResponse<QuestionsDAO> deleteResponse = questionsService.deleteByID(id);
+
+        if (deleteResponse.getStatusCode() < 300) {
+            return Response.ok().build();
         } else {
             return Response.noContent().build();
         }

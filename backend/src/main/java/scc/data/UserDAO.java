@@ -2,6 +2,8 @@ package scc.data;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
+import java.util.Set;
 
 import scc.cache.Cachable;
 
@@ -9,37 +11,13 @@ import scc.cache.Cachable;
  * Represents a User, as stored in the database
  */
 public class UserDAO implements Cachable {
-	private String _rid;
-	private String _ts;
 	private String id;
 	private String name;
 	private String pwd;
-	private ArrayList<String> houseIds;
+	private Set<String> houseIds = Collections.emptySet();
 
-	public UserDAO() {
-	}
-	public UserDAO( User u) {
-		this(u.getId(), u.getName(), u.getPwd(), u.getHouseIds());
-	}
-	public UserDAO(String id, String name, String pwd, ArrayList<String> houseIds) {
-		super();
-		this.id = id;
-		this.name = name;
-		this.pwd = pwd;
-		this.houseIds = houseIds;
-	}
-	public String get_rid() {
-		return _rid;
-	}
-	public void set_rid(String _rid) {
-		this._rid = _rid;
-	}
-	public String get_ts() {
-		return _ts;
-	}
-	public void set_ts(String _ts) {
-		this._ts = _ts;
-	}
+	public UserDAO() {}
+
 	public String getId() {
 		return id;
 	}
@@ -59,21 +37,15 @@ public class UserDAO implements Cachable {
 		this.pwd = pwd;
 	}
 
-	public ArrayList<String> getHouseIds() {
+	public Set<String> getHouseIds() {
 		return houseIds;
 	}
-	public void setHouseIds(ArrayList<String> houseIds) {
+	public void setHouseIds(Set<String> houseIds) {
 		this.houseIds = houseIds;
 	}
 	public User toUser() {
 		return new User( id, name, pwd, houseIds);
 	}
-	@Override
-	public String toString() {
-		return "UserDAO [_rid=" + _rid + ", _ts=" + _ts + ", id=" + id + ", name=" + name + ", pwd=" + pwd
-				+ ", houseIds=" + houseIds + "]";
-	}
-
 	public String getCachingKey() {
         return id;
     }

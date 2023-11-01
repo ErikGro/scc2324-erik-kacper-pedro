@@ -1,11 +1,13 @@
 package scc.srv;
 
 import jakarta.ws.rs.*;
+import jakarta.ws.rs.core.Cookie;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
 import scc.cache.HouseService;
 import scc.cache.RentalService;
 import scc.cache.ServiceResponse;
+import scc.cache.UserService;
 import scc.data.RentalDAO;
 import scc.data.house.AvailablePeriod;
 import scc.data.house.HouseDAO;
@@ -27,6 +29,7 @@ import java.util.UUID;
 public class RentalResource {
     private final HouseService houseService = new HouseService();
     private final RentalService rentalService = new RentalService();
+    private final UserService userService = new UserService();
 
     @POST
     @Path("/")
@@ -76,21 +79,34 @@ public class RentalResource {
         if (response.getStatusCode() != 201)
             return Response.status(response.getStatusCode()).build();
 
-        URI rentalPath = URI.create("/rest/house/" + houseID + "/rental/" + rentalID);
+        URI rentalPath = URI.create("/house/" + houseID + "/rental/" + rentalID);
         return Response.created(rentalPath).build();
     }
 
     /**
      * Update a rental by a given id
-     * @param houseID the id of the house to which the rental belongs
-     * @param rentalID the id of the rental to be updated
+     *
+     * @param houseID   the id of the house to which the rental belongs
+     * @param rentalID  the id of the rental to be updated
      * @param rentalDAO the updated content
      * @return nothing - 2xx if update was successful
      */
     @PUT
     @Path("/{rentalID}")
     @Consumes(MediaType.APPLICATION_JSON)
-    public Response putRental(@PathParam("houseID") String houseID, @PathParam("rentalID") String rentalID, RentalDAO rentalDAO) {
+    public Response putRental(@CookieParam("scc:session") Cookie session,
+                              @PathParam("houseID") String houseID,
+                              @PathParam("rentalID") String rentalID,
+                              RentalDAO rentalDAO) {
+        ServiceResponse<HouseDAO> houseResponse = houseService.getByID(houseID);
+
+        if (houseResponse.getItem().isEmpty())
+            return Response.status(404).build();
+
+        if (session == null || session.getValue() == null ||
+                userService.userSessionInvalid(session.getValue(), houseResponse.getItem().get().getOwnerID()))
+            return Response.status(401).build();
+
         rentalDAO.setId(rentalID);
         rentalDAO.setHouseID(houseID);
         ServiceResponse<RentalDAO> response = rentalService.upsert(rentalDAO);
@@ -100,7 +116,8 @@ public class RentalResource {
 
     /**
      * If rental with given id exists, return rental as JSON
-     * @param houseID the id of the house to which the rental belongs
+     *
+     * @param houseID  the id of the house to which the rental belongs
      * @param rentalID the id of the rental to be fetched
      * @return Response with rental JSON for given id in body
      */
@@ -115,12 +132,24 @@ public class RentalResource {
 
     /**
      * Delete a rental by a given id
+     *
      * @param rentalID of the rental to be deleted
      * @return nothing - 2xx if delete succeeded
      */
     @DELETE
     @Path("/{rentalID}")
-    public Response deleteRental(@PathParam("houseID") String houseID, @PathParam("rentalID") String rentalID) {
+    public Response deleteRental(@CookieParam("scc:session") Cookie session,
+                                 @PathParam("houseID") String houseID,
+                                 @PathParam("rentalID") String rentalID) {
+        ServiceResponse<HouseDAO> houseResponse = houseService.getByID(houseID);
+
+        if (houseResponse.getItem().isEmpty())
+            return Response.status(404).build();
+
+        if (session == null || session.getValue() == null ||
+                userService.userSessionInvalid(session.getValue(), houseResponse.getItem().get().getOwnerID()))
+            return Response.status(401).build();
+
         ServiceResponse<RentalDAO> response = rentalService.deleteByID(rentalID);
 
         return Response.status(response.getStatusCode()).build();

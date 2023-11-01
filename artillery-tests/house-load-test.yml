@@ -11,10 +11,6 @@ config:
   plugins:
     metrics-by-endpoint: 
       useOnlyRequestNames: true
-  http:
-    defaults:
-      headers:
-        Content-Type: "application/json"
   processor: "./processor.js"
 scenarios:
   - name: "House Flow"
@@ -30,9 +26,11 @@ scenarios:
             - header: "location"
               as: "houseID"
           afterResponse: "setHouseID"
-      - get:
-          url: "/house/{{ houseID }}"
-          name: "GET /house/:houseID"
+      - loop:
+          - get:
+              url: "/house/{{ houseID }}"
+              name: "GET /house/:houseID"
+        count: 20
       - delete:
           url: "/house/{{ houseID }}"
           name: "DELETE /house/:houseID"

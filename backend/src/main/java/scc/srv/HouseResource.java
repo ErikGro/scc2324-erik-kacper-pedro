@@ -2,16 +2,17 @@ package scc.srv;
 
 import com.azure.cosmos.util.CosmosPagedIterable;
 import jakarta.ws.rs.*;
+import jakarta.ws.rs.core.Cookie;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
 import scc.cache.HouseService;
 import scc.cache.ServiceResponse;
+import scc.cache.UserService;
 import scc.data.house.HouseDAO;
 import scc.db.CosmosDBLayer;
 import scc.db.blob.BlobLayer;
 
 import java.net.URI;
-import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.Optional;
 import java.util.UUID;
@@ -20,9 +21,9 @@ import java.util.UUID;
  * Resource for accessing houses
  */ 
 @Path("/house")
-public class HouseResource
-{
+public class HouseResource {
 	private final HouseService houseService = new HouseService();
+	private final UserService userService = new UserService();
 
 	/**
 	 * Create a single house
@@ -34,7 +35,6 @@ public class HouseResource
 	@Consumes(MediaType.APPLICATION_JSON)
 	public Response postHouse(HouseDAO houseDAO) {
 		houseDAO.setId(UUID.randomUUID().toString());
-		houseDAO.setPhotoIDs(new ArrayList<String>());
 
 		ServiceResponse<HouseDAO> response = houseService.upsert(houseDAO);
 		// TODO: add houseID to owner's houseIDs list
@@ -43,7 +43,8 @@ public class HouseResource
 			return Response.status(response.getStatusCode()).build();
 		}
 
-		return Response.created(URI.create("/house/" + response.getItem().get().getId())).build();
+		URI housePath = URI.create("/house/" + response.getItem().get().getId());
+		return Response.created(housePath).build();
 	}
 
 	/**
@@ -55,7 +56,18 @@ public class HouseResource
 	@PUT
 	@Path("/{id}")
 	@Consumes(MediaType.APPLICATION_JSON)
-	public Response putHouse(@PathParam("id") String id, HouseDAO houseDAO) {
+	public Response putHouse(@CookieParam("scc:session") Cookie session,
+							 @PathParam("id") String id,
+							 HouseDAO houseDAO) {
+		ServiceResponse<HouseDAO> houseResponse = houseService.getByID(id);
+
+		if (houseResponse.getItem().isEmpty())
+			return Response.status(404).build();
+
+		if (session == null || session.getValue() == null ||
+				userService.userSessionInvalid(session.getValue(), houseResponse.getItem().get().getOwnerID()))
+			return Response.status(401).build();
+
 		houseDAO.setId(id);
 		ServiceResponse<HouseDAO> response = houseService.upsert(houseDAO);
 
@@ -87,10 +99,20 @@ public class HouseResource
 	 */
 	@DELETE
 	@Path("/{id}")
-	public Response deleteHouse(@PathParam("id") String id) {
-		ServiceResponse<HouseDAO> response = houseService.deleteByID(id);
+	public Response deleteHouse(@CookieParam("scc:session") Cookie session,
+								@PathParam("id") String id) {
+		ServiceResponse<HouseDAO> response = houseService.getByID(id);
 
-		return Response.status(response.getStatusCode()).build();
+		if (response.getItem().isEmpty())
+			return Response.status(404).build();
+
+		if (session == null || session.getValue() == null ||
+				userService.userSessionInvalid(session.getValue(), response.getItem().get().getOwnerID()))
+			return Response.status(401).build();
+
+		ServiceResponse<HouseDAO> deleteResponse = houseService.deleteByID(id);
+
+		return Response.status(deleteResponse.getStatusCode()).build();
 	}
 
 	/**
@@ -149,13 +171,18 @@ public class HouseResource
 	@Path("/{houseID}/photo")
 	@Consumes(MediaType.APPLICATION_OCTET_STREAM)
 	@Produces(MediaType.TEXT_PLAIN)
-	public Response uploadPhoto(@PathParam("houseID") String houseID, byte[] photo) {
+	public Response uploadPhoto(@CookieParam("scc:session") Cookie session,
+								@PathParam("houseID") String houseID, byte[] photo) {
 		Optional<HouseDAO> optionalHouse = houseService.getByID(houseID).getItem();
-        if (optionalHouse.isEmpty()) {
+
+        if (optionalHouse.isEmpty())
             return Response.status(404).entity("House doesn't exist.").build();
-        }
 
 		HouseDAO house = optionalHouse.get();
+
+		if (session == null || session.getValue() == null ||
+				userService.userSessionInvalid(session.getValue(), house.getOwnerID()))
+			return Response.status(401).build();
 
 		BlobLayer blobLayer = BlobLayer.getInstance();
 

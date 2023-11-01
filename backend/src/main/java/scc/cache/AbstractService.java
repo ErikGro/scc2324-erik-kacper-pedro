@@ -12,7 +12,7 @@ import java.util.Optional;
 public class AbstractService<T extends Cachable, DBType extends AbstractDB<T>> {
     protected final DBType db;
     private final Class<T> type;
-    private final ObjectMapper mapper = new ObjectMapper();
+    protected final ObjectMapper mapper = new ObjectMapper();
     private final String cachingPrefix;
 
     public AbstractService(Class<T> type, String cachingPrefix, DBType db) {
