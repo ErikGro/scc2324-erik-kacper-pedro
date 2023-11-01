@@ -1,14 +1,12 @@
 package scc.data.house;
 
-import scc.cache.Cachable;
+import scc.cache.Identifiable;
 
-import java.time.Month;
 import java.util.Collections;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 
-public class HouseDAO implements Cachable {
+public class HouseDAO implements Identifiable {
     private String id;
     private String ownerID;
     private String name;
@@ -17,7 +15,8 @@ public class HouseDAO implements Cachable {
     private List<String> photoIDs = Collections.emptyList();
     private Set<AvailablePeriod> availablePeriods = Collections.emptySet();
 
-    public HouseDAO() {}
+    public HouseDAO() {
+    }
 
     public String getId() {
         return id;
@@ -73,9 +72,5 @@ public class HouseDAO implements Cachable {
 
     public void setAvailablePeriods(Set<AvailablePeriod> availablePeriods) {
         this.availablePeriods = availablePeriods;
-    }
-
-    public String getCachingKey() {
-        return id;
     }
 }

@@ -9,7 +9,7 @@ import scc.utils.Constants;
 
 import java.util.Optional;
 
-public class AbstractService<T extends Cachable, DBType extends AbstractDB<T>> {
+public class AbstractService<T extends Identifiable, DBType extends AbstractDB<T>> {
     protected final DBType db;
     private final Class<T> type;
     protected final ObjectMapper mapper = new ObjectMapper();
@@ -61,7 +61,7 @@ public class AbstractService<T extends Cachable, DBType extends AbstractDB<T>> {
         if (!Constants.cachingEnabled) return;
 
         try (Jedis jedis = RedisCache.getCachePool().getResource()) {
-            jedis.set(cachingPrefix + object.getCachingKey(), mapper.writeValueAsString(object));
+            jedis.set(cachingPrefix + object.getId(), mapper.writeValueAsString(object));
         } catch (JsonProcessingException ignored) {
 
         }

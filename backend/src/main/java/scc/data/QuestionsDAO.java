@@ -1,8 +1,8 @@
 package scc.data;
 
-import scc.cache.Cachable;
+import scc.cache.Identifiable;
 
-public class QuestionsDAO implements Cachable {
+public class QuestionsDAO implements Identifiable {
 
     private String _rid;
     private String _ts;
@@ -117,9 +117,5 @@ public class QuestionsDAO implements Cachable {
     public String toString() {
         return "Question [id=" + id + ", houseId=" + houseId + ", userId=" + userId + ", text=" + text + ", timestamp=" + timestamp + "]\n" +
                 "Answer [userId=" + answerUserId + ", text=" + answerText + ", timestamp=" + answerTimestamp + "]\n";
-    }
-
-    public String getCachingKey() {
-        return id;
     }
 }

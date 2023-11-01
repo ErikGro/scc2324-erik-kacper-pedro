@@ -37,7 +37,7 @@ public class UserService extends AbstractService<UserDAO, UserDB> {
         }
     }
 
-    @Override 
+    @Override
     public ServiceResponse<UserDAO> deleteByID(String id) {
         ServiceResponse<UserDAO> response = super.deleteByID(id);
 

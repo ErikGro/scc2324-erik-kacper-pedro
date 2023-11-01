@@ -1,10 +1,10 @@
 package scc.data;
 
-import scc.cache.Cachable;
+import scc.cache.Identifiable;
 
 import java.time.Month;
 
-public class RentalDAO implements Cachable {
+public class RentalDAO implements Identifiable {
     private String id;
     private String houseID;
     private String tenantID;
@@ -60,10 +60,5 @@ public class RentalDAO implements Cachable {
 
     public void setPrice(Float price) {
         this.price = price;
-    }
-
-    @Override
-    public String getCachingKey() {
-        return id;
     }
 }

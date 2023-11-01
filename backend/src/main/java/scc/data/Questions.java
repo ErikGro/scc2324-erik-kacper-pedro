@@ -1,12 +1,14 @@
 package scc.data;
 
+import scc.cache.Identifiable;
+
 /**
  * Represents Questions asked about a house,
  * stores id of the question, houseId,
  * usedID - user who asked a question,
  * text of the question and timestamp of the question 
  */
-public class Questions {
+public class Questions implements Identifiable {
     private String id; 
     private String houseId;
     private String userId;
@@ -15,8 +17,7 @@ public class Questions {
     private String answerUserId;
     private String answerText;
     private String answerTimestamp;
-    
-    
+
     public Questions () {}
     
     public Questions(String id, String houseId, String userId, String text, String timestamp, String answerUserId, String answerText, String answerTimestamp) {

@@ -1,7 +1,5 @@
 package scc.cache;
 
-import jakarta.ws.rs.core.Response;
-
 import java.util.Optional;
 
 public class ServiceResponse<T> {

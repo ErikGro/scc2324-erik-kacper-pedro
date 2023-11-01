@@ -75,7 +75,7 @@ public class UserResource {
     @GET
     @Produces(MediaType.APPLICATION_JSON)
     public Response getUser(@CookieParam("scc:session") Cookie session, @PathParam("id") String id) {
-        if(session == null || session.getValue() == null || userService.userSessionInvalid(session.getValue(), id))
+        if (session == null || session.getValue() == null || userService.userSessionInvalid(session.getValue(), id))
             return Response.status(401).build();
 
         ServiceResponse<UserDAO> res = userService.getByID(id);
@@ -94,7 +94,7 @@ public class UserResource {
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
     public Response deleteUser(@CookieParam("scc:session") Cookie session, @PathParam("id") String id) {
-        if(session == null || session.getValue() == null || userService.userSessionInvalid(session.getValue(), id))
+        if (session == null || session.getValue() == null || userService.userSessionInvalid(session.getValue(), id))
             return Response.status(401).build();
 
         Optional<UserDAO> user = userService.getByID(id).getItem();
@@ -113,7 +113,7 @@ public class UserResource {
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
     public Response updateUser(@CookieParam("scc:session") Cookie session, @PathParam("id") String id, UserDAO data) {
-        if(session == null || session.getValue() == null || userService.userSessionInvalid(session.getValue(), id))
+        if (session == null || session.getValue() == null || userService.userSessionInvalid(session.getValue(), id))
             return Response.status(401).build();
 
         data.setId(id);
@@ -127,7 +127,7 @@ public class UserResource {
     @Consumes(MediaType.APPLICATION_OCTET_STREAM)
     @Produces(MediaType.TEXT_PLAIN)
     public Response uploadPhoto(@CookieParam("scc:session") Cookie session, @PathParam("id") String id, byte[] photo) {
-        if(session == null || session.getValue() == null || userService.userSessionInvalid(session.getValue(), id))
+        if (session == null || session.getValue() == null || userService.userSessionInvalid(session.getValue(), id))
             return Response.status(401).build();
 
         Optional<UserDAO> user = userService.getByID(id).getItem();
