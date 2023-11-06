@@ -78,6 +78,13 @@ public class HouseResource {
 				userService.userSessionInvalid(session.getValue(), houseResponse.getItem().get().getOwnerID()))
 			return Response.status(401).build();
 
+		Optional<String> userID = userService.getUserIDBySession(session.getValue());
+
+		if (userID.isEmpty())
+			return Response.status(401).build();
+
+		houseDAO.setOwnerID(userID.get());
+
 		houseDAO.setId(id);
 		ServiceResponse<HouseDAO> response = houseService.upsert(houseDAO);
 
