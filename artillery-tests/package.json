@@ -1,0 +1,15 @@
+{
+  "name": "artillery-tests",
+  "version": "1.0.0",
+  "type": "module",
+  "description": "`npm install -g artillery`",
+  "main": "processor.js",
+  "scripts": {
+    "generate-test-data": "node generate-test-data.js"
+  },
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "@faker-js/faker": "^8.2.0"
+  }
+}

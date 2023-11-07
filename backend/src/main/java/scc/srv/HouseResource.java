@@ -84,7 +84,6 @@ public class HouseResource {
 			return Response.status(401).build();
 
 		houseDAO.setOwnerID(userID.get());
-
 		houseDAO.setId(id);
 		ServiceResponse<HouseDAO> response = houseService.upsert(houseDAO);
 

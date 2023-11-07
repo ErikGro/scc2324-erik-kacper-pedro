@@ -1,6 +1,7 @@
 module.exports = {
     setHouseID: setHouseID,
-    setRentalID: setRentalID
+    setRentalID: setRentalID,
+    setUserID: setUserID
 };
 
 function setHouseID(requestParams, response, context, ee, next) {
@@ -14,3 +15,10 @@ function setRentalID(requestParams, response, context, ee, next) {
     context.vars["rentalID"] = id;
     return next();
 }
+
+function setUserID(requestParams, response, context, ee, next) {
+    var id = /[^/]*$/.exec(context.vars["userID"])[0];
+    context.vars["userID"] = id;
+    return next();
+}
+

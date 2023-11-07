@@ -1,26 +1,48 @@
 config:
   target: https://scc-backend-erikg.azurewebsites.net/rest
   phases:
-    - duration: 10
-      arrivalRate: 1 # virtual users per second
+    - duration: 15
+      arrivalRate: 1 # new virtual users per second
       rampTo: 5
       name: Warm up phase
-    - duration: 20
-      arrivalRate: 5
+    - duration: 25
+      arrivalRate: 10
       name: Main test
   plugins:
     metrics-by-endpoint: 
       useOnlyRequestNames: true
-  processor: "./processor.js"
+  processor: "./processor.cjs"
+  payload:
+    path: "users.csv"
+    fields:
+      - "username"
+      - "password"
+    order: sequence
+    skipHeader: true
 scenarios:
-  - name: "House Flow"
+  - name: "House Flow" # Each virtual users runs this scenario
     flow:
+      - post: 
+          url: "/user"
+          name: "POST /user"
+          json: 
+            name: "{{ username }}"
+            pwd: "{{ password }}"
+          capture:
+            - header: "location"
+              as: "userID"
+          afterResponse: "setUserID"
+      - post: 
+          url: "/user/auth"
+          name: "POST /user/auth"
+          json: 
+            username: "{{ username }}"
+            password: "{{ password }}"
       - post:
           url: "/house"
           name: "POST /house"
           json:
             name: "testHouse"
-            ownerID: "testOwner"
             description: "testDescription"
           capture:
             - header: "location"
@@ -30,7 +52,10 @@ scenarios:
           - get:
               url: "/house/{{ houseID }}"
               name: "GET /house/:houseID"
-        count: 20
+        count: 50
       - delete:
           url: "/house/{{ houseID }}"
           name: "DELETE /house/:houseID"
+      - delete:
+          url: "/user/{{ userID }}"
+          name: "DELETE /user/:userID"
