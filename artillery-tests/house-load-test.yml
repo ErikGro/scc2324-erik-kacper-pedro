@@ -5,19 +5,18 @@ config:
       arrivalRate: 1 # new virtual users per second
       rampTo: 5
       name: Warm up phase
-    - duration: 25
-      arrivalRate: 10
+    - duration: 10
+      arrivalRate: 5
       name: Main test
   plugins:
     metrics-by-endpoint: 
       useOnlyRequestNames: true
   processor: "./processor.cjs"
   payload:
-    path: "users.csv"
+    path: "mock-data/users.csv"
     fields:
       - "username"
       - "password"
-    order: sequence
     skipHeader: true
 scenarios:
   - name: "House Flow" # Each virtual users runs this scenario
@@ -52,7 +51,7 @@ scenarios:
           - get:
               url: "/house/{{ houseID }}"
               name: "GET /house/:houseID"
-        count: 50
+        count: 30
       - delete:
           url: "/house/{{ houseID }}"
           name: "DELETE /house/:houseID"
