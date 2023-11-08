@@ -102,9 +102,9 @@ public class HouseResource {
 		ServiceResponse<HouseDAO> response = houseService.getByID(id);
 
         if (response.getItem().isPresent()) {
-			return Response.accepted(response.getItem().get()).build();
+			return Response.ok(response.getItem().get()).build();
 		} else {
-			return Response.noContent().build();
+			throw new NotFoundException("House with the given id does not exist");
 		}
 	}
 
@@ -162,7 +162,7 @@ public class HouseResource {
 			return Response.status(400).build();
 		}
 
-		return Response.accepted(response.stream().toList()).build();
+		return Response.ok(response.stream().toList()).build();
 	}
 
 	private boolean isValidQuery(String string) {
@@ -179,7 +179,7 @@ public class HouseResource {
 	public Response getDiscountedHousesNearFuture() {
 		CosmosPagedIterable<HouseDAO> response = CosmosDBLayer.getInstance().houseDB.getDiscountedHousesNearFuture();
 
-		return Response.accepted(response.stream().toList()).build();
+		return Response.ok(response.stream().toList()).build();
 	}
 
 	/////////////////// PHOTOS ENDPOINTS ///////////////////////

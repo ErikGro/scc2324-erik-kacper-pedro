@@ -41,7 +41,7 @@ public class RentalResource {
 
         Optional<HouseDAO> optionalHouse = houseService.getByID(houseID).getItem();
         if (optionalHouse.isEmpty()) {
-            return Response.noContent().build();
+            throw new NotFoundException("House with the given id does not exist");
         }
 
         HouseDAO house = optionalHouse.get();
@@ -58,7 +58,7 @@ public class RentalResource {
                 .findFirst();
 
         if (optionalPeriod.isEmpty()) {
-            return Response.noContent().build();
+            throw new BadRequestException("There is no available period for the given period.");
         }
 
         AvailablePeriod period = optionalPeriod.get();
@@ -127,7 +127,7 @@ public class RentalResource {
     public Response getRentalByID(@PathParam("houseID") String houseID, @PathParam("rentalID") String rentalID) {
         ServiceResponse<RentalDAO> response = rentalService.getByID(rentalID);
 
-        return Response.accepted(response.getItem()).build();
+        return Response.ok(response.getItem()).build();
     }
 
     /**

@@ -11,7 +11,7 @@ public class RentalDB extends AbstractDB<RentalDAO> {
         super(container, RentalDAO.class);
     }
 
-    public void deleteUserID(String id) {
+    public synchronized void deleteUserID(String id) {
         CosmosPagedIterable<RentalDAO> rentalsTenant = getRentalsByUserID(id);
 
         for (RentalDAO rental : rentalsTenant) {
@@ -19,10 +19,7 @@ public class RentalDB extends AbstractDB<RentalDAO> {
             upsert(rental);
         }
     }
-
-    public CosmosPagedIterable<RentalDAO> getRentalsByUserID(String id) {
+    public synchronized CosmosPagedIterable<RentalDAO> getRentalsByUserID(String id) {
         return container.queryItems("SELECT * FROM rental WHERE rental.tenantID=\"" + id + "\"", new CosmosQueryRequestOptions(), RentalDAO.class);
     }
-
-
 }

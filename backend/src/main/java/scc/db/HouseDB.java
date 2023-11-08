@@ -15,12 +15,12 @@ public class HouseDB extends AbstractDB<HouseDAO> {
         super(container, HouseDAO.class);
     }
 
-    public CosmosPagedIterable<HouseDAO> getHousesByUserID(String id) {
+    public synchronized CosmosPagedIterable<HouseDAO> getHousesByUserID(String id) {
         String query = "SELECT * FROM houses WHERE houses.ownerID=\"" + id + "\"";
         return container.queryItems(query, new CosmosQueryRequestOptions(), HouseDAO.class);
     }
     
-    public void deleteUserID(String id) {
+    public synchronized void deleteUserID(String id) {
         CosmosPagedIterable<HouseDAO> houses = getHousesByUserID(id);
         for (HouseDAO house : houses) {
             house.setOwnerID("DeletedUser");
@@ -28,17 +28,17 @@ public class HouseDB extends AbstractDB<HouseDAO> {
         }
     }
     
-    public CosmosPagedIterable<HouseDAO> getHousesByCity(String name) {
+    public synchronized CosmosPagedIterable<HouseDAO> getHousesByCity(String name) {
         String query = "SELECT * FROM houses WHERE houses.address.city=\"" + name + "\"";
         return container.queryItems(query, new CosmosQueryRequestOptions(), HouseDAO.class);
     }
 
-    public CosmosPagedIterable<HouseDAO> getHousesByCityAndPeriod(String name, String startDate, String endDate) {
+    public synchronized CosmosPagedIterable<HouseDAO> getHousesByCityAndPeriod(String name, String startDate, String endDate) {
         String query = "SELECT * FROM houses WHERE houses.address.city=\"" + name + "\" AND EXISTS (SELECT VALUE p FROM p IN houses.availablePeriods WHERE p.startDate >= \"" + startDate + "\" AND p.startDate <= \"" + endDate + "\")";
         return container.queryItems(query, new CosmosQueryRequestOptions(), HouseDAO.class);
     }
 
-    public CosmosPagedIterable<HouseDAO> getDiscountedHousesNearFuture() {
+    public synchronized CosmosPagedIterable<HouseDAO> getDiscountedHousesNearFuture() {
         Calendar cal = Calendar.getInstance();
         DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
 
@@ -52,12 +52,12 @@ public class HouseDB extends AbstractDB<HouseDAO> {
         return container.queryItems(query, new CosmosQueryRequestOptions(), HouseDAO.class);
     }
 
-    public boolean hasHouse(String id) {
-        CosmosPagedIterable<HouseDAO> res = getHousesByUserID(id);
+    public synchronized boolean hasHouse(String userID) {
+        CosmosPagedIterable<HouseDAO> res = getHousesByUserID(userID);
         return res.iterator().hasNext();
     }
 
-    public boolean houseExists(String id) {
+    public synchronized  boolean houseExists(String id) {
         CosmosPagedIterable<HouseDAO> res = container.queryItems("SELECT * FROM houses WHERE houses.id=\"" + id + "\"", new CosmosQueryRequestOptions(), HouseDAO.class);
         return res.iterator().hasNext();
     }

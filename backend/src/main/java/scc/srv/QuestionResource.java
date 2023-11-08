@@ -87,10 +87,10 @@ public class QuestionResource {
 
         
         ServiceResponse<QuestionsDAO> res = questionsService.getByID(id);
-        if (res.getStatusCode() < 300) {
+        if (res.getItem().isPresent()) {
             return Response.ok(res.getItem().get().toString()).build();
         } else {
-            return Response.noContent().build();
+            throw new NotFoundException("No question for the given ID found.");
         }
     }
 
@@ -103,18 +103,18 @@ public class QuestionResource {
         ServiceResponse<QuestionsDAO> questionResponse = questionsService.getByID(id);
 
         if (questionResponse.getItem().isEmpty())
-            return Response.status(404).build();
+            throw new NotFoundException("There exists no question for the given id.");
 
         if (session == null || session.getValue() == null ||
                 userService.userSessionInvalid(session.getValue(), questionResponse.getItem().get().getUserId()))
-            return Response.status(401).build();
+            throw new NotAuthorizedException(id);
 
         ServiceResponse<QuestionsDAO> deleteResponse = questionsService.deleteByID(id);
 
         if (deleteResponse.getStatusCode() < 300) {
             return Response.ok().build();
         } else {
-            return Response.noContent().build();
+            return Response.status(deleteResponse.getStatusCode()).build();
         }
     }
 }

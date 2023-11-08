@@ -11,8 +11,7 @@ public class UserDB extends AbstractDB<UserDAO> {
     public UserDB(CosmosContainer container) {
         super(container, UserDAO.class);
     }
-
-    public CosmosPagedIterable<UserDAO> getByUsername(String username) {
+    public synchronized CosmosPagedIterable<UserDAO> getByUsername(String username) {
         String query = "SELECT * FROM users WHERE users.name=\"" + username + "\"";
         return container.queryItems(query, new CosmosQueryRequestOptions(), UserDAO.class);
     }

@@ -12,7 +12,7 @@ public class QuestionsDB extends AbstractDB<QuestionsDAO> {
     }
 
     // Get all questions from a house
-    public CosmosPagedIterable<QuestionsDAO> getQuestions(String houseId) {
+    public synchronized CosmosPagedIterable<QuestionsDAO> getQuestions(String houseId) {
         return container.queryItems("SELECT * FROM questions WHERE questions.houseId=\"" + houseId + "\"", new CosmosQueryRequestOptions(), QuestionsDAO.class);
     }
 }
