@@ -36,7 +36,7 @@ config:
 scenarios:
   - name: "End to end"
     flow:
-      - post: ######### User requests #########
+      - post: ######### user requests #########
           url: "/user"
           name: "POST /user"
           json: 
@@ -54,13 +54,13 @@ scenarios:
             password: "{{ password }}"
       - put: 
           url: "/user/{{ userID }}"
-          name: "PUT /user"
+          name: "PUT /user/:userID"
           json: 
             username: "{{ username }}updated"
             password: "{{ password }}updated"
       - get: 
           url: "/user/{{ userID }}"
-          name: "GET /user"
+          name: "GET /user/:userID"
       - post: ######### house requests #########
           url: "/house"
           name: "POST /house"
@@ -85,20 +85,41 @@ scenarios:
           name: "GET /house/:houseID"
       - post: ######### rental requests #########
           url: /house/{{ houseID }}/rental
-          name: "POST /rental"
+          name: "POST /house/:houseID/rental/:rentalID"
           json: 
             startDate: "{{ startDate }}"
-            endDate: "{{ startDate }}"
+            endDate: "{{ endDate }}"
           capture:
             - header: "location"
               as: "rentalID"
           afterResponse: "setRentalID"
-      - delete: ######### CLEANUP DELETE RESOURCES #########
-          url: "/house/{{ houseID }}"
-          name: "DELETE /house/:houseID"
-      - delete:
+      - put: 
+          url: /house/{{ houseID }}/rental/{{ rentalID }}
+          name: "PUT /house/:houseID/rental/:rentalID"
+          json: 
+            startDate: "{{ startDate }}"
+            endDate: "{{ endDate }}"
+      - post: ######### question requests #########
+          url: /house/{{ houseID }}/question
+          name: "POST /house/:houseID/question"
+          json: 
+            text: "Can I get a discount?"
+          capture:
+            - header: "location"
+              as: "questionID"
+          afterResponse: "setQuestionID"
+      - get:
+          url: /house/{{ houseID }}/question/{{ questionID }}
+          name: "GET /house/:houseID/question/:questionID"
+      - delete:  ######### CLEANUP DELETE RESOURCES #########
           url: "/house/{{ houseID }}/rental/{{ rentalID }}"
           name: "DELETE /house/:houseID/rental/:rentalID"
       - delete:
+          url: /house/{{ houseID }}/question/{{ questionID }}
+          name: "DELETE /house/:houseID/question/:questionID"
+      - delete:
+          url: "/house/{{ houseID }}"
+          name: "DELETE /house/:houseID"
+      - delete: 
           url: "/user/{{ userID }}"
           name: "DELETE /user/:userID"

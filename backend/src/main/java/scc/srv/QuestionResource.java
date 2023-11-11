@@ -3,6 +3,7 @@ package scc.srv;
 import jakarta.ws.rs.core.Cookie;
 import jakarta.ws.rs.core.Response;
 
+import java.net.URI;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Optional;
@@ -45,7 +46,17 @@ public class QuestionResource {
     @POST
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
-    public Response createQuestion(@PathParam("houseId") String houseId, Questions questions) {
+    public Response createQuestion(@CookieParam("scc:session") Cookie session,
+                                   @PathParam("houseId") String houseId,
+                                   Questions questions) {
+        if (session == null || session.getValue() == null)
+            return Response.status(401).build();
+
+        Optional<String> userID = userService.getUserIDBySession(session.getValue());
+
+        if (userID.isEmpty())
+            return Response.status(401).build();
+
         Optional<HouseDAO> house = houseService.getByID(houseId).getItem();
         if (house.isEmpty()) {
             return Response.status(404, "House doesn't exist.").build();
@@ -53,12 +64,13 @@ public class QuestionResource {
         
         String id = UUID.randomUUID().toString();
         String ts = new SimpleDateFormat("yyyy-MM-dd.HH-mm-ss").format(new java.util.Date());
+        QuestionsDAO questionDAO = new QuestionsDAO(id, houseId, userID.get(), questions.getText(), ts, "", "", "");
 
-        QuestionsDAO qDAO = new QuestionsDAO(id, houseId, questions.getUserId(), questions.getText(), ts, "", "", "");
-
-        ServiceResponse<QuestionsDAO> res = questionsService.upsert(qDAO);
+        ServiceResponse<QuestionsDAO> response = questionsService.upsert(questionDAO);
+        if (response.getStatusCode() < 300)
+            return Response.status(response.getStatusCode()).build();
         
-        return Response.status(res.getStatusCode()).build();
+        return Response.created(URI.create("/house/" + houseId + "/question/" + id)).build();
     }
 
     /**
@@ -92,13 +104,11 @@ public class QuestionResource {
      * @param id of the questiom
      * @return the content of the question as json
      */
-    @Path("/{id}/")
+    @Path("/{id}")
     @GET
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
     public Response getQuestion(@PathParam("id") String id) {
-
-        
         ServiceResponse<QuestionsDAO> res = questionsService.getByID(id);
         if (res.getItem().isPresent()) {
             return Response.ok(res.getItem().get().toString()).build();
@@ -113,7 +123,7 @@ public class QuestionResource {
      * @param id of the question
      * @return 200 if successfully deleted
      */
-    @Path("/{id}/")
+    @Path("/{id}")
     @DELETE
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
