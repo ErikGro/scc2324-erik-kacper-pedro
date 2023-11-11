@@ -1,7 +1,6 @@
 package scc.cache;
 
 import com.azure.cosmos.models.CosmosItemResponse;
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import redis.clients.jedis.Jedis;
 import scc.db.AbstractDB;

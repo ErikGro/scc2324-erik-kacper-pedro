@@ -12,4 +12,12 @@ public class Constants {
     public static String getDBKey() {
         return System.getenv("DB_KEY");
     }
+
+    public static String getRedisHostname() {
+        return System.getenv("REDIS_HOSTNAME");
+    }
+
+    public static String getRedisKey() {
+        return System.getenv("REDIS_KEY");
+    }
 }

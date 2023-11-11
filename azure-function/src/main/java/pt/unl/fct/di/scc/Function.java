@@ -1,60 +1,43 @@
 package pt.unl.fct.di.scc;
 
-import com.azure.cosmos.*;
 import com.azure.cosmos.models.CosmosQueryRequestOptions;
 import com.azure.cosmos.util.CosmosPagedIterable;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.microsoft.azure.functions.ExecutionContext;
 import com.microsoft.azure.functions.annotation.FunctionName;
 import com.microsoft.azure.functions.annotation.TimerTrigger;
+import redis.clients.jedis.Jedis;
 
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 /**
  * Azure Functions with HTTP Trigger.
  */
 public class Function {
-    CosmosContainer container;
+    @FunctionName("periodic-compute")
+    public void updateDiscountedNearFuture(@TimerTrigger(name = "periodicSetTime", schedule = "0 * * * *")
+                                           String timerInfo,
+                                           ExecutionContext context) {
+        CosmosPagedIterable<HouseDAO> houses = DB.getInstance().getDiscountedHousesNearFuture();
 
-    Function() {
-        CosmosClient client = new CosmosClientBuilder()
-                .endpoint(Constants.getDBConnectionURL())
-                .key(Constants.getDBKey())
-                //.directMode()
-                .gatewayMode()
-                // replace by .directMode() for better performance
-                .consistencyLevel(ConsistencyLevel.SESSION)
-                .connectionSharingAcrossClientsEnabled(true)
-                .contentResponseOnWriteEnabled(true)
-                .buildClient();
+        Set<HouseDAO> set = houses.stream().collect(Collectors.toSet());
 
-        CosmosDatabase db = client.getDatabase(Constants.getDBName());
-
-        container = db.getContainer("houses");
+        try (Jedis jedis = RedisCache.getCachePool().getResource()) {
+            ObjectMapper mapper = new ObjectMapper();
+            jedis.set("discountedNearFuture", mapper.writeValueAsString(set));
+        } catch (Exception ignored) {
+            // Do nothing
+        }
     }
 
     @FunctionName("periodic-compute")
-    public void updateDiscountedNearFuture(
-            @TimerTrigger(name = "periodicSetTime", schedule = "0 * * * *")
-                                String timerInfo,
-                                ExecutionContext context) {
-        CosmosPagedIterable<HouseDAO> houses = getDiscountedHousesNearFuture();
-
-
-    }
-
-    public CosmosPagedIterable<HouseDAO> getDiscountedHousesNearFuture() {
-        Calendar cal = Calendar.getInstance();
-        DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
-
-        String startDate = dateFormat.format(cal.getTime());
-
-        cal.add(Calendar.MONTH, 3);
-        String endDate = dateFormat.format(cal.getTime());
-
-        String query = "SELECT * FROM houses WHERE EXISTS (SELECT VALUE p FROM p IN houses.availablePeriods WHERE p.startDate >= \"" + startDate + "\" AND p.startDate <= \"" + endDate + "\" AND IS_DEFINED(p.promotionPrice))";
-
-        return container.queryItems(query, new CosmosQueryRequestOptions(), HouseDAO.class);
+    public void garbageCollector(@TimerTrigger(name = "periodicSetTime", schedule = "0 * * * *")
+                                           String timerInfo,
+                                           ExecutionContext context) {
+        DB.getInstance().removeDeletedUserEntries();
     }
 }

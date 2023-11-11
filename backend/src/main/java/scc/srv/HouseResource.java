@@ -15,6 +15,7 @@ import scc.db.blob.BlobService;
 import java.net.URI;
 import java.util.ArrayList;
 import java.util.Optional;
+import java.util.Set;
 import java.util.UUID;
 
 /**
@@ -178,9 +179,9 @@ public class HouseResource {
 	@Path("/discounted-soon")
 	@Produces(MediaType.APPLICATION_JSON)
 	public Response getDiscountedHousesNearFuture() {
-		CosmosPagedIterable<HouseDAO> response = CosmosDBLayer.getInstance().getHouseDB().getDiscountedHousesNearFuture();
+		Set<HouseDAO> discountedSoon = houseService.getDiscountedSoon();
 
-		return Response.ok(response.stream().toList()).build();
+		return Response.ok(discountedSoon).build();
 	}
 
 	/////////////////// PHOTOS ENDPOINTS ///////////////////////
