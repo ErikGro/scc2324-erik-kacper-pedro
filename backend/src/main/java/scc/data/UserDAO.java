@@ -7,7 +7,8 @@ import scc.cache.Identifiable;
  */
 public class UserDAO implements Identifiable {
     private String id;
-    private String username;
+    private String username; // Aka nickname
+    private String fullName;
     private String passwordHash;
     private String photoID;
 
@@ -17,6 +18,14 @@ public class UserDAO implements Identifiable {
 
     public void setId(String id) {
         this.id = id;
+    }
+
+    public String getFullName() {
+        return fullName;
+    }
+
+    public void setFullName(String fullName) {
+        this.fullName = fullName;
     }
 
     public String getUsername() {
