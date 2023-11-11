@@ -1,6 +1,5 @@
 package scc.cache;
 
-import com.azure.cosmos.models.CosmosItemResponse;
 import com.azure.cosmos.util.CosmosPagedIterable;
 import redis.clients.jedis.Jedis;
 import scc.data.UserDAO;
@@ -15,7 +14,7 @@ public class UserService extends AbstractService<UserDAO, UserDB> {
     private final RentalService rentalService = new RentalService();
 
     public UserService() {
-        super(UserDAO.class, "user:", CosmosDBLayer.getInstance().userDB);
+        super(UserDAO.class, "user:", CosmosDBLayer.getInstance().getUserDB());
     }
 
     public ServiceResponse<UserDAO> getByUsername(String username) {

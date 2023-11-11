@@ -1,4 +1,4 @@
-import { faker } from '@faker-js/faker';
+import { fa, faker } from '@faker-js/faker';
 import * as fs from 'fs';
 
 //////////////////// HELPER ////////////////////
@@ -41,8 +41,16 @@ export function availablePeriod() {
   return {
     startDate: format(start),
     endDate: format(end),
-    normalPricePerDay: normalPrice,
-    promotionPricePerDay: promotionPricePerDay
+    normalPricePerDay: normalPrice.toFixed(2),
+    promotionPricePerDay: promotionPricePerDay.toFixed(2)
+  }
+}
+
+export function address() {
+  return {
+    street: faker.location.street(), 
+    city: faker.location.city(),
+    country: faker.location.country(),
   }
 }
 
@@ -54,12 +62,11 @@ export function createRandomUser() {
     password: faker.internet.password()
   };
 }
-
 export const users = faker.helpers.multiple(createRandomUser, {
-  count: 50000
+  count: 100000
 })
-
 createCSVFromArray(users, 'users.csv')
+
 
 export function createRandomHouse() {
   return {
@@ -67,15 +74,19 @@ export function createRandomHouse() {
     description: faker.commerce.productDescription(),
   };
 }
-
 export const houses = faker.helpers.multiple(createRandomHouse, {
   count: 1000
 })
-
 createCSVFromArray(houses, 'houses.csv')
 
-export const periods = faker.helpers.multiple(availablePeriod, {
-  count: 10
-})
 
+export const periods = faker.helpers.multiple(availablePeriod, {
+  count: 1000
+})
 createCSVFromArray(periods, 'periods.csv')
+
+
+export const addresses = faker.helpers.multiple(address, {
+  count: 1000
+})
+createCSVFromArray(addresses, 'addresses.csv')

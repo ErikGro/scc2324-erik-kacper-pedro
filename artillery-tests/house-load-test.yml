@@ -25,8 +25,8 @@ scenarios:
           url: "/user"
           name: "POST /user"
           json: 
-            name: "{{ username }}"
-            pwd: "{{ password }}"
+            username: "{{ username }}"
+            password: "{{ password }}"
           capture:
             - header: "location"
               as: "userID"
@@ -41,8 +41,17 @@ scenarios:
           url: "/house"
           name: "POST /house"
           json:
-            name: "testHouse"
-            description: "testDescription"
+            name: "{{ name }}"
+            description: "{{ description }}"
+            address:  
+              street: "{{ street }}"
+              city: "{{ city }}"
+              country: "{{ country }}"
+            availablePeriods:
+              - startDate: "{{ startDate }}"
+                endDate: "{{ endDate }}"
+                normalPricePerDay: "{{ normalPricePerDay }}"
+                promotionPricePerDay: "{{ promotionPricePerDay }}"
           capture:
             - header: "location"
               as: "houseID"

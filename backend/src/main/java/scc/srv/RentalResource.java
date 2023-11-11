@@ -34,10 +34,17 @@ public class RentalResource {
     @POST
     @Path("/")
     @Consumes(MediaType.APPLICATION_JSON)
-    public Response postRental(@PathParam("houseID") String houseID, RentalDAO rentalDAO) {
+    public Response postRental(@CookieParam("scc:session") Cookie session,
+                               @PathParam("houseID") String houseID,
+                               RentalDAO rentalDAO) {
         String rentalID = UUID.randomUUID().toString();
         rentalDAO.setId(rentalID);
         rentalDAO.setHouseID(houseID);
+
+        Optional<String> userID = userService.getUserIDBySession(session.getValue());
+        if (userID.isEmpty())
+            return Response.status(401).build();
+        rentalDAO.setTenantID(userID.get());
 
         Optional<HouseDAO> optionalHouse = houseService.getByID(houseID).getItem();
         if (optionalHouse.isEmpty()) {
@@ -98,17 +105,18 @@ public class RentalResource {
                               @PathParam("houseID") String houseID,
                               @PathParam("rentalID") String rentalID,
                               RentalDAO rentalDAO) {
-        ServiceResponse<HouseDAO> houseResponse = houseService.getByID(houseID);
+        ServiceResponse<RentalDAO> rentalResponse = rentalService.getByID(rentalID);
 
-        if (houseResponse.getItem().isEmpty())
+        if (rentalResponse.getItem().isEmpty())
             return Response.status(404).build();
 
         if (session == null || session.getValue() == null ||
-                userService.userSessionInvalid(session.getValue(), houseResponse.getItem().get().getOwnerID()))
+                userService.userSessionInvalid(session.getValue(), rentalResponse.getItem().get().getTenantID()))
             return Response.status(401).build();
 
         rentalDAO.setId(rentalID);
         rentalDAO.setHouseID(houseID);
+        rentalDAO.setTenantID(rentalResponse.getItem().get().getTenantID());
         ServiceResponse<RentalDAO> response = rentalService.upsert(rentalDAO);
 
         return Response.status(response.getStatusCode()).build();
@@ -141,13 +149,13 @@ public class RentalResource {
     public Response deleteRental(@CookieParam("scc:session") Cookie session,
                                  @PathParam("houseID") String houseID,
                                  @PathParam("rentalID") String rentalID) {
-        ServiceResponse<HouseDAO> houseResponse = houseService.getByID(houseID);
+        ServiceResponse<RentalDAO> rentalResponse = rentalService.getByID(rentalID);
 
-        if (houseResponse.getItem().isEmpty())
+        if (rentalResponse.getItem().isEmpty())
             return Response.status(404).build();
 
         if (session == null || session.getValue() == null ||
-                userService.userSessionInvalid(session.getValue(), houseResponse.getItem().get().getOwnerID()))
+                userService.userSessionInvalid(session.getValue(), rentalResponse.getItem().get().getTenantID()))
             return Response.status(401).build();
 
         ServiceResponse<RentalDAO> response = rentalService.deleteByID(rentalID);

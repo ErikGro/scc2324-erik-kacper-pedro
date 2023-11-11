@@ -55,7 +55,7 @@ public class UserResource {
      * @param credentials user credentials to be updated
      * @return
      */
-    @Path("/{id}/")
+    @Path("/{id}")
     @PUT
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
@@ -114,6 +114,10 @@ public class UserResource {
 
         //TODO: add compatibility with houses to show that the user has been deleted
         userService.deleteByID(id);
+
+        if (user.get().getPhotoID() != null) {
+            blobService.getUsersContainer().deleteImage(user.get().getPhotoID());
+        }
 
         return Response.ok().build();
     }

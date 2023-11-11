@@ -1,0 +1,104 @@
+config:
+  target: https://scc-backend-erikg.azurewebsites.net/rest
+  phases:
+    - duration: 3
+      arrivalRate: 1 # new virtual users per second
+      rampTo: 3
+      name: Warm up phase
+  plugins:
+    metrics-by-endpoint: 
+      useOnlyRequestNames: true
+  processor: "./processor.cjs"
+  payload:
+    - path: "mock-data/addresses.csv"
+      fields:
+        - "street"
+        - "city"
+        - "country"
+      skipHeader: true
+    - path: "mock-data/houses.csv"
+      fields:
+        - "name"
+        - "description"
+      skipHeader: true
+    - path: "mock-data/periods.csv"
+      fields:
+        - "startDate"
+        - "endDate"
+        - "normalPricePerDay"
+        - "promotionPricePerDay"
+      skipHeader: true
+    - path: "mock-data/users.csv"
+      fields:
+        - "username"
+        - "password"
+      skipHeader: true
+scenarios:
+  - name: "End to end"
+    flow:
+      - post: ######### User requests #########
+          url: "/user"
+          name: "POST /user"
+          json: 
+            username: "{{ username }}"
+            password: "{{ password }}"
+          capture:
+            - header: "location"
+              as: "userID"
+          afterResponse: "setUserID"
+      - post: 
+          url: "/user/auth"
+          name: "POST /user/auth"
+          json: 
+            username: "{{ username }}"
+            password: "{{ password }}"
+      - put: 
+          url: "/user/{{ userID }}"
+          name: "PUT /user"
+          json: 
+            username: "{{ username }}updated"
+            password: "{{ password }}updated"
+      - get: 
+          url: "/user/{{ userID }}"
+          name: "GET /user"
+      - post: ######### house requests #########
+          url: "/house"
+          name: "POST /house"
+          json:
+            name: "{{ name }}"
+            description: "{{ description }}"
+            address:  
+              street: "{{ street }}"
+              city: "{{ city }}"
+              country: "{{ country }}"
+            availablePeriods:
+              - startDate: "{{ startDate }}"
+                endDate: "{{ endDate }}"
+                normalPricePerDay: "{{ normalPricePerDay }}"
+                promotionPricePerDay: "{{ promotionPricePerDay }}"
+          capture:
+            - header: "location"
+              as: "houseID"
+          afterResponse: "setHouseID"
+      - get:
+          url: "/house/{{ houseID }}"
+          name: "GET /house/:houseID"
+      - post: ######### rental requests #########
+          url: /house/{{ houseID }}/rental
+          name: "POST /rental"
+          json: 
+            startDate: "{{ startDate }}"
+            endDate: "{{ endDate }}"
+          capture:
+            - header: "location"
+              as: "rentalID"
+          afterResponse: "setRentalID"
+      - delete: ######### CLEANUP DELETE RESOURCES #########
+          url: "/house/{{ houseID }}"
+          name: "DELETE /house/:houseID"
+      - delete:
+          url: "/house/{{ houseID }}/rental/{{ rentalID }}"
+          name: "DELETE /house/:houseID/rental/:rentalID"
+      - delete:
+          url: "/user/{{ userID }}"
+          name: "DELETE /user/:userID"

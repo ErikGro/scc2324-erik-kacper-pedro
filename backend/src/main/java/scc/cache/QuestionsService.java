@@ -9,7 +9,7 @@ import scc.db.QuestionsDB;
 
 public class QuestionsService extends AbstractService<QuestionsDAO, QuestionsDB> {
     public QuestionsService() {
-        super(QuestionsDAO.class, "question:", CosmosDBLayer.getInstance().questionsDB);
+        super(QuestionsDAO.class, "question:", CosmosDBLayer.getInstance().getQuestionsDB());
     }
 
     // Get all questions from a house

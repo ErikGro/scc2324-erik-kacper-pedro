@@ -6,7 +6,7 @@ import scc.db.HouseDB;
 
 public class HouseService extends AbstractService<HouseDAO, HouseDB> {
     public HouseService() {
-        super(HouseDAO.class, "house:", CosmosDBLayer.getInstance().houseDB);
+        super(HouseDAO.class, "house:", CosmosDBLayer.getInstance().getHouseDB());
     }
 
     public void deleteUserID(String id) {
