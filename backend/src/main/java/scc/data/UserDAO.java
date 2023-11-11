@@ -2,20 +2,14 @@ package scc.data;
 
 import scc.cache.Identifiable;
 
-import java.util.Collections;
-import java.util.Set;
-
 /**
  * Represents a User, as stored in the database
  */
 public class UserDAO implements Identifiable {
     private String id;
-    private String name;
-    private String pwd;
-    private Set<String> houseIds = Collections.emptySet();
-
-    public UserDAO() {
-    }
+    private String username;
+    private String passwordHash;
+    private String photoID;
 
     public String getId() {
         return id;
@@ -25,32 +19,35 @@ public class UserDAO implements Identifiable {
         this.id = id;
     }
 
-    public String getName() {
-        return name;
+    public String getUsername() {
+        return username;
     }
 
-    public void setName(String name) {
-        this.name = name;
+    public void setUsername(String username) {
+        this.username = username;
     }
 
-    public String getPwd() {
-        return pwd;
+    public String getPasswordHash() {
+        return passwordHash;
     }
 
-    public void setPwd(String pwd) {
-        this.pwd = pwd;
+    public void setPasswordHash(String passwordHash) {
+        this.passwordHash = passwordHash;
     }
 
-    public Set<String> getHouseIds() {
-        return houseIds;
+    public String getPhotoID() {
+        return photoID;
     }
 
-    public void setHouseIds(Set<String> houseIds) {
-        this.houseIds = houseIds;
+    public void setPhotoID(String photoID) {
+        this.photoID = photoID;
     }
 
     public User toUser() {
-        return new User(id, name, pwd, houseIds);
-    }
+        User user = new User();
+        user.setName(username);
+        user.setPhotoID(photoID);
 
+        return user;
+    }
 }

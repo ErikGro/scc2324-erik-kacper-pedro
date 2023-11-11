@@ -8,6 +8,7 @@ import jakarta.ws.rs.core.Response;
 import scc.cache.ServiceResponse;
 import scc.cache.UserService;
 import scc.data.LoginCredentials;
+import scc.data.User;
 import scc.data.UserDAO;
 import scc.db.blob.BlobLayer;
 import scc.utils.Hash;
@@ -20,18 +21,23 @@ import java.util.UUID;
 public class UserResource {
     private final UserService userService = new UserService();
 
+    /**
+     * Create a new user
+     * @param credentials of the new user
+     * @return 201 and path if succeeded
+     */
     @Path("/")
     @POST
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
-    public Response createUser(UserDAO user) {
-        ServiceResponse<UserDAO> userResponse = userService.getByUsername(user.getName());
+    public Response createUser(LoginCredentials credentials) {
+        ServiceResponse<UserDAO> userResponse = userService.getByUsername(credentials.getUsername());
         if (userResponse.getItem().isPresent())
             return Response.status(400).entity("User already exists").build();
 
+        UserDAO user = credentials.toUserDAO();
         String id = UUID.randomUUID().toString();
         user.setId(id);
-        user.setPwd(Hash.of(user.getPwd()));
 
         ServiceResponse<UserDAO> upsertResponse = userService.upsert(user);
 
@@ -41,6 +47,11 @@ public class UserResource {
         return Response.created(URI.create("/user/" + id)).build();
     }
 
+    /**
+     * Authenticate a user
+     * @param credentials of the user to authenticate
+     * @return 200 and session cookie if valid
+     */
     @Path("/auth")
     @POST
     @Consumes(MediaType.APPLICATION_JSON)
@@ -53,7 +64,7 @@ public class UserResource {
 
         UserDAO user = res.getItem().get();
 
-        if (!Hash.of(credentials.getPassword()).equals(user.getPwd()))
+        if (!Hash.of(credentials.getPassword()).equals(user.getPasswordHash()))
             return Response.status(401).build();
 
         String sessionID = UUID.randomUUID().toString();
@@ -71,24 +82,31 @@ public class UserResource {
         return Response.ok().cookie(cookie).build();
     }
 
+    /**
+     * Get user of the given id in the path
+     * @param id of the user
+     * @return
+     */
     @Path("/{id}")
     @GET
     @Produces(MediaType.APPLICATION_JSON)
-    public Response getUser(@CookieParam("scc:session") Cookie session, @PathParam("id") String id) {
-        if (session == null || session.getValue() == null || userService.userSessionInvalid(session.getValue(), id))
-            return Response.status(401).build();
-
+    public Response getUser(@PathParam("id") String id) {
         ServiceResponse<UserDAO> res = userService.getByID(id);
 
         if (res.getStatusCode() != 200 || res.getItem().isEmpty())
             return Response.status(res.getStatusCode()).build();
 
-        UserDAO user = res.getItem().get();
-        user.setPwd(null);
+        User user = res.getItem().get().toUser();
 
         return Response.ok(user).build();
     }
 
+    /**
+     * Delete a user for the given id
+     * @param session of the user to delete, only the user is eligible to delete itself
+     * @param id of the user
+     * @return 200 if successful
+     */
     @Path("/{id}")
     @DELETE
     @Consumes(MediaType.APPLICATION_JSON)
@@ -107,21 +125,36 @@ public class UserResource {
         return Response.ok().build();
     }
 
-    //TODO: transactions
+    /**
+     * Update a user for the given id
+     * @param session of the user to be updated
+     * @param id of the user
+     * @param credentials user credentials to be updated
+     * @return
+     */
     @Path("/{id}/")
     @PUT
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
-    public Response updateUser(@CookieParam("scc:session") Cookie session, @PathParam("id") String id, UserDAO data) {
+    public Response updateUser(@CookieParam("scc:session") Cookie session, @PathParam("id") String id, LoginCredentials credentials) {
         if (session == null || session.getValue() == null || userService.userSessionInvalid(session.getValue(), id))
             return Response.status(401).build();
 
-        data.setId(id);
-        ServiceResponse<UserDAO> res = userService.upsert(data);
+        UserDAO user = credentials.toUserDAO();
+        user.setId(id);
+
+        ServiceResponse<UserDAO> res = userService.upsert(user);
 
         return Response.status(res.getStatusCode()).build();
     }
 
+    /**
+     * Upload a photo for a given user
+     * @param session of the user
+     * @param id of the user
+     * @param photo of the user to be created
+     * @return
+     */
     @Path("/{id}/photo")
     @POST
     @Consumes(MediaType.APPLICATION_OCTET_STREAM)
@@ -136,28 +169,8 @@ public class UserResource {
 
         BlobLayer blobLayer = BlobLayer.getInstance();
         blobLayer.usersContainer.uploadImage(id, photo);
+        //TODO: Set photoID in user
 
         return Response.ok(id).build();
-    }
-
-    @Path("/{id}/photo")
-    @GET
-    @Produces(MediaType.APPLICATION_OCTET_STREAM)
-    public Response getPhoto(@PathParam("id") String id) {
-
-        Optional<UserDAO> user = userService.getByID(id).getItem();
-        if (user.isEmpty())
-            return Response.status(400).entity("No such user").build();
-
-        BlobLayer blobLayer = BlobLayer.getInstance();
-
-        byte[] photo;
-        try {
-            photo = blobLayer.usersContainer.getImage(id);
-        } catch (Exception e) {
-            return Response.status(404).entity("No photo found").build();
-        }
-
-        return Response.ok(photo).build();
     }
 }

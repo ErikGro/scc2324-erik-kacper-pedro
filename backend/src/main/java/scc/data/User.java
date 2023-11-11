@@ -1,42 +1,13 @@
 package scc.data;
 
-import java.util.Collections;
-import java.util.Set;
-
-import scc.cache.Identifiable;
-import scc.utils.Hash;
-
 /**
  * Represents a User, as returned to the clients
- * <p>
- * NOTE: array of house ids is shown as an example of how to store a list of elements and
- * handle the empty list.
  */
 
-public class User implements Identifiable {
-    private String id;
+public class User {
     private String name;
-    private String pwd;
-    private Set<String> houseIds = Collections.emptySet();
 
-    public User() {
-    }
-
-    public User(String id, String name, String pwd, Set<String> houseIds) {
-        super();
-        this.id = id;
-        this.name = name;
-        this.pwd = pwd;
-        this.houseIds = houseIds;
-    }
-
-    public String getId() {
-        return id;
-    }
-
-    public void setId(String id) {
-        this.id = id;
-    }
+    private String photoID;
 
     public String getName() {
         return name;
@@ -46,31 +17,11 @@ public class User implements Identifiable {
         this.name = name;
     }
 
-    public String getPwd() {
-        return pwd;
+    public String getPhotoID() {
+        return photoID;
     }
 
-
-    public void setPwd(String pwd) {
-        this.pwd = Hash.of(pwd);//password is now hashed to compare paswwords just hash the given before comparing
-    }
-
-    public Set<String> getHouseIds() {
-        return houseIds;
-    }
-
-    public void setHouseIds(Set<String> houseIds) {
-        this.houseIds = houseIds;
-    }
-
-    @Override
-    public String toString() {
-        return "User [id=" + id + ", name=" + name + ", pwd=" + pwd + ", houseIds="
-                + houseIds + "]";
-    }
-
-    public boolean isValid() {
-        return !(id.isEmpty() && pwd.isEmpty() && name.isEmpty());
-
+    public void setPhotoID(String photoID) {
+        this.photoID = photoID;
     }
 }
