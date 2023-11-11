@@ -64,7 +64,7 @@ public class RentalResource {
                 .filter(p -> p.containsPeriod(start, end))
                 .findFirst();
 
-        if (optionalPeriod.isEmpty()) {
+        if (optionalPeriod.isEmpty() || start.isEqual(end)) {
             throw new BadRequestException("There is no available period for the given period.");
         }
 
@@ -135,7 +135,10 @@ public class RentalResource {
     public Response getRentalByID(@PathParam("houseID") String houseID, @PathParam("rentalID") String rentalID) {
         ServiceResponse<RentalDAO> response = rentalService.getByID(rentalID);
 
-        return Response.ok(response.getItem()).build();
+        if (response.getItem().isEmpty())
+            throw new NotFoundException("Rental with the given id does not exist");
+
+        return Response.ok(response.getItem().get()).build();
     }
 
     /**

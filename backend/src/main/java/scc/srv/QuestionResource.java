@@ -35,12 +35,17 @@ public class QuestionResource {
     private final QuestionsService questionsService = new QuestionsService();
     private final UserService userService = new UserService();
 
+    /**
+     * Crete a new question for a house
+     * @param houseId of the house which is related to the question
+     * @param questions question
+     * @return 200 if successfully created
+     */
     @Path("/")
     @POST
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
-    public Response createQuestion(@PathParam("houseId") String houseId,  Questions q) {
-
+    public Response createQuestion(@PathParam("houseId") String houseId, Questions questions) {
         Optional<HouseDAO> house = houseService.getByID(houseId).getItem();
         if (house.isEmpty()) {
             return Response.status(404, "House doesn't exist.").build();
@@ -49,20 +54,23 @@ public class QuestionResource {
         String id = UUID.randomUUID().toString();
         String ts = new SimpleDateFormat("yyyy-MM-dd.HH-mm-ss").format(new java.util.Date());
 
-        QuestionsDAO qDAO = new QuestionsDAO(id, houseId, q.getUserId(), q.getText(), ts, "", "", "");
+        QuestionsDAO qDAO = new QuestionsDAO(id, houseId, questions.getUserId(), questions.getText(), ts, "", "", "");
 
         ServiceResponse<QuestionsDAO> res = questionsService.upsert(qDAO);
         
         return Response.status(res.getStatusCode()).build();
     }
 
+    /**
+     * Get all questions for a house
+     * @param houseId related to the questions
+     * @return an array of all questions
+     */
     @Path("/")
     @GET
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
     public Response getQuestions(@PathParam("houseId") String houseId) {
-
-        
         Optional<HouseDAO> house = houseService.getByID(houseId).getItem();
         if (house.isEmpty()) {
             return Response.status(404, "House doesn't exist.").build();
@@ -79,6 +87,11 @@ public class QuestionResource {
         return Response.ok(questions).build();
     }
 
+    /**
+     * Get a specific question for a house
+     * @param id of the questiom
+     * @return the content of the question as json
+     */
     @Path("/{id}/")
     @GET
     @Consumes(MediaType.APPLICATION_JSON)
@@ -94,6 +107,12 @@ public class QuestionResource {
         }
     }
 
+    /**
+     * Delete a question by id
+     * @param session of the user
+     * @param id of the question
+     * @return 200 if successfully deleted
+     */
     @Path("/{id}/")
     @DELETE
     @Consumes(MediaType.APPLICATION_JSON)

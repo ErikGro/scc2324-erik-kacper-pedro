@@ -9,7 +9,7 @@ public abstract class AbstractDB<T> {
     protected CosmosContainer container;
     private final Class<T> type;
 
-    public AbstractDB(CosmosContainer container, Class<T> type) {
+    protected AbstractDB(CosmosContainer container, Class<T> type) {
         this.container = container;
         this.type = type;
     }

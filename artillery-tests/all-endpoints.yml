@@ -88,7 +88,7 @@ scenarios:
           name: "POST /rental"
           json: 
             startDate: "{{ startDate }}"
-            endDate: "{{ endDate }}"
+            endDate: "{{ startDate }}"
           capture:
             - header: "location"
               as: "rentalID"
