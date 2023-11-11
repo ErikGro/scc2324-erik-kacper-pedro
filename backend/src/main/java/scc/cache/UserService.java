@@ -1,10 +1,12 @@
 package scc.cache;
 
+import com.azure.cosmos.models.CosmosItemResponse;
 import com.azure.cosmos.util.CosmosPagedIterable;
 import redis.clients.jedis.Jedis;
 import scc.data.UserDAO;
 import scc.db.CosmosDBLayer;
 import scc.db.UserDB;
+import scc.utils.Constants;
 
 import java.util.Optional;
 
@@ -17,13 +19,27 @@ public class UserService extends AbstractService<UserDAO, UserDB> {
     }
 
     public ServiceResponse<UserDAO> getByUsername(String username) {
-        CosmosPagedIterable<UserDAO> response = db.getByUsername(username);
+        if (Constants.cachingEnabled) {
+            Optional<UserDAO> cache = getFromCacheByID(username);
+            if (cache.isPresent()) { // Cache hit
+                return new ServiceResponse<>(200, cache.get());
+            }
+        }
 
+        // Cache miss
+        CosmosPagedIterable<UserDAO> response = db.getByUsername(username);
         if (!response.iterator().hasNext()) {
             return new ServiceResponse<>(404, null);
         }
 
-        return new ServiceResponse<>(200, response.iterator().next());
+        UserDAO user = response.iterator().next();
+
+        // Cache item
+        if (Constants.cachingEnabled) {
+            writeToCache(user, username);
+        }
+
+        return new ServiceResponse<>(200, user);
     }
 
     @Override

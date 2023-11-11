@@ -12,7 +12,7 @@ public class UserDB extends AbstractDB<UserDAO> {
         super(container, UserDAO.class);
     }
     public synchronized CosmosPagedIterable<UserDAO> getByUsername(String username) {
-        String query = "SELECT * FROM users WHERE users.name=\"" + username + "\"";
+        String query = "SELECT * FROM users WHERE users.username=\"" + username + "\"";
         return container.queryItems(query, new CosmosQueryRequestOptions(), UserDAO.class);
     }
 }

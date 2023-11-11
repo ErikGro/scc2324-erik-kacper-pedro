@@ -63,6 +63,10 @@ public class UserResource {
         if (session == null || session.getValue() == null || userService.userSessionInvalid(session.getValue(), id))
             return Response.status(401).build();
 
+        ServiceResponse<UserDAO> userResponse = userService.getByUsername(credentials.getUsername());
+        if (userResponse.getItem().isPresent())
+            return Response.status(400).entity("User already exists").build();
+
         UserDAO user = credentials.toUserDAO();
         user.setId(id);
 
@@ -114,7 +118,6 @@ public class UserResource {
         return Response.ok().build();
     }
 
-
     /**
      * Authenticate a user
      * @param credentials of the user to authenticate
@@ -147,21 +150,26 @@ public class UserResource {
 
         userService.putSession(sessionID, user.getId());
 
-        return Response.ok().cookie(cookie).build();
+        return Response
+                .ok()
+                .cookie(cookie)
+                .location(URI.create("/user/" + user.getId()))
+                .build();
     }
 
     /**
-     * Upload a photo for a given user
+     * Post a photo for a given user
      * @param session of the user
      * @param id of the user
      * @param photo of the user to be created
      * @return HTTP status code
      */
     @Path("/{id}/photo")
+    @POST
     @PUT
     @Consumes(MediaType.APPLICATION_OCTET_STREAM)
     @Produces(MediaType.TEXT_PLAIN)
-    public Response uploadPhoto(@CookieParam("scc:session") Cookie session, @PathParam("id") String id, byte[] photo) {
+    public Response postPhoto(@CookieParam("scc:session") Cookie session, @PathParam("id") String id, byte[] photo) {
         if (session == null || session.getValue() == null || userService.userSessionInvalid(session.getValue(), id))
             return Response.status(401).build();
 
@@ -172,6 +180,11 @@ public class UserResource {
         UserDAO user = userDAO.get();
 
         String photoID = UUID.randomUUID().toString();
+
+        if (user.getPhotoID() != null) {
+            photoID = user.getPhotoID(); // Overwrite
+        }
+
         blobService.getUsersContainer().upsertImage(photoID, photo);
 
         user.setPhotoID(photoID);

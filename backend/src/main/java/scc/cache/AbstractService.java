@@ -62,28 +62,38 @@ public class AbstractService<T extends Identifiable, DBType extends AbstractDB<T
 
         try (Jedis jedis = RedisCache.getCachePool().getResource()) {
             jedis.set(cachingPrefix + object.getId(), mapper.writeValueAsString(object));
-        } catch (JsonProcessingException ignored) {
+        } catch (Exception ignored) {
             // Do nothing
         }
     }
 
-    protected void deleteFromCache(String id) {
+    protected void writeToCache(T object, String cacheID) {
         if (!Constants.cachingEnabled) return;
 
         try (Jedis jedis = RedisCache.getCachePool().getResource()) {
-            jedis.del(cachingPrefix + id);
+            jedis.set(cachingPrefix + cacheID, mapper.writeValueAsString(object));
+        } catch (Exception ignored) {
+            // Do nothing
         }
     }
 
-    protected Optional<T> getFromCacheByID(String id) {
+    protected void deleteFromCache(String cacheID) {
+        if (!Constants.cachingEnabled) return;
+
+        try (Jedis jedis = RedisCache.getCachePool().getResource()) {
+            jedis.del(cachingPrefix + cacheID);
+        }
+    }
+
+    protected Optional<T> getFromCacheByID(String cacheID) {
         if (!Constants.cachingEnabled) return Optional.empty();
 
         try (Jedis jedis = RedisCache.getCachePool().getResource()) {
-            String cacheValue = jedis.get(cachingPrefix + id);
+            String cacheValue = jedis.get(cachingPrefix + cacheID);
             T object = mapper.readValue(cacheValue, type);
 
             return Optional.of(object);
-        } catch (JsonProcessingException ignored) {
+        } catch (Exception ignored) {
             // Return empty optional
         }
 
