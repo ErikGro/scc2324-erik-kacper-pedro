@@ -15,9 +15,6 @@ public class HouseDAO implements Identifiable {
     private List<String> photoIDs = Collections.emptyList();
     private Set<AvailablePeriod> availablePeriods = Collections.emptySet();
 
-    public HouseDAO() {
-    }
-
     public String getId() {
         return id;
     }

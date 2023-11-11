@@ -10,7 +10,7 @@ import scc.cache.ServiceResponse;
 import scc.cache.UserService;
 import scc.data.house.HouseDAO;
 import scc.db.CosmosDBLayer;
-import scc.db.blob.BlobLayer;
+import scc.db.blob.BlobService;
 
 import java.net.URI;
 import java.util.ArrayList;
@@ -24,6 +24,7 @@ import java.util.UUID;
 public class HouseResource {
 	private final HouseService houseService = new HouseService();
 	private final UserService userService = new UserService();
+	private final BlobService blobService = BlobService.getInstance();
 
 	/**
 	 * Create a single house
@@ -201,10 +202,8 @@ public class HouseResource {
 				userService.userSessionInvalid(session.getValue(), house.getOwnerID()))
 			return Response.status(401).build();
 
-		BlobLayer blobLayer = BlobLayer.getInstance();
-
 		String photoID = UUID.randomUUID().toString();
-		blobLayer.housesContainer.uploadImage(photoID, photo);
+		blobService.getHousesContainer().upsertImage(photoID, photo);
 
 		// Update house photoIDs list by new photoID		
 		ArrayList<String> photoIDs = new ArrayList<>(house.getPhotoIDs());
@@ -224,17 +223,14 @@ public class HouseResource {
         if (houseService.getByID(houseID).getItem().isEmpty()) {
 			return Response.status(404).entity("House doesn't exist.").build();
 		}
-		
-		BlobLayer blobLayer = BlobLayer.getInstance();
 
 		byte[] photo;
 		try {
-			photo = blobLayer.housesContainer.getImage(photoID);
+			photo = blobService.getHousesContainer().getImageBytes(photoID);
 		} catch (Exception e) {
 			return Response.status(404).entity("No photo found").build();
 		}
 
 		return Response.ok(photo).build();
 	}
-
 }

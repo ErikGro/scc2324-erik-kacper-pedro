@@ -10,7 +10,7 @@ import scc.cache.UserService;
 import scc.data.LoginCredentials;
 import scc.data.User;
 import scc.data.UserDAO;
-import scc.db.blob.BlobLayer;
+import scc.db.blob.BlobService;
 import scc.utils.Hash;
 
 import java.net.URI;
@@ -20,6 +20,7 @@ import java.util.UUID;
 @Path("/user")
 public class UserResource {
     private final UserService userService = new UserService();
+    private final BlobService blobService = BlobService.getInstance();
 
     /**
      * Create a new user
@@ -48,38 +49,26 @@ public class UserResource {
     }
 
     /**
-     * Authenticate a user
-     * @param credentials of the user to authenticate
-     * @return 200 and session cookie if valid
+     * Update a user for the given id
+     * @param session of the user to be updated
+     * @param id of the user
+     * @param credentials user credentials to be updated
+     * @return
      */
-    @Path("/auth")
-    @POST
+    @Path("/{id}/")
+    @PUT
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
-    public Response auth(LoginCredentials credentials) {
-        ServiceResponse<UserDAO> res = userService.getByUsername(credentials.getUsername());
-
-        if (res.getStatusCode() != 200 || res.getItem().isEmpty())
-            return Response.status(res.getStatusCode()).build();
-
-        UserDAO user = res.getItem().get();
-
-        if (!Hash.of(credentials.getPassword()).equals(user.getPasswordHash()))
+    public Response updateUser(@CookieParam("scc:session") Cookie session, @PathParam("id") String id, LoginCredentials credentials) {
+        if (session == null || session.getValue() == null || userService.userSessionInvalid(session.getValue(), id))
             return Response.status(401).build();
 
-        String sessionID = UUID.randomUUID().toString();
-        NewCookie cookie = new NewCookie.Builder("scc:session")
-                .value(sessionID)
-                .path("/")
-                .comment("sessionid")
-                .maxAge(3600)
-                .secure(false)
-                .httpOnly(true)
-                .build();
+        UserDAO user = credentials.toUserDAO();
+        user.setId(id);
 
-        userService.putSession(sessionID, user.getId());
+        ServiceResponse<UserDAO> res = userService.upsert(user);
 
-        return Response.ok().cookie(cookie).build();
+        return Response.status(res.getStatusCode()).build();
     }
 
     /**
@@ -125,27 +114,40 @@ public class UserResource {
         return Response.ok().build();
     }
 
+
     /**
-     * Update a user for the given id
-     * @param session of the user to be updated
-     * @param id of the user
-     * @param credentials user credentials to be updated
-     * @return
+     * Authenticate a user
+     * @param credentials of the user to authenticate
+     * @return 200 and session cookie if valid
      */
-    @Path("/{id}/")
-    @PUT
+    @Path("/auth")
+    @POST
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
-    public Response updateUser(@CookieParam("scc:session") Cookie session, @PathParam("id") String id, LoginCredentials credentials) {
-        if (session == null || session.getValue() == null || userService.userSessionInvalid(session.getValue(), id))
+    public Response auth(LoginCredentials credentials) {
+        ServiceResponse<UserDAO> res = userService.getByUsername(credentials.getUsername());
+
+        if (res.getStatusCode() != 200 || res.getItem().isEmpty())
+            return Response.status(res.getStatusCode()).build();
+
+        UserDAO user = res.getItem().get();
+
+        if (!Hash.of(credentials.getPassword()).equals(user.getPasswordHash()))
             return Response.status(401).build();
 
-        UserDAO user = credentials.toUserDAO();
-        user.setId(id);
+        String sessionID = UUID.randomUUID().toString();
+        NewCookie cookie = new NewCookie.Builder("scc:session")
+                .value(sessionID)
+                .path("/")
+                .comment("sessionid")
+                .maxAge(3600)
+                .secure(false)
+                .httpOnly(true)
+                .build();
 
-        ServiceResponse<UserDAO> res = userService.upsert(user);
+        userService.putSession(sessionID, user.getId());
 
-        return Response.status(res.getStatusCode()).build();
+        return Response.ok().cookie(cookie).build();
     }
 
     /**
@@ -153,24 +155,28 @@ public class UserResource {
      * @param session of the user
      * @param id of the user
      * @param photo of the user to be created
-     * @return
+     * @return HTTP status code
      */
     @Path("/{id}/photo")
-    @POST
+    @PUT
     @Consumes(MediaType.APPLICATION_OCTET_STREAM)
     @Produces(MediaType.TEXT_PLAIN)
     public Response uploadPhoto(@CookieParam("scc:session") Cookie session, @PathParam("id") String id, byte[] photo) {
         if (session == null || session.getValue() == null || userService.userSessionInvalid(session.getValue(), id))
             return Response.status(401).build();
 
-        Optional<UserDAO> user = userService.getByID(id).getItem();
-        if (user.isEmpty())
+        Optional<UserDAO> userDAO = userService.getByID(id).getItem();
+        if (userDAO.isEmpty())
             return Response.status(400).entity("No such user").build();
 
-        BlobLayer blobLayer = BlobLayer.getInstance();
-        blobLayer.usersContainer.uploadImage(id, photo);
-        //TODO: Set photoID in user
+        UserDAO user = userDAO.get();
 
-        return Response.ok(id).build();
+        String photoID = UUID.randomUUID().toString();
+        blobService.getUsersContainer().upsertImage(photoID, photo);
+
+        user.setPhotoID(photoID);
+        ServiceResponse<UserDAO> response = userService.upsert(user);
+
+        return Response.status(response.getStatusCode()).build();
     }
 }
