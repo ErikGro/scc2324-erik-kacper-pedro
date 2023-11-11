@@ -19,13 +19,3 @@ test-load-houses.yml is used for a high load scenario, testing the impact of cac
 - `artillery run test-all-endpoints.yml`
 test-all-endpoints.yml is used as and end to end test, testing all endpoints for moderate load.
 Can be used for comparing the latencies for different endpoints.
-
-- post: ######### question&answers requests #########
-
-    - duration: 15
-      arrivalRate: 1 # new virtual users per second
-      rampTo: 3
-      name: Warm up phase
-    - duration: 30
-      arrivalRate: 5
-      name: Main test

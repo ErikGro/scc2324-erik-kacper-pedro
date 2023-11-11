@@ -1,10 +1,13 @@
 config:
   target: https://scc-backend-erikg.azurewebsites.net/rest
   phases:
-    - duration: 3
+    - duration: 15
       arrivalRate: 1 # new virtual users per second
       rampTo: 3
       name: Warm up phase
+    - duration: 30
+      arrivalRate: 5
+      name: Main test
   plugins:
     metrics-by-endpoint: 
       useOnlyRequestNames: true
@@ -71,15 +74,25 @@ scenarios:
               street: "{{ street }}"
               city: "{{ city }}"
               country: "{{ country }}"
+          capture:
+            - header: "location"
+              as: "houseID"
+          afterResponse: "setHouseID"
+      - put: ######### house requests #########
+          url: "/house/{{ houseID }}"
+          name: "PUT /house"
+          json:
+            name: "{{ name }}"
+            description: "{{ description }}"
+            address:  
+              street: "{{ street }}"
+              city: "{{ city }}"
+              country: "{{ country }}"
             availablePeriods:
               - startDate: "{{ startDate }}"
                 endDate: "{{ endDate }}"
                 normalPricePerDay: "{{ normalPricePerDay }}"
                 promotionPricePerDay: "{{ promotionPricePerDay }}"
-          capture:
-            - header: "location"
-              as: "houseID"
-          afterResponse: "setHouseID"
       - get:
           url: "/house/{{ houseID }}"
           name: "GET /house/:houseID"
@@ -112,11 +125,11 @@ scenarios:
           url: /house/{{ houseID }}/question/{{ questionID }}
           name: "GET /house/:houseID/question/:questionID"
       - delete:  ######### CLEANUP DELETE RESOURCES #########
-          url: "/house/{{ houseID }}/rental/{{ rentalID }}"
-          name: "DELETE /house/:houseID/rental/:rentalID"
-      - delete:
           url: /house/{{ houseID }}/question/{{ questionID }}
           name: "DELETE /house/:houseID/question/:questionID"
+      - delete:
+          url: "/house/{{ houseID }}/rental/{{ rentalID }}"
+          name: "DELETE /house/:houseID/rental/:rentalID"
       - delete:
           url: "/house/{{ houseID }}"
           name: "DELETE /house/:houseID"

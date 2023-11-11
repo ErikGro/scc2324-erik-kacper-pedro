@@ -67,7 +67,7 @@ public class QuestionResource {
         QuestionsDAO questionDAO = new QuestionsDAO(id, houseId, userID.get(), questions.getText(), ts, "", "", "");
 
         ServiceResponse<QuestionsDAO> response = questionsService.upsert(questionDAO);
-        if (response.getStatusCode() < 300)
+        if (response.getStatusCode() > 300)
             return Response.status(response.getStatusCode()).build();
         
         return Response.created(URI.create("/house/" + houseId + "/question/" + id)).build();
