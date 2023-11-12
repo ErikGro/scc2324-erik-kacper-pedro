@@ -18,6 +18,8 @@
 
 **9.** Deploy the app: mvn clean compile package azure-webapp:deploy
 
-**10.** Run commands from azureprops-westeurope.sh to create environment variables. (on Windows you can use git bash and run command: sh filename.sh)
+**10.** Deploy the Azure Function.
 
-**11.** If you want Delete Resources run: java -cp target/scc2324-mgt-1.0-jar-with-dependencies.jar scc.mgt.AzureManagement --delete
+**11.** Run commands from azureprops-westeurope.sh to create environment variables. (on Windows you can use git bash and run command: sh filename.sh)
+
+**12.** If you want Delete Resources run: java -cp target/scc2324-mgt-1.0-jar-with-dependencies.jar scc.mgt.AzureManagement --delete
