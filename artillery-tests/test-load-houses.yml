@@ -5,8 +5,8 @@ config:
       arrivalRate: 1 # new virtual users per second
       rampTo: 5
       name: Warm up phase
-    - duration: 10
-      arrivalRate: 5
+    - duration: 20
+      arrivalRate: 10
       name: Main test
   plugins:
     metrics-by-endpoint: 
