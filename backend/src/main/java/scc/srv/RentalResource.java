@@ -14,7 +14,6 @@ import scc.data.house.HouseDAO;
 import scc.utils.Constants;
 
 import java.net.URI;
-import java.net.URISyntaxException;
 import java.time.LocalDate;
 import java.time.temporal.ChronoUnit;
 import java.util.HashSet;
@@ -53,7 +52,6 @@ public class RentalResource {
 
         HouseDAO house = optionalHouse.get();
 
-        // TODO catch Exception
         LocalDate start = LocalDate.parse(rentalDAO.getStartDate(), Constants.dateFormat);
         LocalDate end = LocalDate.parse(rentalDAO.getEndDate(), Constants.dateFormat);
 
@@ -120,6 +118,24 @@ public class RentalResource {
         ServiceResponse<RentalDAO> response = rentalService.upsert(rentalDAO);
 
         return Response.status(response.getStatusCode()).build();
+    }
+
+    /**
+     * Returns a list of all rentals for a given house
+     *
+     * @param houseID  the id of the house to which the rental belongs
+     * @return Response json array containing all rentals
+     */
+    @GET
+    @Path("/")
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response getRentalsForHouse(@PathParam("houseID") String houseID) {
+        ServiceResponse<Set<RentalDAO>> response = rentalService.getRentalsForHouse(houseID);
+
+        if (response.getItem().isEmpty())
+            throw new NotFoundException("No rentals for the given house found.");
+
+        return Response.ok(response.getItem().get()).build();
     }
 
     /**

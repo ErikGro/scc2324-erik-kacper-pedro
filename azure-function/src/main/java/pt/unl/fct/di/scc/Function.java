@@ -30,7 +30,7 @@ public class Function {
     }
 
     @FunctionName("periodic-compute")
-    public void garbageCollector(@TimerTrigger(name = "periodicSetTime", schedule = "0 * * * *")
+    public void garbageCollector(@TimerTrigger(name = "periodicSetTime", schedule = "0 */6 * * *")
                                            String timerInfo,
                                            ExecutionContext context) {
         DB.getInstance().removeDeletedUserEntries();

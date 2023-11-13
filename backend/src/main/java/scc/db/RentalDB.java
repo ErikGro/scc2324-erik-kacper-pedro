@@ -4,7 +4,6 @@ import com.azure.cosmos.CosmosContainer;
 import com.azure.cosmos.models.CosmosQueryRequestOptions;
 import com.azure.cosmos.util.CosmosPagedIterable;
 import scc.data.RentalDAO;
-import scc.data.house.HouseDAO;
 
 public class RentalDB extends AbstractDB<RentalDAO> {
     public RentalDB(CosmosContainer container) {
@@ -19,7 +18,11 @@ public class RentalDB extends AbstractDB<RentalDAO> {
             upsert(rental);
         }
     }
-    public synchronized CosmosPagedIterable<RentalDAO> getRentalsByUserID(String id) {
-        return container.queryItems("SELECT * FROM rental WHERE rental.tenantID=\"" + id + "\"", new CosmosQueryRequestOptions(), RentalDAO.class);
+    public synchronized CosmosPagedIterable<RentalDAO> getRentalsByUserID(String userID) {
+        return container.queryItems("SELECT * FROM rental WHERE rental.tenantID=\"" + userID + "\"", new CosmosQueryRequestOptions(), RentalDAO.class);
+    }
+
+    public synchronized CosmosPagedIterable<RentalDAO> getRentalsByHouseID(String houseID) {
+        return container.queryItems("SELECT * FROM rental WHERE rental.houseID=\"" + houseID + "\"", new CosmosQueryRequestOptions(), RentalDAO.class);
     }
 }

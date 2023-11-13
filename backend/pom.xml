@@ -132,8 +132,8 @@
                             </resource>
                         </resources>
                     </deployment>
-                    <resourceGroup>scc-backend-resource-erikg</resourceGroup>
-                    <appName>scc-backend-erikg</appName>
+                    <resourceGroup>egrosskopf</resourceGroup>
+                    <appName>outsideeurope</appName>
                 </configuration>
             </plugin>
         </plugins>

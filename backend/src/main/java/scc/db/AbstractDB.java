@@ -6,7 +6,7 @@ import com.azure.cosmos.models.CosmosItemResponse;
 import com.azure.cosmos.models.PartitionKey;
 
 public abstract class AbstractDB<T> {
-    protected CosmosContainer container;
+    protected final CosmosContainer container;
     private final Class<T> type;
 
     protected AbstractDB(CosmosContainer container, Class<T> type) {

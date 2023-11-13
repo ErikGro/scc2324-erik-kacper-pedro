@@ -53,7 +53,7 @@ public class UserResource {
      * @param session of the user to be updated
      * @param id of the user
      * @param credentials user credentials to be updated
-     * @return
+     * @return 200 if update successful
      */
     @Path("/{id}")
     @PUT
@@ -78,7 +78,7 @@ public class UserResource {
     /**
      * Get user of the given id in the path
      * @param id of the user
-     * @return
+     * @return user JSON
      */
     @Path("/{id}")
     @GET
@@ -112,7 +112,6 @@ public class UserResource {
         if (user.isEmpty())
             return Response.status(400).entity("No such user").build();
 
-        //TODO: add compatibility with houses to show that the user has been deleted
         userService.deleteByID(id);
 
         if (user.get().getPhotoID() != null) {

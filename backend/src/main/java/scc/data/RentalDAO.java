@@ -2,8 +2,6 @@ package scc.data;
 
 import scc.cache.Identifiable;
 
-import java.time.Month;
-
 public class RentalDAO implements Identifiable {
     private String id;
     private String houseID;

@@ -1,5 +1,5 @@
 config:
-  target: https://scc-backend-erikg.azurewebsites.net/rest
+  target: https://outsideeurope.azurewebsites.net/rest
   phases:
     - duration: 15
       arrivalRate: 1 # new virtual users per second

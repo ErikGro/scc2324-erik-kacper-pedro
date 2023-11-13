@@ -4,9 +4,7 @@ import jakarta.ws.rs.core.Cookie;
 import jakarta.ws.rs.core.Response;
 
 import java.net.URI;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 
 import jakarta.ws.rs.*;
 import jakarta.ws.rs.core.MediaType;
@@ -21,9 +19,6 @@ import scc.data.house.HouseDAO;
 
 
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-
-import java.util.UUID;
 
 /**
  * Class with control endpoints.
@@ -88,20 +83,18 @@ public class QuestionResource {
             return Response.status(404, "House doesn't exist.").build();
         }
 
-        Iterator<QuestionsDAO> res = questionsService.getQuestions(houseId).getItem().get().iterator();
-        // Get all questions from a house using getQuestions from QuestionDB
-        List<String> questions = new ArrayList<>();
-        while (res.hasNext()) {
-            QuestionsDAO q = res.next();
-            questions.add(q.toString());
+        Optional<Set<QuestionsDAO>> optionalQuestion = questionsService.getQuestions(houseId).getItem();
+
+        if (optionalQuestion.isEmpty()) {
+            return Response.status(404).build();
         }
         
-        return Response.ok(questions).build();
+        return Response.ok(optionalQuestion.get()).build();
     }
 
     /**
      * Get a specific question for a house
-     * @param id of the questiom
+     * @param id of the question
      * @return the content of the question as json
      */
     @Path("/{id}")

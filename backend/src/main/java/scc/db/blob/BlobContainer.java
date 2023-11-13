@@ -5,7 +5,6 @@ import com.azure.storage.blob.BlobClient;
 import com.azure.storage.blob.BlobContainerClient;
 
 import java.io.ByteArrayInputStream;
-import java.util.Optional;
 
 public class BlobContainer {
     private final BlobContainerClient container;
@@ -26,8 +25,8 @@ public class BlobContainer {
         return image.toBytes();
     }
 
-    public synchronized boolean deleteImage(String filename) {
+    public synchronized void deleteImage(String filename) {
         BlobClient blobClient = container.getBlobClient(filename);
-        return blobClient.deleteIfExists();
+        blobClient.deleteIfExists();
     }
 }

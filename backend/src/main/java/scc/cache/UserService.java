@@ -45,7 +45,7 @@ public class UserService extends AbstractService<UserDAO, UserDB> {
     public ServiceResponse<UserDAO> deleteByID(String id) {
         ServiceResponse<UserDAO> response = super.deleteByID(id);
 
-        // For all houses and rentals assosiated with user set userId to "DeletedUser"
+        // For all houses and rentals associated with user set userId to "DeletedUser"
         houseService.deleteUserID(id);
         rentalService.deleteUserID(id);
 

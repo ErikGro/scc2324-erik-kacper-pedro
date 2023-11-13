@@ -8,7 +8,7 @@ import scc.utils.Constants;
 
 import java.util.Optional;
 
-public class AbstractService<T extends Identifiable, DBType extends AbstractDB<T>> {
+public abstract class AbstractService<T extends Identifiable, DBType extends AbstractDB<T>> {
     protected final DBType db;
     private final Class<T> type;
     protected final ObjectMapper mapper = new ObjectMapper();

@@ -49,7 +49,6 @@ public class HouseResource {
 		houseDAO.setId(UUID.randomUUID().toString());
 
 		ServiceResponse<HouseDAO> response = houseService.upsert(houseDAO);
-		// TODO: add houseID to owner's houseIDs list
 
 		if (response.getStatusCode() != 201 || response.getItem().isEmpty()) {
 			return Response.status(response.getStatusCode()).build();
@@ -203,35 +202,14 @@ public class HouseResource {
 				userService.userSessionInvalid(session.getValue(), house.getOwnerID()))
 			return Response.status(401).build();
 
-		String photoID = UUID.randomUUID().toString();
-		blobService.getHousesContainer().upsertImage(photoID, photo);
+		String newPhotoID = UUID.randomUUID().toString();
+		blobService.getHousesContainer().upsertImage(newPhotoID, photo);
 
-		// Update house photoIDs list by new photoID		
 		ArrayList<String> photoIDs = new ArrayList<>(house.getPhotoIDs());
-		photoIDs.add(houseID);
+		photoIDs.add(newPhotoID);
 		house.setPhotoIDs(photoIDs);
-
 		houseService.upsert(house);
 
 		return Response.ok().build();
-	}
-
-	@GET
-	@Path("/{houseID}/photo/{photoID}")
-	@Produces(MediaType.APPLICATION_OCTET_STREAM)
-	public Response getPhoto(@PathParam("houseID") String houseID, @PathParam("photoID") String photoID) {
-
-        if (houseService.getByID(houseID).getItem().isEmpty()) {
-			return Response.status(404).entity("House doesn't exist.").build();
-		}
-
-		byte[] photo;
-		try {
-			photo = blobService.getHousesContainer().getImageBytes(photoID);
-		} catch (Exception e) {
-			return Response.status(404).entity("No photo found").build();
-		}
-
-		return Response.ok(photo).build();
 	}
 }

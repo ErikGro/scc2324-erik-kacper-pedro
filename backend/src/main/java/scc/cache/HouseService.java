@@ -32,7 +32,7 @@ public class HouseService extends AbstractService<HouseDAO, HouseDB> {
         Set<HouseDAO> set = houses.stream().collect(Collectors.toSet());
 
         try (Jedis jedis = RedisCache.getCachePool().getResource()) {
-            jedis.set("discountedNearFurture", mapper.writeValueAsString(set));
+            jedis.set("discountedNearFuture", mapper.writeValueAsString(set));
         } catch (Exception ignored) {
             // ignore
         }
