@@ -206,7 +206,7 @@ public class HouseResource {
 		String photoID = UUID.randomUUID().toString();
 		blobService.getHousesContainer().upsertImage(photoID, photo);
 
-		// Update house photoIDs list by new photoID		
+		// TODO: Update house photoIDs list by new photoID
 		ArrayList<String> photoIDs = new ArrayList<>(house.getPhotoIDs());
 		photoIDs.add(houseID);
 		house.setPhotoIDs(photoIDs);

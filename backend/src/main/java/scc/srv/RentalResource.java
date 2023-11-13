@@ -53,7 +53,6 @@ public class RentalResource {
 
         HouseDAO house = optionalHouse.get();
 
-        // TODO catch Exception
         LocalDate start = LocalDate.parse(rentalDAO.getStartDate(), Constants.dateFormat);
         LocalDate end = LocalDate.parse(rentalDAO.getEndDate(), Constants.dateFormat);
 
