@@ -11,6 +11,9 @@ import java.util.Arrays;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
+
+import javax.swing.plaf.synth.Region;
+
 import java.util.List;
 
 import com.azure.resourcemanager.*;
@@ -460,6 +463,9 @@ public class AzureManagement {
 							createCosmosCollection(cosmosClient, AZURE_COSMOSDB_DATABASE, "questions", "/id",
 									null);
 
+							createCosmosCollection(cosmosClient, AZURE_COSMOSDB_DATABASE, "housesSuggestions", "/id",
+									null);
+							
 							System.err.println("Azure Cosmos DB resources created with success");
 
 						} catch (Exception e) {
