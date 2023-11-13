@@ -14,7 +14,6 @@ import scc.data.house.HouseDAO;
 import scc.utils.Constants;
 
 import java.net.URI;
-import java.net.URISyntaxException;
 import java.time.LocalDate;
 import java.time.temporal.ChronoUnit;
 import java.util.HashSet;

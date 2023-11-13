@@ -1,7 +1,5 @@
 package scc.utils;
 
-import com.azure.storage.blob.BlobServiceClientBuilder;
-
 import java.time.format.DateTimeFormatter;
 
 public class Constants {
@@ -10,9 +8,9 @@ public class Constants {
         return "https://" + appName + ".azurewebsites.net";
     }
 
-    public static DateTimeFormatter dateFormat = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+    public static final DateTimeFormatter dateFormat = DateTimeFormatter.ofPattern("yyyy-MM-dd");
 
-    public static boolean cachingEnabled = true;
+    public static final boolean cachingEnabled = true;
 
     ///////////////////////////////// DB Env /////////////////////////////////
 

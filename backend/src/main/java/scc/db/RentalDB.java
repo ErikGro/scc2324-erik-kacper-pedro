@@ -4,7 +4,6 @@ import com.azure.cosmos.CosmosContainer;
 import com.azure.cosmos.models.CosmosQueryRequestOptions;
 import com.azure.cosmos.util.CosmosPagedIterable;
 import scc.data.RentalDAO;
-import scc.data.house.HouseDAO;
 
 public class RentalDB extends AbstractDB<RentalDAO> {
     public RentalDB(CosmosContainer container) {

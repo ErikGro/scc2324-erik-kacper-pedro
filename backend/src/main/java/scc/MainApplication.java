@@ -6,7 +6,7 @@ import jakarta.ws.rs.core.Application;
 import scc.srv.*;
 
 public class MainApplication extends Application {
-	private final Set<Class<?>> resources = new HashSet<Class<?>>();
+	private final Set<Class<?>> resources = new HashSet<>();
 
 	public MainApplication() {
 		resources.add(HouseResource.class);

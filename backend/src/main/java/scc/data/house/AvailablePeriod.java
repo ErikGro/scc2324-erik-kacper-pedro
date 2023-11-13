@@ -3,7 +3,6 @@ package scc.data.house;
 import scc.utils.Constants;
 
 import java.time.LocalDate;
-import java.time.format.DateTimeFormatter;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -69,16 +68,13 @@ public class AvailablePeriod {
         LocalDate periodEnd = getPeriodEnd();
 
         HashSet<AvailablePeriod> newPeriods = new HashSet<>();
-        
-        if (periodStart.isEqual(start)) {
-            if (!periodEnd.isEqual(end)) {
-                newPeriods.add(new AvailablePeriod(end.toString(), periodEnd.toString(), getNormalPricePerDay(), getPromotionPricePerDay()));
-            }
-        } else { // periodStart before start
+
+
+        if (!periodStart.isEqual(start)) { // periodStart before start
             newPeriods.add(new AvailablePeriod(periodStart.toString(), start.toString(), getNormalPricePerDay(), getPromotionPricePerDay()));
-            if (!periodEnd.isEqual(end)) { // periodEnd after end
-                newPeriods.add(new AvailablePeriod(end.toString(), periodEnd.toString(), getNormalPricePerDay(), getPromotionPricePerDay()));
-            }
+        }
+        if (!periodEnd.isEqual(end)) { // periodEnd after end
+            newPeriods.add(new AvailablePeriod(end.toString(), periodEnd.toString(), getNormalPricePerDay(), getPromotionPricePerDay()));
         }
 
         return newPeriods;
