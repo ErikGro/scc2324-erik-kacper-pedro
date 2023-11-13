@@ -19,7 +19,11 @@ public class RentalDB extends AbstractDB<RentalDAO> {
             upsert(rental);
         }
     }
-    public synchronized CosmosPagedIterable<RentalDAO> getRentalsByUserID(String id) {
-        return container.queryItems("SELECT * FROM rental WHERE rental.tenantID=\"" + id + "\"", new CosmosQueryRequestOptions(), RentalDAO.class);
+    public synchronized CosmosPagedIterable<RentalDAO> getRentalsByUserID(String userID) {
+        return container.queryItems("SELECT * FROM rental WHERE rental.tenantID=\"" + userID + "\"", new CosmosQueryRequestOptions(), RentalDAO.class);
+    }
+
+    public synchronized CosmosPagedIterable<RentalDAO> getRentalsByHouseID(String houseID) {
+        return container.queryItems("SELECT * FROM rental WHERE rental.houseID=\"" + houseID + "\"", new CosmosQueryRequestOptions(), RentalDAO.class);
     }
 }

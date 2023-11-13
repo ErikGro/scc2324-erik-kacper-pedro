@@ -123,6 +123,24 @@ public class RentalResource {
     }
 
     /**
+     * Returns a list of all rentals for a given house
+     *
+     * @param houseID  the id of the house to which the rental belongs
+     * @return Response json array containing all rentals
+     */
+    @GET
+    @Path("/")
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response getRentalsForHouse(@PathParam("houseID") String houseID) {
+        ServiceResponse<Set<RentalDAO>> response = rentalService.getRentalsForHouse(houseID);
+
+        if (response.getItem().isEmpty())
+            throw new NotFoundException("No rentals for the given house found.");
+
+        return Response.ok(response.getItem().get()).build();
+    }
+
+    /**
      * If rental with given id exists, return rental as JSON
      *
      * @param houseID  the id of the house to which the rental belongs
