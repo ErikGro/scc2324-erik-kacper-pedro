@@ -16,10 +16,9 @@ public class DB {
     private static DB instance;
     private final CosmosContainer houses;
     private final CosmosContainer rentals;
-    private final CosmosContainer questions;
 
     public static synchronized DB getInstance() {
-        if(instance != null)
+        if (instance != null)
             return instance;
 
         instance = new DB();
@@ -42,7 +41,6 @@ public class DB {
         CosmosDatabase db = client.getDatabase(Constants.getDBName());
 
         houses = db.getContainer("houses");
-        questions = db.getContainer("questions");
         rentals = db.getContainer("rental");
     }
 
@@ -61,12 +59,20 @@ public class DB {
     }
 
     public void removeDeletedUserEntries() {
-        List<CosmosContainer> containers = Arrays.asList(houses, rentals, questions);
+        String queryHouses = "SELECT * FROM houses WHERE houses.ownerID=\"DeletedUser\"";
+        CosmosPagedIterable<Identifiable> responseHouses = houses.queryItems(queryHouses,
+                new CosmosQueryRequestOptions(),
+                Identifiable.class);
+        responseHouses.forEach(o -> houses.deleteItem(o.getId(),
+                new PartitionKey(o.getId()),
+                new CosmosItemRequestOptions()));
 
-        containers.forEach(container -> {
-            String query = "SELECT * FROM " + container.getId() + " WHERE " + container.getId() + "ownerID=\"DeletedUser\"";
-            CosmosPagedIterable<Identifiable> response = container.queryItems(query, new CosmosQueryRequestOptions(), Identifiable.class);
-            response.forEach(o -> container.deleteItem(o.getId(), new PartitionKey(o.getId()), new CosmosItemRequestOptions()));
-        });
+        String queryRental = "SELECT * FROM rental WHERE rental.ownerID=\"DeletedUser\"";
+        CosmosPagedIterable<Identifiable> responseRentals = rentals.queryItems(queryRental,
+                new CosmosQueryRequestOptions(),
+                Identifiable.class);
+        responseRentals.forEach(o -> rentals.deleteItem(o.getId(),
+                new PartitionKey(o.getId()),
+                new CosmosItemRequestOptions()));
     }
 }

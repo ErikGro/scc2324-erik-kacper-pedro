@@ -112,7 +112,6 @@ public class UserResource {
         if (user.isEmpty())
             return Response.status(400).entity("No such user").build();
 
-        //TODO: add compatibility with houses to show that the user has been deleted
         userService.deleteByID(id);
 
         if (user.get().getPhotoID() != null) {
