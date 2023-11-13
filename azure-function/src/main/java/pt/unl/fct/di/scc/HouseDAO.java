@@ -1,11 +1,7 @@
 package pt.unl.fct.di.scc;
 
-import sun.jvm.hotspot.debugger.Address;
-
-import java.time.Month;
 import java.util.Collections;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 
 public class HouseDAO {
