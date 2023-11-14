@@ -10,7 +10,7 @@ public class Constants {
 
     public static final DateTimeFormatter dateFormat = DateTimeFormatter.ofPattern("yyyy-MM-dd");
 
-    public static final boolean cachingEnabled = true;
+    public static final boolean cachingEnabled = false;
 
     ///////////////////////////////// DB Env /////////////////////////////////
 
