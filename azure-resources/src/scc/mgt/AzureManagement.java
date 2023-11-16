@@ -12,8 +12,6 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
-import javax.swing.plaf.synth.Region;
-
 import java.util.List;
 
 import com.azure.resourcemanager.*;
@@ -56,7 +54,8 @@ public class AzureManagement {
 	
 	// Name of resoruce group for each region
 	static final String[] AZURE_RG_REGIONS = Arrays.stream(REGIONS)
-			.map(reg -> "scc-rg" + reg.name() + "-" + MY_SUFFIX).toArray(String[]::new);
+		.map(reg -> "scc-rg" + reg.name() + "-" + MY_SUFFIX).toArray(String[]::new);
+
 
 	// Name of application server to be launched in each regions -- launching the application
 	// server must be done using mvn, as you have been doing
