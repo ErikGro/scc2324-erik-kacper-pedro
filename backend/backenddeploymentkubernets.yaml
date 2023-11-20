@@ -14,7 +14,7 @@ spec:
     spec:
       containers:
       - name: backend-app
-        image: pedromdabribeiro/ccs2324:backend-app
+        image: subsurfer/backend-kacper-erik-pedro
         resources:
           requests:
             cpu: 100m

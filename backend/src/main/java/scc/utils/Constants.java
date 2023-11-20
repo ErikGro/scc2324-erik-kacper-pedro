@@ -3,14 +3,9 @@ package scc.utils;
 import java.time.format.DateTimeFormatter;
 
 public class Constants {
-    public static String getApplicationURL() {
-        String appName = System.getenv("WEBSITE_SITE_NAME");
-        return "https://" + appName + ".azurewebsites.net";
-    }
-
     public static final DateTimeFormatter dateFormat = DateTimeFormatter.ofPattern("yyyy-MM-dd");
 
-    public static final boolean cachingEnabled = true;
+    public static final boolean cachingEnabled = false;
 
     ///////////////////////////////// DB Env /////////////////////////////////
 
