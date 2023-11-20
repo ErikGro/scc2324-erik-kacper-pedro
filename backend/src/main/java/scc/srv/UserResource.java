@@ -20,7 +20,7 @@ import java.util.UUID;
 @Path("/user")
 public class UserResource {
     private final UserService userService = new UserService();
-    private final BlobService blobService = BlobService.getInstance();
+    // private final BlobService blobService = BlobService.getInstance();
 
     /**
      * Create a new user
@@ -114,9 +114,9 @@ public class UserResource {
 
         userService.deleteByID(id);
 
-        if (user.get().getPhotoID() != null) {
-            blobService.getUsersContainer().deleteImage(user.get().getPhotoID());
-        }
+        // if (user.get().getPhotoID() != null) {
+        //     blobService.getUsersContainer().deleteImage(user.get().getPhotoID());
+        // }
 
         return Response.ok().build();
     }
@@ -188,7 +188,7 @@ public class UserResource {
             photoID = user.getPhotoID(); // Overwrite
         }
 
-        blobService.getUsersContainer().upsertImage(photoID, photo);
+        // blobService.getUsersContainer().upsertImage(photoID, photo);
 
         user.setPhotoID(photoID);
         ServiceResponse<UserDAO> response = userService.upsert(user);

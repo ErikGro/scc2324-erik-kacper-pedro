@@ -9,14 +9,14 @@ public class BlobService {
     private final BlobContainer usersContainer;
     private final BlobContainer housesContainer;
 
-    public static synchronized BlobService getInstance() {
-        if (instance != null)
-            return instance;
+    // public static synchronized BlobService getInstance() {
+    //     if (instance != null)
+    //         return instance;
 
-        instance = new BlobService();
+    //     instance = new BlobService();
 
-        return instance;
-    }
+    //     return instance;
+    // }
 
     public BlobContainer getUsersContainer() {
         return usersContainer;
