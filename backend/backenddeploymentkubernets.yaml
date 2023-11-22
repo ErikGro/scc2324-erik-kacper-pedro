@@ -1,39 +1,88 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: backend-app-deployment
+  name: redis
 spec:
   replicas: 1
   selector:
     matchLabels:
-      app: backend-app
+      app: redis
   template:
     metadata:
       labels:
-        app: backend-app
+        app: redis
     spec:
+      nodeSelector:
+        "kubernetes.io/os": linux
       containers:
-      - name: backend-app
-        image: pedromdabribeiro/ccs2324:backend-app
-        resources:
-          requests:
-            cpu: 100m
-            memory: 128Mi
-          limits:
-            cpu: 250m
-            memory: 256Mi
+      - name: redis
+        image: mcr.microsoft.com/oss/bitnami/redis:6.0.8
+        imagePullPolicy: Always
+        env:
+        - name: ALLOW_EMPTY_PASSWORD
+          value: "yes"
         ports:
-        - containerPort: 8080
-
+        - containerPort: 6379
+          name: redis
 ---
 apiVersion: v1
 kind: Service
 metadata:
-  name: backend-app-service
+  name: redis
+spec:
+  ports:
+  - port: 6379
+  selector:
+    app: redis
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: scc2324-webapp
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: scc2324-webapp
+  template:
+    metadata:
+      labels:
+        app: scc2324-webapp
+    spec:
+      nodeSelector:
+        "kubernetes.io/os": linux
+      containers:
+      - name: scc2324-webapp
+        image: subsurfer/backend-kacper-erik-pedro
+        imagePullPolicy: Always
+        ports:
+        - containerPort: 8080
+        env:
+        - name: REDIS_HOSTNAME
+          value: "redis"
+        - name: DB_CONNECTION_URL
+          value: "https://scc2468806.documents.azure.com:443/"
+        - name: DB_NAME
+          value: "scc24db68806"
+        - name: DB_KEY
+          value: "hXE0VuJE67xu5CGiEkkmv0a45xjq10QXb5PDJatdfkx5vOqwkUYXtPxoCdoqc2TVReVfivQAh89fACDbqbg9JQ=="
+        - name: "DB_BLOB_CONNECTION_STRING"
+          value: "DefaultEndpointsProtocol=https;AccountName=sccstwesteurope68806;AccountKey=sAVB2qGEYd5IYwu/pe6vOkDLxUmGyA6U+vouY7+q+LFlLixDiDL8ieNxqDXeY8f6wlhK1huGXZHC+AStBxzFbA==;EndpointSuffix=core.windows.net"
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: scc2324-webapp
 spec:
   type: LoadBalancer
   ports:
-  - port: 80
+  - protocol: TCP
+    port: 80
     targetPort: 8080
   selector:
-    app: backend-app
+    app: scc2324-webapp
+
+
+
+
+
