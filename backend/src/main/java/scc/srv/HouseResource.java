@@ -25,7 +25,7 @@ import java.util.UUID;
 public class HouseResource {
 	private final HouseService houseService = new HouseService();
 	private final UserService userService = new UserService();
-	private final BlobService blobService = BlobService.getInstance();
+	// private final BlobService blobService = BlobService.getInstance();
 
 	/**
 	 * Create a single house
@@ -203,7 +203,7 @@ public class HouseResource {
 			return Response.status(401).build();
 
 		String newPhotoID = UUID.randomUUID().toString();
-		blobService.getHousesContainer().upsertImage(newPhotoID, photo);
+		// blobService.getHousesContainer().upsertImage(newPhotoID, photo);
 
 		ArrayList<String> photoIDs = new ArrayList<>(house.getPhotoIDs());
 		photoIDs.add(newPhotoID);

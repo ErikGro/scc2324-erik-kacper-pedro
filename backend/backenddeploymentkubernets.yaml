@@ -68,6 +68,7 @@ spec:
           value: "hXE0VuJE67xu5CGiEkkmv0a45xjq10QXb5PDJatdfkx5vOqwkUYXtPxoCdoqc2TVReVfivQAh89fACDbqbg9JQ=="
         - name: "DB_BLOB_CONNECTION_STRING"
           value: "DefaultEndpointsProtocol=https;AccountName=sccstwesteurope68806;AccountKey=sAVB2qGEYd5IYwu/pe6vOkDLxUmGyA6U+vouY7+q+LFlLixDiDL8ieNxqDXeY8f6wlhK1huGXZHC+AStBxzFbA==;EndpointSuffix=core.windows.net"
+          
 ---
 apiVersion: v1
 kind: Service
