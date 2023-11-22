@@ -1,14 +1,13 @@
 package scc.cache;
 
-import com.azure.cosmos.models.CosmosItemResponse;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import redis.clients.jedis.Jedis;
-import scc.persistence.db.AbstractDB;
+import scc.persistence.db.cosmos.CosmosAbstractDB;
 import scc.utils.Constants;
 
 import java.util.Optional;
 
-public abstract class AbstractService<T extends Identifiable, DBType extends AbstractDB<T>> {
+public abstract class AbstractService<T extends Identifiable, DBType extends CosmosAbstractDB<T>> {
     protected final DBType db;
     private final Class<T> type;
     protected final ObjectMapper mapper = new ObjectMapper();
@@ -27,31 +26,30 @@ public abstract class AbstractService<T extends Identifiable, DBType extends Abs
         }
 
         // Cache miss
-        CosmosItemResponse<T> response = db.getByID(id);
-        T item = response.getItem();
+        ServiceResponse<T> response = db.getByID(id);
+        Optional<T> item = response.getItem();
 
-        if (item != null) { // Cache item
-            writeToCache(item);
-        }
+        // Cache item
+        item.ifPresent(this::writeToCache);
 
-        return new ServiceResponse<>(response.getStatusCode(), item);
+        return response;
     }
 
     public ServiceResponse<T> upsert(T object) {
-        CosmosItemResponse<T> response = db.upsert(object);
+        ServiceResponse<T> response = db.upsert(object);
 
-        if (response.getStatusCode() < 300) {
-            writeToCache(response.getItem());
+        if (response.getStatusCode() < 300 && response.getItem().isEmpty()) {
+            writeToCache(response.getItem().get());
         }
 
-        return new ServiceResponse<>(response.getStatusCode(), response.getItem());
+        return response;
     }
 
-    public ServiceResponse<T> deleteByID(String id) {
-        CosmosItemResponse<Object> response = db.deleteByID(id);
+    public ServiceResponse<Object> deleteByID(String id) {
+        ServiceResponse<Object> response = db.deleteByID(id);
         deleteFromCache(id);
 
-        return new ServiceResponse<>(response.getStatusCode());
+        return response;
     }
 
     /////////////////// CACHING METHODS ///////////////////////

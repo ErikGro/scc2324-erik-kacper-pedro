@@ -20,6 +20,7 @@ import java.util.HashSet;
 import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
+import java.util.List;
 
 /**
  * Resource for accessing rentals
@@ -130,7 +131,7 @@ public class RentalResource {
     @Path("/")
     @Produces(MediaType.APPLICATION_JSON)
     public Response getRentalsForHouse(@PathParam("houseID") String houseID) {
-        ServiceResponse<Set<RentalDAO>> response = rentalService.getRentalsForHouse(houseID);
+        ServiceResponse<List<RentalDAO>> response = rentalService.getRentalsForHouse(houseID);
 
         if (response.getItem().isEmpty())
             throw new NotFoundException("No rentals for the given house found.");
@@ -177,7 +178,7 @@ public class RentalResource {
                 userService.userSessionInvalid(session.getValue(), rentalResponse.getItem().get().getTenantID()))
             return Response.status(401).build();
 
-        ServiceResponse<RentalDAO> response = rentalService.deleteByID(rentalID);
+        ServiceResponse<Object> response = rentalService.deleteByID(rentalID);
 
         return Response.status(response.getStatusCode()).build();
     }

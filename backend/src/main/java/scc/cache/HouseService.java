@@ -1,16 +1,15 @@
 package scc.cache;
 
-import com.azure.cosmos.util.CosmosPagedIterable;
 import com.fasterxml.jackson.core.type.TypeReference;
 import redis.clients.jedis.Jedis;
 import scc.data.house.HouseDAO;
-import scc.persistence.db.CosmosDBLayer;
-import scc.persistence.db.HouseDB;
+import scc.persistence.db.cosmos.CosmosDBLayer;
+import scc.persistence.db.cosmos.CosmosHouseDB;
 
-import java.util.Set;
-import java.util.stream.Collectors;
+import java.util.Collections;
+import java.util.List;
 
-public class HouseService extends AbstractService<HouseDAO, HouseDB> {
+public class HouseService extends AbstractService<HouseDAO, CosmosHouseDB> {
     public HouseService() {
         super(HouseDAO.class, "house:", CosmosDBLayer.getInstance().getHouseDB());
     }
@@ -19,7 +18,7 @@ public class HouseService extends AbstractService<HouseDAO, HouseDB> {
         db.deleteUserID(id);
     }
 
-    public Set<HouseDAO> getDiscountedSoon() {
+    public List<HouseDAO> getDiscountedSoon() {
         try (Jedis jedis = RedisCache.getCachePool().getResource()) {
             String cacheValue = jedis.get("discountedNearFuture");
 
@@ -28,15 +27,17 @@ public class HouseService extends AbstractService<HouseDAO, HouseDB> {
             // ignore
         }
 
-        CosmosPagedIterable<HouseDAO> houses = db.getDiscountedHousesNearFuture();
-        Set<HouseDAO> set = houses.stream().collect(Collectors.toSet());
+        ServiceResponse<List<HouseDAO>> houses = db.getDiscountedHousesNearFuture();
+
+        if (houses.getItem().isEmpty())
+            return Collections.emptyList();
 
         try (Jedis jedis = RedisCache.getCachePool().getResource()) {
-            jedis.set("discountedNearFuture", mapper.writeValueAsString(set));
+            jedis.set("discountedNearFuture", mapper.writeValueAsString(houses));
         } catch (Exception ignored) {
             // ignore
         }
 
-        return set;
+        return houses.getItem().get();
     }
 }

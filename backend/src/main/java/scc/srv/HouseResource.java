@@ -1,6 +1,6 @@
 package scc.srv;
 
-import com.azure.cosmos.util.CosmosPagedIterable;
+import java.util.List;
 import jakarta.ws.rs.*;
 import jakarta.ws.rs.core.Cookie;
 import jakarta.ws.rs.core.MediaType;
@@ -8,16 +8,14 @@ import jakarta.ws.rs.core.Response;
 import scc.cache.HouseService;
 import scc.cache.ServiceResponse;
 import scc.cache.UserService;
-import scc.data.UserDAO;
 import scc.data.house.HouseDAO;
-import scc.persistence.db.CosmosDBLayer;
+import scc.persistence.db.cosmos.CosmosDBLayer;
 import scc.persistence.media.FileSystemService;
 import scc.persistence.media.MediaService;
 
 import java.net.URI;
 import java.util.ArrayList;
 import java.util.Optional;
-import java.util.Set;
 import java.util.UUID;
 
 /**
@@ -129,7 +127,7 @@ public class HouseResource {
 				userService.userSessionInvalid(session.getValue(), response.getItem().get().getOwnerID()))
 			return Response.status(401).build();
 
-		ServiceResponse<HouseDAO> deleteResponse = houseService.deleteByID(id);
+		ServiceResponse<Object> deleteResponse = houseService.deleteByID(id);
 
 		return Response.status(deleteResponse.getStatusCode()).build();
 	}
@@ -153,7 +151,7 @@ public class HouseResource {
 									 @QueryParam("city") String city,
 									 @QueryParam("start-date") String startDate,
 									 @QueryParam("end-date") String endDate) {
-		CosmosPagedIterable<HouseDAO> response;
+		ServiceResponse<List<HouseDAO>> response;
 
 		if (isValidQuery(userID)) { // List of houses of a given user
 			response = CosmosDBLayer.getInstance().getHouseDB().getHousesByUserID(userID);
@@ -165,7 +163,11 @@ public class HouseResource {
 			return Response.status(400).build();
 		}
 
-		return Response.ok(response.stream().toList()).build();
+		if (response.getItem().isEmpty()) {
+			throw new NotFoundException();
+		}
+
+		return Response.ok(response.getItem().get()).build();
 	}
 
 	private boolean isValidQuery(String string) {
@@ -180,7 +182,7 @@ public class HouseResource {
 	@Path("/discounted-soon")
 	@Produces(MediaType.APPLICATION_JSON)
 	public Response getDiscountedHousesNearFuture() {
-		Set<HouseDAO> discountedSoon = houseService.getDiscountedSoon();
+		List<HouseDAO> discountedSoon = houseService.getDiscountedSoon();
 
 		return Response.ok(discountedSoon).build();
 	}
