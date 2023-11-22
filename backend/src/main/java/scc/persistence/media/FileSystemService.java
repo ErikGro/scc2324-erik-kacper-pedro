@@ -1,5 +1,7 @@
 package scc.persistence.media;
 
+import scc.utils.Constants;
+
 public class FileSystemService implements MediaService {
     private static FileSystemService instance;
     private final FileSystemContainer usersContainer;
@@ -23,8 +25,7 @@ public class FileSystemService implements MediaService {
     }
 
     private FileSystemService() {
-        // TODO: Replace
-        String root = "/usr/local/tomcat/webapps/pedro-kacper-erik-backend-1.0/";
+        String root = Constants.getMediaRootDir();
 
         usersContainer = new FileSystemContainer(root + "users/");
         housesContainer = new FileSystemContainer(root + "houses/");

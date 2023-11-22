@@ -24,7 +24,16 @@ spec:
             memory: 256Mi
         ports:
         - containerPort: 8080
-
+        volumeMounts:
+        - mountPath: "/mnt/vol"
+          name: mediavolume
+        env:
+          - name: MEDIA_ROOT_DIR
+            value: "/mnt/vol"
+      volumes:
+        - name: mediavolume
+          persistentVolumeClaim:
+            claimName: azure-managed-disk
 ---
 apiVersion: v1
 kind: Service
@@ -37,3 +46,15 @@ spec:
     targetPort: 8080
   selector:
     app: backend-app
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: azure-managed-disk
+spec:
+  accessModes:
+    - ReadWriteOnce
+  storageClassName: azurefile
+  resources:
+    requests:
+      storage: 1Gi

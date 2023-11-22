@@ -7,7 +7,11 @@ import java.util.Optional;
 public class FileSystemContainer implements Container {
     private final File dir;
     public FileSystemContainer(String dirName) {
-        this.dir = new File(dirName);;
+        this.dir = new File(dirName);
+
+        if (!dir.exists()) {
+            dir.mkdirs();
+        }
     }
 
     @Override
@@ -27,17 +31,9 @@ public class FileSystemContainer implements Container {
     @Override
     public synchronized void upsertImage(String filename, byte[] byteArray) {
         File file = getFile(filename);
-        try {
-            if (!dir.exists()) {
-                dir.mkdirs();
-            }
-
-            file.createNewFile();
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
 
         try (FileOutputStream fos = new FileOutputStream(file, false)) {
+            file.createNewFile();
             fos.write(byteArray);
         } catch (IOException e) {
             throw new RuntimeException(e);

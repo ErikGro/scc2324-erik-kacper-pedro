@@ -8,6 +8,7 @@ import jakarta.ws.rs.core.Response;
 import scc.cache.HouseService;
 import scc.cache.ServiceResponse;
 import scc.cache.UserService;
+import scc.data.UserDAO;
 import scc.data.house.HouseDAO;
 import scc.persistence.db.CosmosDBLayer;
 import scc.persistence.media.FileSystemService;
@@ -195,13 +196,13 @@ public class HouseResource {
 		Optional<HouseDAO> optionalHouse = houseService.getByID(houseID).getItem();
 
         if (optionalHouse.isEmpty())
-            return Response.status(404).entity("House doesn't exist.").build();
+			throw new NotFoundException("House doesn't exist.");
 
 		HouseDAO house = optionalHouse.get();
 
 		if (session == null || session.getValue() == null ||
 				userService.userSessionInvalid(session.getValue(), house.getOwnerID()))
-			return Response.status(401).build();
+			throw new NotAuthorizedException("Not authorized.");
 
 		String newPhotoID = UUID.randomUUID().toString();
 		mediaService.getHousesContainer().upsertImage(newPhotoID, photo);
@@ -212,5 +213,17 @@ public class HouseResource {
 		houseService.upsert(house);
 
 		return Response.ok().build();
+	}
+
+	@Path("/photo/{id}")
+	@GET
+	@Produces({"image/png", "image/jpeg"})
+	public Response getPhoto(@PathParam("id") String id) {
+		Optional<byte[]> byteArray = mediaService.getHousesContainer().getImageBytes(id);
+
+		if (byteArray.isEmpty())
+			throw new NotFoundException("Image not found.");
+
+		return Response.ok(byteArray.get()).build();
 	}
 }

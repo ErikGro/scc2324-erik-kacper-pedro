@@ -174,9 +174,8 @@ public class UserResource {
     @Consumes(MediaType.APPLICATION_OCTET_STREAM)
     @Produces(MediaType.TEXT_PLAIN)
     public Response postPhoto(@CookieParam("scc:session") Cookie session, @PathParam("id") String id, byte[] photo) {
-        // TODO: Reenable auth
-        //        if (session == null || session.getValue() == null || userService.userSessionInvalid(session.getValue(), id))
-//            return Response.status(401).build();
+        if (session == null || session.getValue() == null || userService.userSessionInvalid(session.getValue(), id))
+            return Response.status(401).build();
 
         Optional<UserDAO> userDAO = userService.getByID(id).getItem();
         if (userDAO.isEmpty())
@@ -196,5 +195,23 @@ public class UserResource {
         ServiceResponse<UserDAO> response = userService.upsert(user);
 
         return Response.status(response.getStatusCode()).build();
+    }
+
+    @Path("/{id}/photo")
+    @GET
+    @Produces({"image/png", "image/jpeg"})
+    public Response getPhoto(@PathParam("id") String id) {
+        Optional<UserDAO> userDAO = userService.getByID(id).getItem();
+        if (userDAO.isEmpty())
+            return Response.status(400).entity("No such user").build();
+
+        UserDAO user = userDAO.get();
+
+        Optional<byte[]> byteArray = mediaService.getUsersContainer().getImageBytes(user.getPhotoID());
+
+        if (byteArray.isEmpty())
+            throw new NotFoundException("Image not found for user.");
+
+        return Response.ok(byteArray.get()).build();
     }
 }
