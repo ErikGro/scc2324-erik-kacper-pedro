@@ -1,15 +1,15 @@
 package scc.cache;
 
-import com.azure.cosmos.util.CosmosPagedIterable;
 import redis.clients.jedis.Jedis;
 import scc.data.UserDAO;
-import scc.persistence.db.CosmosDBLayer;
-import scc.persistence.db.UserDB;
+import scc.persistence.db.cosmos.CosmosDBLayer;
+import scc.persistence.db.cosmos.CosmosUserDB;
 import scc.utils.Constants;
 
+import java.util.List;
 import java.util.Optional;
 
-public class UserService extends AbstractService<UserDAO, UserDB> {
+public class UserService extends AbstractService<UserDAO, CosmosUserDB> {
     private final HouseService houseService = new HouseService();
     private final RentalService rentalService = new RentalService();
 
@@ -26,12 +26,12 @@ public class UserService extends AbstractService<UserDAO, UserDB> {
         }
 
         // Cache miss
-        CosmosPagedIterable<UserDAO> response = db.getByUsername(username);
-        if (!response.iterator().hasNext()) {
+        ServiceResponse<List<UserDAO>> response = db.getByUsername(username);
+        if (response.getItem().isEmpty()) {
             return new ServiceResponse<>(404, null);
         }
 
-        UserDAO user = response.iterator().next();
+        UserDAO user = response.getItem().get().get(0);
 
         // Cache item
         if (Constants.cachingEnabled) {
@@ -42,8 +42,8 @@ public class UserService extends AbstractService<UserDAO, UserDB> {
     }
 
     @Override
-    public ServiceResponse<UserDAO> deleteByID(String id) {
-        ServiceResponse<UserDAO> response = super.deleteByID(id);
+    public ServiceResponse<Object> deleteByID(String id) {
+        ServiceResponse<Object> response = super.deleteByID(id);
 
         // For all houses and rentals associated with user set userId to "DeletedUser"
         houseService.deleteUserID(id);
