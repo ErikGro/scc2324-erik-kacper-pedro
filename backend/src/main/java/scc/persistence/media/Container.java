@@ -1,7 +1,9 @@
 package scc.persistence.media;
 
+import java.util.Optional;
+
 public interface Container {
-    byte[] getImageBytes(String filename);
-    void deleteImage(String filename);
+    Optional<byte[]> getImageBytes(String filename);
+    boolean deleteImage(String filename);
     void upsertImage(String filename, byte[] byteArray);
 }

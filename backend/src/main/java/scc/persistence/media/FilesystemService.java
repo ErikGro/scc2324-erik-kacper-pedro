@@ -23,7 +23,9 @@ public class FilesystemService implements MediaService {
     }
 
     private FilesystemService() {
-        usersContainer = new FileSystemContainer("users");
-        housesContainer = new FileSystemContainer("houses");
+        String baseDir = "volume/mount/";
+
+        usersContainer = new FileSystemContainer(baseDir + "users/");
+        housesContainer = new FileSystemContainer(baseDir + "houses/");
     }
 }
