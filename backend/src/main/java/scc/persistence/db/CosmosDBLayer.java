@@ -1,4 +1,4 @@
-package scc.db;
+package scc.persistence.db;
 
 import com.azure.cosmos.*;
 import scc.utils.Constants;

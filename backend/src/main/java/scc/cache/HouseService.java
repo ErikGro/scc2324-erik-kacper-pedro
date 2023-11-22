@@ -4,8 +4,8 @@ import com.azure.cosmos.util.CosmosPagedIterable;
 import com.fasterxml.jackson.core.type.TypeReference;
 import redis.clients.jedis.Jedis;
 import scc.data.house.HouseDAO;
-import scc.db.CosmosDBLayer;
-import scc.db.HouseDB;
+import scc.persistence.db.CosmosDBLayer;
+import scc.persistence.db.HouseDB;
 
 import java.util.Set;
 import java.util.stream.Collectors;

@@ -3,8 +3,8 @@ package scc.cache;
 import com.azure.cosmos.util.CosmosPagedIterable;
 import redis.clients.jedis.Jedis;
 import scc.data.UserDAO;
-import scc.db.CosmosDBLayer;
-import scc.db.UserDB;
+import scc.persistence.db.CosmosDBLayer;
+import scc.persistence.db.UserDB;
 import scc.utils.Constants;
 
 import java.util.Optional;

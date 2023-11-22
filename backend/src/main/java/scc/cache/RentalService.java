@@ -2,8 +2,8 @@ package scc.cache;
 
 import com.azure.cosmos.util.CosmosPagedIterable;
 import scc.data.RentalDAO;
-import scc.db.CosmosDBLayer;
-import scc.db.RentalDB;
+import scc.persistence.db.CosmosDBLayer;
+import scc.persistence.db.RentalDB;
 import java.util.Set;
 import java.util.stream.Collectors;
 

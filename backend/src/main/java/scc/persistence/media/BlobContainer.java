@@ -1,4 +1,4 @@
-package scc.db.blob;
+package scc.persistence.media;
 
 import com.azure.core.util.BinaryData;
 import com.azure.storage.blob.BlobClient;
@@ -6,7 +6,7 @@ import com.azure.storage.blob.BlobContainerClient;
 
 import java.io.ByteArrayInputStream;
 
-public class BlobContainer {
+public class BlobContainer implements Container {
     private final BlobContainerClient container;
 
     BlobContainer(BlobContainerClient container) {

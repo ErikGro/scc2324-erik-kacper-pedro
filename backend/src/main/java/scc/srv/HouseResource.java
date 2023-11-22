@@ -9,8 +9,9 @@ import scc.cache.HouseService;
 import scc.cache.ServiceResponse;
 import scc.cache.UserService;
 import scc.data.house.HouseDAO;
-import scc.db.CosmosDBLayer;
-import scc.db.blob.BlobService;
+import scc.persistence.db.CosmosDBLayer;
+import scc.persistence.media.FilesystemService;
+import scc.persistence.media.MediaService;
 
 import java.net.URI;
 import java.util.ArrayList;
@@ -25,7 +26,7 @@ import java.util.UUID;
 public class HouseResource {
 	private final HouseService houseService = new HouseService();
 	private final UserService userService = new UserService();
-	// private final BlobService blobService = BlobService.getInstance();
+	private final MediaService mediaService = FilesystemService.getInstance();
 
 	/**
 	 * Create a single house
@@ -203,7 +204,7 @@ public class HouseResource {
 			return Response.status(401).build();
 
 		String newPhotoID = UUID.randomUUID().toString();
-		// blobService.getHousesContainer().upsertImage(newPhotoID, photo);
+		mediaService.getHousesContainer().upsertImage(newPhotoID, photo);
 
 		ArrayList<String> photoIDs = new ArrayList<>(house.getPhotoIDs());
 		photoIDs.add(newPhotoID);

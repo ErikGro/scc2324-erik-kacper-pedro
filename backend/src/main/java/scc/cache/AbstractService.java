@@ -3,7 +3,7 @@ package scc.cache;
 import com.azure.cosmos.models.CosmosItemResponse;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import redis.clients.jedis.Jedis;
-import scc.db.AbstractDB;
+import scc.persistence.db.AbstractDB;
 import scc.utils.Constants;
 
 import java.util.Optional;

@@ -10,7 +10,8 @@ import scc.cache.UserService;
 import scc.data.LoginCredentials;
 import scc.data.User;
 import scc.data.UserDAO;
-import scc.db.blob.BlobService;
+import scc.persistence.media.FilesystemService;
+import scc.persistence.media.MediaService;
 import scc.utils.Hash;
 
 import java.net.URI;
@@ -20,7 +21,7 @@ import java.util.UUID;
 @Path("/user")
 public class UserResource {
     private final UserService userService = new UserService();
-    // private final BlobService blobService = BlobService.getInstance();
+    private final MediaService mediaService = FilesystemService.getInstance();
 
     /**
      * Create a new user
@@ -114,9 +115,9 @@ public class UserResource {
 
         userService.deleteByID(id);
 
-        // if (user.get().getPhotoID() != null) {
-        //     blobService.getUsersContainer().deleteImage(user.get().getPhotoID());
-        // }
+         if (user.get().getPhotoID() != null) {
+             mediaService.getUsersContainer().deleteImage(user.get().getPhotoID());
+         }
 
         return Response.ok().build();
     }
@@ -188,7 +189,7 @@ public class UserResource {
             photoID = user.getPhotoID(); // Overwrite
         }
 
-        // blobService.getUsersContainer().upsertImage(photoID, photo);
+        mediaService.getUsersContainer().upsertImage(photoID, photo);
 
         user.setPhotoID(photoID);
         ServiceResponse<UserDAO> response = userService.upsert(user);

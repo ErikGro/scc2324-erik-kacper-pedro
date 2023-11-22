@@ -4,8 +4,8 @@ package scc.cache;
 import com.azure.cosmos.util.CosmosPagedIterable;
 
 import scc.data.QuestionsDAO;
-import scc.db.CosmosDBLayer;
-import scc.db.QuestionsDB;
+import scc.persistence.db.CosmosDBLayer;
+import scc.persistence.db.QuestionsDB;
 
 import java.util.Set;
 import java.util.stream.Collectors;
