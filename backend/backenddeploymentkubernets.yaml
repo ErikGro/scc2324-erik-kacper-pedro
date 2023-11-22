@@ -49,9 +49,12 @@ spec:
       labels:
         app: backend-app
     spec:
+      nodeSelector:
+        "kubernetes.io/os": linux
       containers:
       - name: backend-app
-        image: kmotyka00/ccs2324-app 
+        image: kmotyka00/ccs2324-backend
+        imagePullPolicy: Always
         resources:
           requests:
             cpu: 100m
