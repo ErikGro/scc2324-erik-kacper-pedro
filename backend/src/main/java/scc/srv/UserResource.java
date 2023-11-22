@@ -10,7 +10,7 @@ import scc.cache.UserService;
 import scc.data.LoginCredentials;
 import scc.data.User;
 import scc.data.UserDAO;
-import scc.persistence.media.FilesystemService;
+import scc.persistence.media.FileSystemService;
 import scc.persistence.media.MediaService;
 import scc.utils.Hash;
 
@@ -21,7 +21,7 @@ import java.util.UUID;
 @Path("/user")
 public class UserResource {
     private final UserService userService = new UserService();
-    private final MediaService mediaService = FilesystemService.getInstance();
+    private final MediaService mediaService = FileSystemService.getInstance();
 
     /**
      * Create a new user
@@ -174,8 +174,9 @@ public class UserResource {
     @Consumes(MediaType.APPLICATION_OCTET_STREAM)
     @Produces(MediaType.TEXT_PLAIN)
     public Response postPhoto(@CookieParam("scc:session") Cookie session, @PathParam("id") String id, byte[] photo) {
-        if (session == null || session.getValue() == null || userService.userSessionInvalid(session.getValue(), id))
-            return Response.status(401).build();
+        // TODO: Reenable auth
+        //        if (session == null || session.getValue() == null || userService.userSessionInvalid(session.getValue(), id))
+//            return Response.status(401).build();
 
         Optional<UserDAO> userDAO = userService.getByID(id).getItem();
         if (userDAO.isEmpty())

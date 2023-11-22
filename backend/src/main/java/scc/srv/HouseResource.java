@@ -10,7 +10,7 @@ import scc.cache.ServiceResponse;
 import scc.cache.UserService;
 import scc.data.house.HouseDAO;
 import scc.persistence.db.CosmosDBLayer;
-import scc.persistence.media.FilesystemService;
+import scc.persistence.media.FileSystemService;
 import scc.persistence.media.MediaService;
 
 import java.net.URI;
@@ -26,7 +26,7 @@ import java.util.UUID;
 public class HouseResource {
 	private final HouseService houseService = new HouseService();
 	private final UserService userService = new UserService();
-	private final MediaService mediaService = FilesystemService.getInstance();
+	private final MediaService mediaService = FileSystemService.getInstance();
 
 	/**
 	 * Create a single house
