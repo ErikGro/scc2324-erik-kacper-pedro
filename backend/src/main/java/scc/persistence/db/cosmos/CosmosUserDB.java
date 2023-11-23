@@ -14,10 +14,14 @@ public class CosmosUserDB extends CosmosAbstractDB<UserDAO> implements UserDB<Us
     public CosmosUserDB(CosmosContainer container) {
         super(container, UserDAO.class);
     }
-    public synchronized ServiceResponse<List<UserDAO>> getByUsername(String username) {
+    public synchronized ServiceResponse<UserDAO> getByUsername(String username) {
         String query = "SELECT * FROM users WHERE users.username=\"" + username + "\"";
         CosmosPagedIterable<UserDAO> response = container.queryItems(query, new CosmosQueryRequestOptions(), UserDAO.class);
-
-        return new ServiceResponse<>(200, response.stream().collect(Collectors.toList()));
+        List<UserDAO> list = response.stream().toList();
+        if (list.isEmpty()) {
+            return new ServiceResponse<>(404);
+        } else {
+            return new ServiceResponse<>(200, list.get(0));
+        }
     }
 }

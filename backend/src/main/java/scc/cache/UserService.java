@@ -26,12 +26,12 @@ public class UserService extends AbstractService<UserDAO, CosmosUserDB> {
         }
 
         // Cache miss
-        ServiceResponse<List<UserDAO>> response = db.getByUsername(username);
+        ServiceResponse<UserDAO> response = db.getByUsername(username);
         if (response.getItem().isEmpty()) {
             return new ServiceResponse<>(404, null);
         }
 
-        UserDAO user = response.getItem().get().get(0);
+        UserDAO user = response.getItem().get();
 
         // Cache item
         if (Constants.cachingEnabled) {
