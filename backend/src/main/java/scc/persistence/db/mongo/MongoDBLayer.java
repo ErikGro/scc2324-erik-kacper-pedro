@@ -17,7 +17,7 @@ public class MongoDBLayer implements DBLayer {
     private final MongoHouseCollection houseContainer;
     private final MongoRentalCollection rentalContainer;
     private final MongoQuestionsCollection questionsContainer;
-    
+
     public static synchronized MongoDBLayer getInstance() {
         if(instance != null)
             return instance;
