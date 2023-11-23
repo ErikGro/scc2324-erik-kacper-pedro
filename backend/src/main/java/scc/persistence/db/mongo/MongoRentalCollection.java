@@ -13,17 +13,17 @@ public class MongoRentalCollection extends MongoAbstractCollection<RentalDAO> im
     }
 
     @Override
-    public void deleteUserID(String id) {
+    synchronized public void deleteUserID(String id) {
 
     }
 
     @Override
-    public ServiceResponse<List<RentalDAO>> getRentalsByUserID(String userID) {
+    synchronized public ServiceResponse<List<RentalDAO>> getRentalsByUserID(String userID) {
         return null;
     }
 
     @Override
-    public ServiceResponse<List<RentalDAO>> getRentalsByHouseID(String houseID) {
+    synchronized public ServiceResponse<List<RentalDAO>> getRentalsByHouseID(String houseID) {
         return null;
     }
 }

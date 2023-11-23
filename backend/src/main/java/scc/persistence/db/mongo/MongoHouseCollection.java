@@ -13,27 +13,27 @@ public class MongoHouseCollection extends MongoAbstractCollection<HouseDAO> impl
     }
 
     @Override
-    public void deleteUserID(String id) {
+    synchronized public void deleteUserID(String id) {
 
     }
 
     @Override
-    public ServiceResponse<List<HouseDAO>> getHousesByUserID(String id) {
+    synchronized public ServiceResponse<List<HouseDAO>> getHousesByUserID(String id) {
         return null;
     }
 
     @Override
-    public ServiceResponse<List<HouseDAO>> getHousesByCity(String name) {
+    synchronized public ServiceResponse<List<HouseDAO>> getHousesByCity(String name) {
         return null;
     }
 
     @Override
-    public ServiceResponse<List<HouseDAO>> getHousesByCityAndPeriod(String name, String startDate, String endDate) {
+    synchronized public ServiceResponse<List<HouseDAO>> getHousesByCityAndPeriod(String name, String startDate, String endDate) {
         return null;
     }
 
     @Override
-    public ServiceResponse<List<HouseDAO>> getDiscountedHousesNearFuture() {
+    synchronized public ServiceResponse<List<HouseDAO>> getDiscountedHousesNearFuture() {
         return null;
     }
 }

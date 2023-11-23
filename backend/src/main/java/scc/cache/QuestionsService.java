@@ -14,6 +14,6 @@ public class QuestionsService extends AbstractService<QuestionsDAO, QuestionsCon
 
     // Get all questions from a house
     public ServiceResponse<List<QuestionsDAO>> getQuestions(String houseId) {
-        return db.getQuestions(houseId);
+        return container.getQuestions(houseId);
     }
 }

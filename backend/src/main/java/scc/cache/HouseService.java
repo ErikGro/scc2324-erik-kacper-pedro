@@ -3,10 +3,7 @@ package scc.cache;
 import com.fasterxml.jackson.core.type.TypeReference;
 import redis.clients.jedis.Jedis;
 import scc.data.house.HouseDAO;
-import scc.persistence.db.Container;
 import scc.persistence.db.HouseContainer;
-import scc.persistence.db.cosmos.CosmosDBLayer;
-import scc.persistence.db.cosmos.CosmosHouseContainer;
 import scc.persistence.db.mongo.MongoDBLayer;
 
 import java.util.Collections;
@@ -18,7 +15,7 @@ public class HouseService extends AbstractService<HouseDAO, HouseContainer> {
     }
 
     public void deleteUserID(String id) {
-        db.deleteUserID(id);
+        container.deleteUserID(id);
     }
 
     public List<HouseDAO> getDiscountedSoon() {
@@ -30,7 +27,7 @@ public class HouseService extends AbstractService<HouseDAO, HouseContainer> {
             // ignore
         }
 
-        ServiceResponse<List<HouseDAO>> houses = db.getDiscountedHousesNearFuture();
+        ServiceResponse<List<HouseDAO>> houses = container.getDiscountedHousesNearFuture();
 
         if (houses.getItem().isEmpty())
             return Collections.emptyList();

@@ -13,7 +13,7 @@ public class MongoQuestionsCollection extends MongoAbstractCollection<QuestionsD
     }
 
     @Override
-    public ServiceResponse<List<QuestionsDAO>> getQuestions(String houseId) {
+    synchronized public ServiceResponse<List<QuestionsDAO>> getQuestions(String houseId) {
         return null;
     }
 }

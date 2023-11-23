@@ -2,28 +2,40 @@ package scc.persistence.db.mongo;
 
 import com.mongodb.client.MongoCollection;
 import org.bson.Document;
+import scc.cache.Identifiable;
 import scc.cache.ServiceResponse;
 import scc.persistence.db.Container;
 
-public abstract class MongoAbstractCollection<T extends Document> implements Container<T> {
+import static com.mongodb.client.model.Filters.eq;
+
+public abstract class MongoAbstractCollection<T extends Document & Identifiable> implements Container<T> {
     protected MongoCollection<T> collection;
 
     MongoAbstractCollection(MongoCollection<T> collection) {
         this.collection = collection;
     }
     @Override
-    public ServiceResponse<T> getByID(String id) {
-//        Document doc = collection.find(eq("title", "Back to the Future")).first();
-        return null;
+    public synchronized ServiceResponse<T> getByID(String id) {
+        return getResponse(collection.find(eq("id", id)).first());
     }
 
     @Override
-    public ServiceResponse<T> upsert(T t) {
-        return null;
+    public synchronized ServiceResponse<T> upsert(T t) {
+        return getResponse(collection.findOneAndReplace(eq("id", t.getId()), t));
     }
 
     @Override
-    public ServiceResponse<Object> deleteByID(String id) {
-        return null;
+    public synchronized ServiceResponse<Object> deleteByID(String id) {
+        collection.findOneAndDelete(eq("id", id));
+        // TODO: check
+        return new ServiceResponse<>(200);
+    }
+
+    public synchronized ServiceResponse<T> getResponse(T returnVal) {
+        if (returnVal == null) {
+            return new ServiceResponse<>(404);
+        } else {
+            return new ServiceResponse<>(200, returnVal);
+        }
     }
 }

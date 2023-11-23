@@ -12,10 +12,10 @@ public class RentalService extends AbstractService<RentalDAO, RentalContainer> {
     }
 
     public void deleteUserID(String id) {
-        db.deleteUserID(id);
+        container.deleteUserID(id);
     }
 
     public ServiceResponse<List<RentalDAO>> getRentalsForHouse(String houseID) {
-        return db.getRentalsByHouseID(houseID);
+        return container.getRentalsByHouseID(houseID);
     }
 }
