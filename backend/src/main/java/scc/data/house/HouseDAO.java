@@ -1,12 +1,13 @@
 package scc.data.house;
 
+import org.bson.Document;
 import scc.cache.Identifiable;
 
 import java.util.Collections;
 import java.util.List;
 import java.util.Set;
 
-public class HouseDAO implements Identifiable {
+public class HouseDAO extends Document implements Identifiable{
     private String id;
     private String ownerID;
     private String name;

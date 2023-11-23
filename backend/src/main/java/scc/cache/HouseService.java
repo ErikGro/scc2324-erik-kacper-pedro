@@ -3,15 +3,18 @@ package scc.cache;
 import com.fasterxml.jackson.core.type.TypeReference;
 import redis.clients.jedis.Jedis;
 import scc.data.house.HouseDAO;
+import scc.persistence.db.Container;
+import scc.persistence.db.HouseContainer;
 import scc.persistence.db.cosmos.CosmosDBLayer;
-import scc.persistence.db.cosmos.CosmosHouseDB;
+import scc.persistence.db.cosmos.CosmosHouseContainer;
+import scc.persistence.db.mongo.MongoDBLayer;
 
 import java.util.Collections;
 import java.util.List;
 
-public class HouseService extends AbstractService<HouseDAO, CosmosHouseDB> {
+public class HouseService extends AbstractService<HouseDAO, HouseContainer> {
     public HouseService() {
-        super(HouseDAO.class, "house:", CosmosDBLayer.getInstance().getHouseDB());
+        super(HouseDAO.class, "house:", MongoDBLayer.getInstance().getHouseContainer());
     }
 
     public void deleteUserID(String id) {

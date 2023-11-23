@@ -5,13 +5,13 @@ import com.azure.cosmos.models.CosmosQueryRequestOptions;
 import com.azure.cosmos.util.CosmosPagedIterable;
 import scc.cache.ServiceResponse;
 import scc.data.RentalDAO;
-import scc.persistence.db.RentalDB;
+import scc.persistence.db.RentalContainer;
 
 import java.util.List;
 import java.util.stream.Collectors;
 
-public class CosmosRentalDB extends CosmosAbstractDB<RentalDAO> implements RentalDB<RentalDAO> {
-    public CosmosRentalDB(CosmosContainer container) {
+public class CosmosRentalContainer extends CosmosAbstractContainer<RentalDAO> implements RentalContainer {
+    public CosmosRentalContainer(CosmosContainer container) {
         super(container, RentalDAO.class);
     }
 

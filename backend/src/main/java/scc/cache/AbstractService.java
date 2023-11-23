@@ -2,12 +2,13 @@ package scc.cache;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import redis.clients.jedis.Jedis;
-import scc.persistence.db.cosmos.CosmosAbstractDB;
+import scc.persistence.db.Container;
+import scc.persistence.db.cosmos.CosmosAbstractContainer;
 import scc.utils.Constants;
 
 import java.util.Optional;
 
-public abstract class AbstractService<T extends Identifiable, DBType extends CosmosAbstractDB<T>> {
+public abstract class AbstractService<T extends Identifiable, DBType extends Container<T>> {
     protected final DBType db;
     private final Class<T> type;
     protected final ObjectMapper mapper = new ObjectMapper();

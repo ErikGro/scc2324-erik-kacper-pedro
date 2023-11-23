@@ -154,11 +154,11 @@ public class HouseResource {
 		ServiceResponse<List<HouseDAO>> response;
 
 		if (isValidQuery(userID)) { // List of houses of a given user
-			response = CosmosDBLayer.getInstance().getHouseDB().getHousesByUserID(userID);
+			response = CosmosDBLayer.getInstance().getHouseContainer().getHousesByUserID(userID);
 		} else if (isValidQuery(city) && isValidQuery(startDate) && isValidQuery(endDate)) { // Search of available houses for a given period and location
-			response = CosmosDBLayer.getInstance().getHouseDB().getHousesByCityAndPeriod(city, startDate, endDate);
+			response = CosmosDBLayer.getInstance().getHouseContainer().getHousesByCityAndPeriod(city, startDate, endDate);
 		} else if (isValidQuery(city)) { // List of available houses for a given location
-			response = CosmosDBLayer.getInstance().getHouseDB().getHousesByCity(city);
+			response = CosmosDBLayer.getInstance().getHouseContainer().getHousesByCity(city);
 		} else {
 			return Response.status(400).build();
 		}

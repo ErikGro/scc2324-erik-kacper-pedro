@@ -1,13 +1,14 @@
 package scc.cache;
 
 import scc.data.RentalDAO;
-import scc.persistence.db.cosmos.CosmosDBLayer;
-import scc.persistence.db.cosmos.CosmosRentalDB;
+import scc.persistence.db.RentalContainer;
+import scc.persistence.db.mongo.MongoDBLayer;
+
 import java.util.List;
 
-public class RentalService extends AbstractService<RentalDAO, CosmosRentalDB> {
+public class RentalService extends AbstractService<RentalDAO, RentalContainer> {
     public RentalService() {
-        super(RentalDAO.class, "rental:", CosmosDBLayer.getInstance().getRentalDB());
+        super(RentalDAO.class, "rental:", MongoDBLayer.getInstance().getRentalContainer());
     }
 
     public void deleteUserID(String id) {

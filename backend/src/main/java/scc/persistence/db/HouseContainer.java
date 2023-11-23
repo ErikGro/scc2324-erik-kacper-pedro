@@ -1,10 +1,11 @@
 package scc.persistence.db;
 
 import scc.cache.ServiceResponse;
+import scc.data.house.HouseDAO;
 
 import java.util.List;
 
-public interface HouseDB<HouseDAO> extends DB<HouseDAO> {
+public interface HouseContainer extends Container<HouseDAO> {
     void deleteUserID(String id);
     ServiceResponse<List<HouseDAO>> getHousesByUserID(String id);
     ServiceResponse<List<HouseDAO>> getHousesByCity(String name);

@@ -1,9 +1,8 @@
 package scc.persistence.db;
 
 import scc.cache.ServiceResponse;
+import scc.data.UserDAO;
 
-import java.util.List;
-
-public interface UserDB<UserDAO> extends DB<UserDAO> {
+public interface UserContainer extends Container<UserDAO> {
     ServiceResponse<UserDAO> getByUsername(String username);
 }

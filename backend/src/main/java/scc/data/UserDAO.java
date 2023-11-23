@@ -1,11 +1,12 @@
 package scc.data;
 
+import org.bson.Document;
 import scc.cache.Identifiable;
 
 /**
  * Represents a User, as stored in the database
  */
-public class UserDAO implements Identifiable {
+public class UserDAO extends Document implements Identifiable {
     private String id;
     private String username; // Aka nickname
     private String fullName;

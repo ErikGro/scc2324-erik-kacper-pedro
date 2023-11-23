@@ -3,18 +3,17 @@ package scc.cache;
 import redis.clients.jedis.Jedis;
 import scc.data.UserDAO;
 import scc.persistence.db.cosmos.CosmosDBLayer;
-import scc.persistence.db.cosmos.CosmosUserDB;
+import scc.persistence.db.cosmos.CosmosUserContainer;
 import scc.utils.Constants;
 
-import java.util.List;
 import java.util.Optional;
 
-public class UserService extends AbstractService<UserDAO, CosmosUserDB> {
+public class UserService extends AbstractService<UserDAO, CosmosUserContainer> {
     private final HouseService houseService = new HouseService();
     private final RentalService rentalService = new RentalService();
 
     public UserService() {
-        super(UserDAO.class, "user:", CosmosDBLayer.getInstance().getUserDB());
+        super(UserDAO.class, "user:", CosmosDBLayer.getInstance().getUserContainer());
     }
 
     public ServiceResponse<UserDAO> getByUsername(String username) {

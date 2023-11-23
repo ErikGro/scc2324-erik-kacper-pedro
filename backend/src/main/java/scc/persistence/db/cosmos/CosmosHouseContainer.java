@@ -7,16 +7,16 @@ import scc.cache.ServiceResponse;
 import java.util.List;
 
 import scc.data.house.HouseDAO;
-import scc.persistence.db.HouseDB;
+import scc.persistence.db.HouseContainer;
 
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.stream.Collectors;
 
-public class CosmosHouseDB extends CosmosAbstractDB<HouseDAO> implements HouseDB<HouseDAO> {
+public class CosmosHouseContainer extends CosmosAbstractContainer<HouseDAO> implements HouseContainer {
 
-    public CosmosHouseDB(CosmosContainer container) {
+    public CosmosHouseContainer(CosmosContainer container) {
         super(container, HouseDAO.class);
     }
 

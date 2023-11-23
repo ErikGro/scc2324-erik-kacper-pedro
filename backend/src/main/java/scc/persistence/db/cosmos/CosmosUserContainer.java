@@ -5,13 +5,12 @@ import com.azure.cosmos.models.CosmosQueryRequestOptions;
 import com.azure.cosmos.util.CosmosPagedIterable;
 import scc.cache.ServiceResponse;
 import scc.data.UserDAO;
-import scc.persistence.db.UserDB;
+import scc.persistence.db.UserContainer;
 
 import java.util.List;
-import java.util.stream.Collectors;
 
-public class CosmosUserDB extends CosmosAbstractDB<UserDAO> implements UserDB<UserDAO> {
-    public CosmosUserDB(CosmosContainer container) {
+public class CosmosUserContainer extends CosmosAbstractContainer<UserDAO> implements UserContainer {
+    public CosmosUserContainer(CosmosContainer container) {
         super(container, UserDAO.class);
     }
     public synchronized ServiceResponse<UserDAO> getByUsername(String username) {

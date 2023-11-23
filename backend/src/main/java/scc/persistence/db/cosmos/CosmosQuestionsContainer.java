@@ -7,10 +7,10 @@ import java.util.List;
 
 import scc.cache.ServiceResponse;
 import scc.data.QuestionsDAO;
-import scc.persistence.db.QuestionsDB;
+import scc.persistence.db.QuestionsContainer;
 
-public class CosmosQuestionsDB extends CosmosAbstractDB<QuestionsDAO> implements QuestionsDB<QuestionsDAO> {
-    public CosmosQuestionsDB(CosmosContainer container) {
+public class CosmosQuestionsContainer extends CosmosAbstractContainer<QuestionsDAO> implements QuestionsContainer {
+    public CosmosQuestionsContainer(CosmosContainer container) {
         super(container, QuestionsDAO.class);
     }
 
