@@ -38,7 +38,7 @@ public abstract class AbstractService<T extends Identifiable, C extends Containe
     public ServiceResponse<T> upsert(T object) {
         ServiceResponse<T> response = container.upsert(object);
 
-        if (response.getStatusCode() < 300 && response.getItem().isEmpty()) {
+        if (response.getStatusCode() < 300 && response.getItem().isPresent()) {
             writeToCache(response.getItem().get());
         }
 

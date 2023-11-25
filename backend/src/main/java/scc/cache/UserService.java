@@ -27,7 +27,7 @@ public class UserService extends AbstractService<UserDAO, UserContainer> {
         // Cache miss
         ServiceResponse<UserDAO> response = container.getByUsername(username);
         if (response.getItem().isEmpty()) {
-            return new ServiceResponse<>(404, null);
+            return new ServiceResponse<>(404);
         }
 
         UserDAO user = response.getItem().get();
