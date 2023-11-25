@@ -1,23 +1,19 @@
 package scc.cache;
 
 
-import com.azure.cosmos.util.CosmosPagedIterable;
-
 import scc.data.QuestionsDAO;
-import scc.persistence.db.cosmos.CosmosDBLayer;
-import scc.persistence.db.cosmos.CosmosQuestionsDB;
+import scc.persistence.db.QuestionsContainer;
+import scc.persistence.db.mongo.MongoDBLayer;
 
 import java.util.List;
-import java.util.Set;
-import java.util.stream.Collectors;
 
-public class QuestionsService extends AbstractService<QuestionsDAO, CosmosQuestionsDB> {
+public class QuestionsService extends AbstractService<QuestionsDAO, QuestionsContainer> {
     public QuestionsService() {
-        super(QuestionsDAO.class, "question:", CosmosDBLayer.getInstance().getQuestionsDB());
+        super(QuestionsDAO.class, "question:", MongoDBLayer.getInstance().getQuestionsContainer());
     }
 
     // Get all questions from a house
     public ServiceResponse<List<QuestionsDAO>> getQuestions(String houseId) {
-        return db.getQuestions(houseId);
+        return container.getQuestions(houseId);
     }
 }

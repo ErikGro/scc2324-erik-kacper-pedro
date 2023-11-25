@@ -1,11 +1,11 @@
 package scc.persistence.db;
 
 public interface DBLayer {
-    public UserDB getUserDB();
+    public UserContainer getUserContainer();
 
-    public HouseDB getHouseDB();
+    public HouseContainer getHouseContainer();
 
-    public RentalDB getRentalDB();
+    public RentalContainer getRentalContainer();
 
-    public QuestionsDB getQuestionsDB();
+    public QuestionsContainer getQuestionsContainer();
 }

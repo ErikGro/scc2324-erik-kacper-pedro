@@ -1,8 +1,9 @@
 package scc.data;
 
+import org.bson.Document;
 import scc.cache.Identifiable;
 
-public class QuestionsDAO implements Identifiable {
+public class QuestionsDAO extends Document implements Identifiable {
     private String id;
     private String houseId;
     private String userId;

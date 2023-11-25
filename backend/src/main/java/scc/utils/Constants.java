@@ -37,6 +37,12 @@ public class Constants {
         return System.getenv("DB_BLOB_CONNECTION_STRING");
     }
 
+    ///////////////////////////////// MongoDB Env /////////////////////////////////
+
+    public static String getMongoDBConnectionString() {
+        return System.getenv("MONGODB_CONNECTION_STRING");
+    }
+
     ///////////////////////////////// Fileservice Env /////////////////////////////////
 
     public static String getMediaRootDir() {

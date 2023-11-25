@@ -7,10 +7,10 @@ import scc.utils.Constants;
 public class CosmosDBLayer implements DBLayer {
 	private static CosmosDBLayer instance;
 	private final CosmosClient client;
-	private final CosmosUserDB userDB;
-	private final CosmosHouseDB cosmosHouseDB;
-	private final CosmosRentalDB cosmosRentalDB;
-	private final CosmosQuestionsDB cosmosQuestionsDB;
+	private final CosmosUserContainer userDB;
+	private final CosmosHouseContainer cosmosHouseDB;
+	private final CosmosRentalContainer cosmosRentalDB;
+	private final CosmosQuestionsContainer cosmosQuestionsDB;
 	
 	public static synchronized CosmosDBLayer getInstance() {
 		if(instance != null)
@@ -33,25 +33,25 @@ public class CosmosDBLayer implements DBLayer {
 
 		CosmosDatabase db = client.getDatabase(Constants.getDBName());
 
-		cosmosQuestionsDB = new CosmosQuestionsDB(db.getContainer("questions"));
-		userDB = new CosmosUserDB(db.getContainer("users"));
-		cosmosHouseDB = new CosmosHouseDB(db.getContainer("houses"));
-		cosmosRentalDB = new CosmosRentalDB(db.getContainer("rental"));
+		cosmosQuestionsDB = new CosmosQuestionsContainer(db.getContainer("questions"));
+		userDB = new CosmosUserContainer(db.getContainer("users"));
+		cosmosHouseDB = new CosmosHouseContainer(db.getContainer("houses"));
+		cosmosRentalDB = new CosmosRentalContainer(db.getContainer("rental"));
 	}
 
-	public CosmosUserDB getUserDB() {
+	public CosmosUserContainer getUserContainer() {
 		return userDB;
 	}
 
-	public CosmosHouseDB getHouseDB() {
+	public CosmosHouseContainer getHouseContainer() {
 		return cosmosHouseDB;
 	}
 
-	public CosmosRentalDB getRentalDB() {
+	public CosmosRentalContainer getRentalContainer() {
 		return cosmosRentalDB;
 	}
 
-	public CosmosQuestionsDB getQuestionsDB() {
+	public CosmosQuestionsContainer getQuestionsContainer() {
 		return cosmosQuestionsDB;
 	}
 }

@@ -2,21 +2,21 @@ package scc.cache;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import redis.clients.jedis.Jedis;
-import scc.persistence.db.cosmos.CosmosAbstractDB;
+import scc.persistence.db.Container;
 import scc.utils.Constants;
 
 import java.util.Optional;
 
-public abstract class AbstractService<T extends Identifiable, DBType extends CosmosAbstractDB<T>> {
-    protected final DBType db;
+public abstract class AbstractService<T extends Identifiable, C extends Container<T>> {
+    protected final C container;
     private final Class<T> type;
     protected final ObjectMapper mapper = new ObjectMapper();
     private final String cachingPrefix;
 
-    public AbstractService(Class<T> type, String cachingPrefix, DBType db) {
+    public AbstractService(Class<T> type, String cachingPrefix, C container) {
         this.type = type;
         this.cachingPrefix = cachingPrefix;
-        this.db = db;
+        this.container = container;
     }
 
     public ServiceResponse<T> getByID(String id) {
@@ -26,7 +26,7 @@ public abstract class AbstractService<T extends Identifiable, DBType extends Cos
         }
 
         // Cache miss
-        ServiceResponse<T> response = db.getByID(id);
+        ServiceResponse<T> response = container.getByID(id);
         Optional<T> item = response.getItem();
 
         // Cache item
@@ -36,7 +36,7 @@ public abstract class AbstractService<T extends Identifiable, DBType extends Cos
     }
 
     public ServiceResponse<T> upsert(T object) {
-        ServiceResponse<T> response = db.upsert(object);
+        ServiceResponse<T> response = container.upsert(object);
 
         if (response.getStatusCode() < 300 && response.getItem().isEmpty()) {
             writeToCache(response.getItem().get());
@@ -46,7 +46,7 @@ public abstract class AbstractService<T extends Identifiable, DBType extends Cos
     }
 
     public ServiceResponse<Object> deleteByID(String id) {
-        ServiceResponse<Object> response = db.deleteByID(id);
+        ServiceResponse<Object> response = container.deleteByID(id);
         deleteFromCache(id);
 
         return response;

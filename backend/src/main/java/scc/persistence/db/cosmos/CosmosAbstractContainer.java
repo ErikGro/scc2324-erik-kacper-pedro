@@ -5,13 +5,13 @@ import com.azure.cosmos.models.CosmosItemRequestOptions;
 import com.azure.cosmos.models.CosmosItemResponse;
 import com.azure.cosmos.models.PartitionKey;
 import scc.cache.ServiceResponse;
-import scc.persistence.db.DB;
+import scc.persistence.db.Container;
 
-public abstract class CosmosAbstractDB<T> implements DB<T> {
+public abstract class CosmosAbstractContainer<T> implements Container<T> {
     protected final CosmosContainer container;
     private final Class<T> type;
 
-    protected CosmosAbstractDB(CosmosContainer container, Class<T> type) {
+    protected CosmosAbstractContainer(CosmosContainer container, Class<T> type) {
         this.container = container;
         this.type = type;
     }

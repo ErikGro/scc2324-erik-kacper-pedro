@@ -2,19 +2,18 @@ package scc.cache;
 
 import redis.clients.jedis.Jedis;
 import scc.data.UserDAO;
-import scc.persistence.db.cosmos.CosmosDBLayer;
-import scc.persistence.db.cosmos.CosmosUserDB;
+import scc.persistence.db.UserContainer;
+import scc.persistence.db.mongo.MongoDBLayer;
 import scc.utils.Constants;
 
-import java.util.List;
 import java.util.Optional;
 
-public class UserService extends AbstractService<UserDAO, CosmosUserDB> {
+public class UserService extends AbstractService<UserDAO, UserContainer> {
     private final HouseService houseService = new HouseService();
     private final RentalService rentalService = new RentalService();
 
     public UserService() {
-        super(UserDAO.class, "user:", CosmosDBLayer.getInstance().getUserDB());
+        super(UserDAO.class, "user:", MongoDBLayer.getInstance().getUserContainer());
     }
 
     public ServiceResponse<UserDAO> getByUsername(String username) {
@@ -26,12 +25,12 @@ public class UserService extends AbstractService<UserDAO, CosmosUserDB> {
         }
 
         // Cache miss
-        ServiceResponse<List<UserDAO>> response = db.getByUsername(username);
+        ServiceResponse<UserDAO> response = container.getByUsername(username);
         if (response.getItem().isEmpty()) {
             return new ServiceResponse<>(404, null);
         }
 
-        UserDAO user = response.getItem().get().get(0);
+        UserDAO user = response.getItem().get();
 
         // Cache item
         if (Constants.cachingEnabled) {

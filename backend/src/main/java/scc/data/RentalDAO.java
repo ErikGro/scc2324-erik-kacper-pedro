@@ -1,8 +1,9 @@
 package scc.data;
 
+import org.bson.Document;
 import scc.cache.Identifiable;
 
-public class RentalDAO implements Identifiable {
+public class RentalDAO extends Document implements Identifiable {
     private String id;
     private String houseID;
     private String tenantID;
