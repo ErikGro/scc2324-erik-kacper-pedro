@@ -8,7 +8,7 @@ import org.bson.types.ObjectId;
 import scc.cache.Identifiable;
 
 @Entity("questions")
-public class QuestionsDAO extends Document implements Identifiable {
+public class QuestionsDAO implements Identifiable {
     @Id
     private ObjectId mongoID;
     @Property("id")

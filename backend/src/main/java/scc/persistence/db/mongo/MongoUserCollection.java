@@ -1,7 +1,6 @@
 package scc.persistence.db.mongo;
 
 import dev.morphia.Datastore;
-import dev.morphia.query.Query;
 import scc.cache.ServiceResponse;
 import scc.data.UserDAO;
 import scc.persistence.db.UserContainer;

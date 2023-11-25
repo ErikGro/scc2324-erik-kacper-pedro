@@ -19,10 +19,11 @@ public class MongoQuestionsCollection extends MongoAbstractCollection<QuestionsD
 
     @Override
     synchronized public ServiceResponse<List<QuestionsDAO>> getQuestions(String houseId) {
-        List<QuestionsDAO> list = datastore.find(QuestionsDAO.class)
+        List<QuestionsDAO> questions = datastore.find(QuestionsDAO.class)
+                .filter(eq("house_id", houseId))
                 .stream()
                 .collect(Collectors.toList());
 
-        return new ServiceResponse<>(200, list);
+        return new ServiceResponse<>(200, questions);
     }
 }
