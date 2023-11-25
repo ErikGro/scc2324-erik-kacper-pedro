@@ -1,17 +1,14 @@
 package scc.persistence.db.mongo;
 
-import com.mongodb.client.MongoClient;
 import com.mongodb.client.MongoClients;
-import com.mongodb.client.MongoDatabase;
-import scc.data.QuestionsDAO;
-import scc.data.RentalDAO;
-import scc.data.UserDAO;
-import scc.data.house.HouseDAO;
+import dev.morphia.Datastore;
+import dev.morphia.Morphia;
 import scc.persistence.db.*;
 import scc.utils.Constants;
 
 public class MongoDBLayer implements DBLayer {
     private static MongoDBLayer instance;
+    final Datastore datastore;
 
     private final MongoUserCollection userContainer;
     private final MongoHouseCollection houseContainer;
@@ -28,14 +25,11 @@ public class MongoDBLayer implements DBLayer {
     }
 
     private MongoDBLayer() {
-        try (MongoClient mongoClient = MongoClients.create(Constants.getMongoDBConnectionString())) {
-            MongoDatabase db = mongoClient.getDatabase("scc");
-
-            userContainer = new MongoUserCollection(db.getCollection("users", UserDAO.class));
-            houseContainer = new MongoHouseCollection(db.getCollection("houses", HouseDAO.class));
-            rentalContainer = new MongoRentalCollection(db.getCollection("rentals", RentalDAO.class));
-            questionsContainer = new MongoQuestionsCollection(db.getCollection("questions", QuestionsDAO.class));
-        }
+        this.datastore = Morphia.createDatastore(MongoClients.create(Constants.getMongoDBConnectionString()));
+        userContainer = new MongoUserCollection(this.datastore);
+        houseContainer = new MongoHouseCollection(this.datastore);
+        rentalContainer = new MongoRentalCollection(this.datastore);
+        questionsContainer = new MongoQuestionsCollection(this.datastore);
     }
 
     @Override

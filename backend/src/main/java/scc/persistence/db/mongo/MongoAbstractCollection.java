@@ -1,41 +1,49 @@
 package scc.persistence.db.mongo;
 
-import com.mongodb.client.MongoCollection;
-import org.bson.Document;
+import dev.morphia.Datastore;
+import dev.morphia.query.Query;
 import scc.cache.Identifiable;
 import scc.cache.ServiceResponse;
 import scc.persistence.db.Container;
 
-import static com.mongodb.client.model.Filters.eq;
+import static dev.morphia.query.filters.Filters.eq;
 
-public abstract class MongoAbstractCollection<T extends Document & Identifiable> implements Container<T> {
-    protected MongoCollection<T> collection;
+public abstract class MongoAbstractCollection<T extends Identifiable> implements Container<T> {
+    private final Class<T> type;
+    final Datastore datastore;
 
-    MongoAbstractCollection(MongoCollection<T> collection) {
-        this.collection = collection;
+    MongoAbstractCollection(Class<T> type, Datastore datastore) {
+        this.type = type;
+        this.datastore = datastore;
     }
+
     @Override
     public synchronized ServiceResponse<T> getByID(String id) {
-        return getResponse(collection.find(eq("id", id)).first());
+        T item = datastore.find(type)
+                .filter(eq("id", id))
+                .first();
+
+        if (item == null) {
+            return new ServiceResponse<>(404);
+        } else {
+            return new ServiceResponse<T>(200, item);
+        }
     }
 
     @Override
     public synchronized ServiceResponse<T> upsert(T t) {
-        return getResponse(collection.findOneAndReplace(eq("id", t.getId()), t));
+        deleteByID(t.getId());
+        datastore.insert(t);
+
+        return new ServiceResponse<>(201, t);
     }
 
     @Override
     public synchronized ServiceResponse<Object> deleteByID(String id) {
-        collection.findOneAndDelete(eq("id", id));
-        // TODO: check
-        return new ServiceResponse<>(200);
-    }
+        datastore.find(type)
+                .filter(eq("id", id))
+                .delete();
 
-    public synchronized ServiceResponse<T> getResponse(T returnVal) {
-        if (returnVal == null) {
-            return new ServiceResponse<>(404);
-        } else {
-            return new ServiceResponse<>(200, returnVal);
-        }
+        return new ServiceResponse<>(200);
     }
 }

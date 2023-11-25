@@ -1,20 +1,42 @@
 package scc.data.house;
 
+import dev.morphia.annotations.Entity;
+import dev.morphia.annotations.Id;
+import dev.morphia.annotations.Property;
 import org.bson.Document;
+import org.bson.codecs.pojo.annotations.BsonProperty;
+import org.bson.types.ObjectId;
 import scc.cache.Identifiable;
 
 import java.util.Collections;
 import java.util.List;
 import java.util.Set;
-
+@Entity("houses")
 public class HouseDAO extends Document implements Identifiable{
+    @Id
+    private ObjectId mongoID;
+    @Property("house_id")
     private String id;
+    @Property("owner_id")
     private String ownerID;
+    @Property("name")
     private String name;
+    @Property("address")
     private Address address;
+    @Property("description")
     private String description;
+    @Property("photo_ids")
     private List<String> photoIDs = Collections.emptyList();
+    @Property("available_periods")
     private Set<AvailablePeriod> availablePeriods = Collections.emptySet();
+
+    public ObjectId getMongoID() {
+        return mongoID;
+    }
+
+    public void setMongoID(ObjectId mongoID) {
+        this.mongoID = mongoID;
+    }
 
     public String getId() {
         return id;
