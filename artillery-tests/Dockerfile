@@ -1,23 +1,16 @@
-# Use a Node.js base image
-FROM node:latest
+FROM artilleryio/artillery
+WORKDIR /
+# Add everything in the current directory to our image, in the working directory '/'
+ADD . /
 
-# Set the working directory inside the container
-WORKDIR /usr/src/app
 
-# Copy package.json and package-lock.json
-COPY package*.json ./
-
-# Install dependencies
 RUN npm install
 
-# Install Artillery globally
-RUN npm install -g artillery
+# Run generate-test-data using npm
+RUN npm run generate-test-data
 
-# Copy the rest of the code
-COPY . .
+# Run the test using npm
+CMD ["run", "/test-all-endpoints.yml"]
 
-# Expose the port that Artillery might use (if needed)
-EXPOSE 3000
-
-# Default command when the container starts
-CMD ["artillery"]
+# # Expose the port that Artillery might use (if needed)
+# EXPOSE 3000
