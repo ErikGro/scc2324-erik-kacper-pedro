@@ -7,7 +7,11 @@ package scc.data;
 public class User {
     private String name;
     private String fullName;
-    private String photoID;
+
+    public User(UserDAO dao) {
+        this.name = dao.getUsername();
+        this.fullName = dao.getFullName();
+    }
 
     public String getName() {
         return name;
@@ -23,13 +27,5 @@ public class User {
 
     public void setFullName(String fullName) {
         this.fullName = fullName;
-    }
-
-    public String getPhotoID() {
-        return photoID;
-    }
-
-    public void setPhotoID(String photoID) {
-        this.photoID = photoID;
     }
 }

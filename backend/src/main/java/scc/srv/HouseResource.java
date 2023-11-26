@@ -10,7 +10,6 @@ import scc.cache.ServiceResponse;
 import scc.cache.UserService;
 import scc.data.house.House;
 import scc.data.house.HouseDAO;
-import scc.persistence.db.cosmos.CosmosDBLayer;
 import scc.persistence.db.mongo.MongoDBLayer;
 import scc.persistence.media.FileSystemService;
 import scc.persistence.media.MediaService;

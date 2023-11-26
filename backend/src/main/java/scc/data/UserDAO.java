@@ -71,12 +71,4 @@ public class UserDAO implements Identifiable {
     public void setPhotoID(String photoID) {
         this.photoID = photoID;
     }
-
-    public User toUser() {
-        User user = new User();
-        user.setName(username);
-        user.setPhotoID(photoID);
-
-        return user;
-    }
 }

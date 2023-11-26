@@ -90,7 +90,7 @@ public class UserResource {
         if (res.getStatusCode() != 200 || res.getItem().isEmpty())
             return Response.status(res.getStatusCode()).build();
 
-        User user = res.getItem().get().toUser();
+        User user = new User(res.getItem().get());
 
         return Response.ok(user).build();
     }
