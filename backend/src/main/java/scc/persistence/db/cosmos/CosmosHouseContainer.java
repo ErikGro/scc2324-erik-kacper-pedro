@@ -45,7 +45,7 @@ public class CosmosHouseContainer extends CosmosAbstractContainer<HouseDAO> impl
     }
 
     public synchronized ServiceResponse<List<HouseDAO>> getHousesByCityAndPeriod(String name, String startDate, String endDate) {
-        String query = "SELECT * FROM houses WHERE houses.address.city=\"" + name + "\" AND EXISTS (SELECT VALUE p FROM p IN houses.availablePeriods WHERE p.startDate >= \"" + startDate + "\" AND p.startDate <= \"" + endDate + "\")";
+        String query = "SELECT * FROM houses WHERE houses.address.city=\"" + name + "\" AND EXISTS (SELECT VALUE p FROM p IN houses.availablePeriods WHERE p.startDate >= \"" + startDate + "\" AND p.endDate <= \"" + endDate + "\")";
         CosmosPagedIterable<HouseDAO> response =  container.queryItems(query, new CosmosQueryRequestOptions(), HouseDAO.class);
 
         return new ServiceResponse<>(200, response.stream().collect(Collectors.toList()));

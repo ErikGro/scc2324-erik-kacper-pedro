@@ -2,15 +2,17 @@ package scc.persistence.db.mongo;
 
 import dev.morphia.Datastore;
 import dev.morphia.DeleteOptions;
-import dev.morphia.query.Query;
 import scc.cache.ServiceResponse;
 import scc.data.house.HouseDAO;
 import scc.persistence.db.HouseContainer;
 
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import static dev.morphia.query.filters.Filters.eq;
+import static dev.morphia.query.filters.Filters.*;
 
 public class MongoHouseCollection extends MongoAbstractCollection<HouseDAO> implements HouseContainer {
     MongoHouseCollection(Datastore datastore) {
@@ -46,15 +48,30 @@ public class MongoHouseCollection extends MongoAbstractCollection<HouseDAO> impl
 
     @Override
     synchronized public ServiceResponse<List<HouseDAO>> getHousesByCityAndPeriod(String name, String startDate, String endDate) {
-        Query<HouseDAO> query = datastore.find(HouseDAO.class);
-        query.filter(eq("address.city", name));
-        // TODO:
-        return new ServiceResponse<>(200, query.stream().collect(Collectors.toList()));
+        List<HouseDAO> houses = datastore.find(HouseDAO.class)
+                .filter(eq("address.city", name),
+                        elemMatch("available_periods", gte("start_date", startDate), lte("end_date", endDate)))
+                .stream()
+                .collect(Collectors.toList());
+
+        return new ServiceResponse<>(200, houses);
     }
 
     @Override
     synchronized public ServiceResponse<List<HouseDAO>> getDiscountedHousesNearFuture() {
-        // TODO:
-        return null;
+        Calendar cal = Calendar.getInstance();
+        DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
+
+        String startDate = dateFormat.format(cal.getTime());
+
+        cal.add(Calendar.MONTH, 3);
+        String endDate = dateFormat.format(cal.getTime());
+
+        List<HouseDAO> houses = datastore.find(HouseDAO.class)
+                .filter(elemMatch("available_periods", gte("start_date", startDate), lte("end_date", endDate)))
+                .stream()
+                .collect(Collectors.toList());
+
+        return new ServiceResponse<>(200, houses);
     }
 }
