@@ -50,7 +50,7 @@ public class MongoHouseCollection extends MongoAbstractCollection<HouseDAO> impl
     synchronized public ServiceResponse<List<HouseDAO>> getHousesByCityAndPeriod(String name, String startDate, String endDate) {
         List<HouseDAO> houses = datastore.find(HouseDAO.class)
                 .filter(eq("address.city", name),
-                        elemMatch("available_periods", gte("start_date", startDate), lte("end_date", endDate)))
+                        elemMatch("available_periods", gte("start_date", startDate), lte("start_date", endDate)))
                 .stream()
                 .collect(Collectors.toList());
 
@@ -68,7 +68,7 @@ public class MongoHouseCollection extends MongoAbstractCollection<HouseDAO> impl
         String endDate = dateFormat.format(cal.getTime());
 
         List<HouseDAO> houses = datastore.find(HouseDAO.class)
-                .filter(elemMatch("available_periods", gte("start_date", startDate), lte("end_date", endDate)))
+                .filter(elemMatch("available_periods", gte("start_date", startDate), lte("start_date", endDate)))
                 .stream()
                 .collect(Collectors.toList());
 

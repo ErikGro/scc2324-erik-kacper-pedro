@@ -11,6 +11,7 @@ import scc.cache.UserService;
 import scc.data.house.House;
 import scc.data.house.HouseDAO;
 import scc.persistence.db.cosmos.CosmosDBLayer;
+import scc.persistence.db.mongo.MongoDBLayer;
 import scc.persistence.media.FileSystemService;
 import scc.persistence.media.MediaService;
 
@@ -157,11 +158,11 @@ public class HouseResource {
 		ServiceResponse<List<HouseDAO>> response;
 
 		if (isValidQuery(userID)) { // List of houses of a given user
-			response = CosmosDBLayer.getInstance().getHouseContainer().getHousesByUserID(userID);
+			response = MongoDBLayer.getInstance().getHouseContainer().getHousesByUserID(userID);
 		} else if (isValidQuery(city) && isValidQuery(startDate) && isValidQuery(endDate)) { // Search of available houses for a given period and location
-			response = CosmosDBLayer.getInstance().getHouseContainer().getHousesByCityAndPeriod(city, startDate, endDate);
+			response = MongoDBLayer.getInstance().getHouseContainer().getHousesByCityAndPeriod(city, startDate, endDate);
 		} else if (isValidQuery(city)) { // List of available houses for a given location
-			response = CosmosDBLayer.getInstance().getHouseContainer().getHousesByCity(city);
+			response = MongoDBLayer.getInstance().getHouseContainer().getHousesByCity(city);
 		} else {
 			return Response.status(400).build();
 		}
