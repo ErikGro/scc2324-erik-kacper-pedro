@@ -1,0 +1,16 @@
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: pedro-kacper-erik-cronjob
+spec:
+  schedule: "0 * * * *" # This runs at the top of every hour
+  jobTemplate:
+    spec:
+      template:
+        spec:
+          containers:
+          - name: pedro-kacper-erik-cronjob
+            image: pedro-kacper-erik-function:latest # Replace with your actual image name
+            args:
+            - "updateDiscountedNearFuture" 
+          restartPolicy: OnFailure
