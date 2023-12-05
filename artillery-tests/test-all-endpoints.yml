@@ -1,5 +1,5 @@
 config:
-  target: https://outsideeurope.azurewebsites.net/rest
+  target: http://40.119.144.42:80/pedro-kacper-erik-backend-1.0/rest
   phases:
     - duration: 15
       arrivalRate: 1 # new virtual users per second

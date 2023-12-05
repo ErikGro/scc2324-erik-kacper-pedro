@@ -1,6 +1,6 @@
 package scc.srv;
 
-import com.azure.cosmos.util.CosmosPagedIterable;
+import java.util.List;
 import jakarta.ws.rs.*;
 import jakarta.ws.rs.core.Cookie;
 import jakarta.ws.rs.core.MediaType;
@@ -8,15 +8,17 @@ import jakarta.ws.rs.core.Response;
 import scc.cache.HouseService;
 import scc.cache.ServiceResponse;
 import scc.cache.UserService;
+import scc.data.house.House;
 import scc.data.house.HouseDAO;
-import scc.db.CosmosDBLayer;
-import scc.db.blob.BlobService;
+import scc.persistence.db.mongo.MongoDBLayer;
+import scc.persistence.media.FileSystemService;
+import scc.persistence.media.MediaService;
 
 import java.net.URI;
 import java.util.ArrayList;
 import java.util.Optional;
-import java.util.Set;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 /**
  * Resource for accessing houses
@@ -25,7 +27,7 @@ import java.util.UUID;
 public class HouseResource {
 	private final HouseService houseService = new HouseService();
 	private final UserService userService = new UserService();
-	// private final BlobService blobService = BlobService.getInstance();
+	private final MediaService mediaService = FileSystemService.getInstance();
 
 	/**
 	 * Create a single house
@@ -103,7 +105,8 @@ public class HouseResource {
 		ServiceResponse<HouseDAO> response = houseService.getByID(id);
 
         if (response.getItem().isPresent()) {
-			return Response.ok(response.getItem().get()).build();
+			House house = new House(response.getItem().get());
+			return Response.ok(house).build();
 		} else {
 			throw new NotFoundException("House with the given id does not exist");
 		}
@@ -127,7 +130,7 @@ public class HouseResource {
 				userService.userSessionInvalid(session.getValue(), response.getItem().get().getOwnerID()))
 			return Response.status(401).build();
 
-		ServiceResponse<HouseDAO> deleteResponse = houseService.deleteByID(id);
+		ServiceResponse<Object> deleteResponse = houseService.deleteByID(id);
 
 		return Response.status(deleteResponse.getStatusCode()).build();
 	}
@@ -151,19 +154,28 @@ public class HouseResource {
 									 @QueryParam("city") String city,
 									 @QueryParam("start-date") String startDate,
 									 @QueryParam("end-date") String endDate) {
-		CosmosPagedIterable<HouseDAO> response;
+		ServiceResponse<List<HouseDAO>> response;
 
 		if (isValidQuery(userID)) { // List of houses of a given user
-			response = CosmosDBLayer.getInstance().getHouseDB().getHousesByUserID(userID);
+			response = MongoDBLayer.getInstance().getHouseContainer().getHousesByUserID(userID);
 		} else if (isValidQuery(city) && isValidQuery(startDate) && isValidQuery(endDate)) { // Search of available houses for a given period and location
-			response = CosmosDBLayer.getInstance().getHouseDB().getHousesByCityAndPeriod(city, startDate, endDate);
+			response = MongoDBLayer.getInstance().getHouseContainer().getHousesByCityAndPeriod(city, startDate, endDate);
 		} else if (isValidQuery(city)) { // List of available houses for a given location
-			response = CosmosDBLayer.getInstance().getHouseDB().getHousesByCity(city);
+			response = MongoDBLayer.getInstance().getHouseContainer().getHousesByCity(city);
 		} else {
 			return Response.status(400).build();
 		}
 
-		return Response.ok(response.stream().toList()).build();
+		if (response.getItem().isEmpty()) {
+			throw new NotFoundException();
+		}
+
+		List<House> houses = response.getItem().get()
+				.stream()
+				.map(House::new)
+				.collect(Collectors.toList());
+
+		return Response.ok(houses).build();
 	}
 
 	private boolean isValidQuery(String string) {
@@ -178,9 +190,14 @@ public class HouseResource {
 	@Path("/discounted-soon")
 	@Produces(MediaType.APPLICATION_JSON)
 	public Response getDiscountedHousesNearFuture() {
-		Set<HouseDAO> discountedSoon = houseService.getDiscountedSoon();
+		List<HouseDAO> discountedSoon = houseService.getDiscountedSoon();
 
-		return Response.ok(discountedSoon).build();
+		List<House> houses = discountedSoon
+				.stream()
+				.map(House::new)
+				.toList();
+
+		return Response.ok(houses).build();
 	}
 
 	/////////////////// PHOTOS ENDPOINTS ///////////////////////
@@ -194,16 +211,16 @@ public class HouseResource {
 		Optional<HouseDAO> optionalHouse = houseService.getByID(houseID).getItem();
 
         if (optionalHouse.isEmpty())
-            return Response.status(404).entity("House doesn't exist.").build();
+			throw new NotFoundException("House doesn't exist.");
 
 		HouseDAO house = optionalHouse.get();
 
 		if (session == null || session.getValue() == null ||
 				userService.userSessionInvalid(session.getValue(), house.getOwnerID()))
-			return Response.status(401).build();
+			throw new NotAuthorizedException("Not authorized.");
 
 		String newPhotoID = UUID.randomUUID().toString();
-		// blobService.getHousesContainer().upsertImage(newPhotoID, photo);
+		mediaService.getHousesContainer().upsertImage(newPhotoID, photo);
 
 		ArrayList<String> photoIDs = new ArrayList<>(house.getPhotoIDs());
 		photoIDs.add(newPhotoID);
@@ -211,5 +228,17 @@ public class HouseResource {
 		houseService.upsert(house);
 
 		return Response.ok().build();
+	}
+
+	@Path("/photo/{id}")
+	@GET
+	@Produces({"image/png", "image/jpeg"})
+	public Response getPhoto(@PathParam("id") String id) {
+		Optional<byte[]> byteArray = mediaService.getHousesContainer().getImageBytes(id);
+
+		if (byteArray.isEmpty())
+			throw new NotFoundException("Image not found.");
+
+		return Response.ok(byteArray.get()).build();
 	}
 }

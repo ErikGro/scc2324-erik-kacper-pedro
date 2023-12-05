@@ -1,8 +1,15 @@
 package scc.data.house;
 
+import dev.morphia.annotations.Entity;
+import dev.morphia.annotations.Property;
+
+@Entity
 public class Address {
+    @Property("street")
     private String street;
+    @Property("city")
     private String city;
+    @Property("country")
     private String country;
 
     public Address() {}

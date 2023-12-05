@@ -1,23 +1,22 @@
 package scc.cache;
 
-import com.azure.cosmos.models.CosmosItemResponse;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import redis.clients.jedis.Jedis;
-import scc.db.AbstractDB;
+import scc.persistence.db.Container;
 import scc.utils.Constants;
 
 import java.util.Optional;
 
-public abstract class AbstractService<T extends Identifiable, DBType extends AbstractDB<T>> {
-    protected final DBType db;
+public abstract class AbstractService<T extends Identifiable, C extends Container<T>> {
+    protected final C container;
     private final Class<T> type;
     protected final ObjectMapper mapper = new ObjectMapper();
     private final String cachingPrefix;
 
-    public AbstractService(Class<T> type, String cachingPrefix, DBType db) {
+    public AbstractService(Class<T> type, String cachingPrefix, C container) {
         this.type = type;
         this.cachingPrefix = cachingPrefix;
-        this.db = db;
+        this.container = container;
     }
 
     public ServiceResponse<T> getByID(String id) {
@@ -27,31 +26,30 @@ public abstract class AbstractService<T extends Identifiable, DBType extends Abs
         }
 
         // Cache miss
-        CosmosItemResponse<T> response = db.getByID(id);
-        T item = response.getItem();
+        ServiceResponse<T> response = container.getByID(id);
+        Optional<T> item = response.getItem();
 
-        if (item != null) { // Cache item
-            writeToCache(item);
-        }
+        // Cache item
+        item.ifPresent(this::writeToCache);
 
-        return new ServiceResponse<>(response.getStatusCode(), item);
+        return response;
     }
 
     public ServiceResponse<T> upsert(T object) {
-        CosmosItemResponse<T> response = db.upsert(object);
+        ServiceResponse<T> response = container.upsert(object);
 
-        if (response.getStatusCode() < 300) {
-            writeToCache(response.getItem());
+        if (response.getStatusCode() < 300 && response.getItem().isPresent()) {
+            writeToCache(response.getItem().get());
         }
 
-        return new ServiceResponse<>(response.getStatusCode(), response.getItem());
+        return response;
     }
 
-    public ServiceResponse<T> deleteByID(String id) {
-        CosmosItemResponse<Object> response = db.deleteByID(id);
+    public ServiceResponse<Object> deleteByID(String id) {
+        ServiceResponse<Object> response = container.deleteByID(id);
         deleteFromCache(id);
 
-        return new ServiceResponse<>(response.getStatusCode());
+        return response;
     }
 
     /////////////////// CACHING METHODS ///////////////////////

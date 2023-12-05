@@ -1,4 +1,4 @@
-package scc.db.blob;
+package scc.persistence.media;
 
 import com.azure.storage.blob.BlobServiceClient;
 import com.azure.storage.blob.BlobServiceClientBuilder;
@@ -9,14 +9,14 @@ public class BlobService {
     private final BlobContainer usersContainer;
     private final BlobContainer housesContainer;
 
-    // public static synchronized BlobService getInstance() {
-    //     if (instance != null)
-    //         return instance;
+     public static synchronized BlobService getInstance() {
+         if (instance != null)
+             return instance;
 
-    //     instance = new BlobService();
+         instance = new BlobService();
 
-    //     return instance;
-    // }
+         return instance;
+     }
 
     public BlobContainer getUsersContainer() {
         return usersContainer;

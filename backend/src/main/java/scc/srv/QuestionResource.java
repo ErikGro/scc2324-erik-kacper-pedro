@@ -15,9 +15,6 @@ import scc.cache.UserService;
 import scc.data.Questions;
 import scc.data.QuestionsDAO;
 import scc.data.house.HouseDAO;
-
-
-
 import java.text.SimpleDateFormat;
 
 /**
@@ -83,7 +80,7 @@ public class QuestionResource {
             return Response.status(404, "House doesn't exist.").build();
         }
 
-        Optional<Set<QuestionsDAO>> optionalQuestion = questionsService.getQuestions(houseId).getItem();
+        Optional<List<QuestionsDAO>> optionalQuestion = questionsService.getQuestions(houseId).getItem();
 
         if (optionalQuestion.isEmpty()) {
             return Response.status(404).build();
@@ -131,7 +128,7 @@ public class QuestionResource {
                 userService.userSessionInvalid(session.getValue(), questionResponse.getItem().get().getUserId()))
             throw new NotAuthorizedException(id);
 
-        ServiceResponse<QuestionsDAO> deleteResponse = questionsService.deleteByID(id);
+        ServiceResponse<Object> deleteResponse = questionsService.deleteByID(id);
 
         if (deleteResponse.getStatusCode() < 300) {
             return Response.ok().build();

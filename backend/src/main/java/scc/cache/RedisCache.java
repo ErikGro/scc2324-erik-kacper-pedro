@@ -19,9 +19,7 @@ public class RedisCache {
 		poolConfig.setTestWhileIdle(true);
 		poolConfig.setNumTestsPerEvictionRun(3);
 		poolConfig.setBlockWhenExhausted(true);
-		// instance = new JedisPool(poolConfig, Constants.getRedisHostname(), 6380, 1000, Constants.getRedisKey(), true);
 		instance = new JedisPool(poolConfig, Constants.getRedisHostname(), 6379, 1000, false);
-
 		return instance;
 	}
 }

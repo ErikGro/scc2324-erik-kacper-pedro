@@ -1,36 +1,20 @@
 package scc.data;
 
-import dev.morphia.annotations.Entity;
-import dev.morphia.annotations.Id;
-import dev.morphia.annotations.Property;
-import org.bson.types.ObjectId;
-import scc.cache.Identifiable;
-
-@Entity("rentals")
-public class RentalDAO implements Identifiable {
-    @Id
-    private ObjectId mongoID;
-    @Property("id")
+public class Rental {
     private String id;
-    @Property("house_id")
     private String houseID;
-    @Property("tenant_id")
     private String tenantID;
-    @Property("start_date")
     private String startDate;
-    @Property("end_date")
     private String endDate;
-    @Property("price")
     private Float price;
 
-    public RentalDAO() {}
-
-    public ObjectId getMongoID() {
-        return mongoID;
-    }
-
-    public void setMongoID(ObjectId mongoID) {
-        this.mongoID = mongoID;
+    public Rental(RentalDAO dao) {
+        this.id = dao.getId();
+        this.houseID = dao.getHouseID();
+        this.tenantID = dao.getTenantID();
+        this.startDate = dao.getStartDate();
+        this.endDate = dao.getEndDate();
+        this.price = dao.getPrice();
     }
 
     public String getId() {

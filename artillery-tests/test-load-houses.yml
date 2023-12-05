@@ -1,5 +1,5 @@
 config:
-  target: https://scc-backend-erikg.azurewebsites.net/rest
+  target: http://4.231.71.144/pedro-kacper-erik-backend-1.0/rest
   phases:
     - duration: 15
       arrivalRate: 1 # new virtual users per second

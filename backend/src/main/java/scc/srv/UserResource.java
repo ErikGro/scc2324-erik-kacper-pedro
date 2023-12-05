@@ -10,7 +10,8 @@ import scc.cache.UserService;
 import scc.data.LoginCredentials;
 import scc.data.User;
 import scc.data.UserDAO;
-import scc.db.blob.BlobService;
+import scc.persistence.media.FileSystemService;
+import scc.persistence.media.MediaService;
 import scc.utils.Hash;
 
 import java.net.URI;
@@ -20,7 +21,7 @@ import java.util.UUID;
 @Path("/user")
 public class UserResource {
     private final UserService userService = new UserService();
-    // private final BlobService blobService = BlobService.getInstance();
+    private final MediaService mediaService = FileSystemService.getInstance();
 
     /**
      * Create a new user
@@ -89,7 +90,7 @@ public class UserResource {
         if (res.getStatusCode() != 200 || res.getItem().isEmpty())
             return Response.status(res.getStatusCode()).build();
 
-        User user = res.getItem().get().toUser();
+        User user = new User(res.getItem().get());
 
         return Response.ok(user).build();
     }
@@ -114,9 +115,9 @@ public class UserResource {
 
         userService.deleteByID(id);
 
-        // if (user.get().getPhotoID() != null) {
-        //     blobService.getUsersContainer().deleteImage(user.get().getPhotoID());
-        // }
+         if (user.get().getPhotoID() != null) {
+             mediaService.getUsersContainer().deleteImage(user.get().getPhotoID());
+         }
 
         return Response.ok().build();
     }
@@ -182,17 +183,32 @@ public class UserResource {
 
         UserDAO user = userDAO.get();
 
-        String photoID = UUID.randomUUID().toString();
-
-        if (user.getPhotoID() != null) {
-            photoID = user.getPhotoID(); // Overwrite
+        if (user.getPhotoID() == null) {
+            user.setPhotoID(UUID.randomUUID().toString());
         }
 
-        // blobService.getUsersContainer().upsertImage(photoID, photo);
+        mediaService.getUsersContainer().upsertImage(user.getPhotoID(), photo);
 
-        user.setPhotoID(photoID);
         ServiceResponse<UserDAO> response = userService.upsert(user);
 
         return Response.status(response.getStatusCode()).build();
+    }
+
+    @Path("/{id}/photo")
+    @GET
+    @Produces({"image/png", "image/jpeg"})
+    public Response getPhoto(@PathParam("id") String id) {
+        Optional<UserDAO> userDAO = userService.getByID(id).getItem();
+        if (userDAO.isEmpty())
+            return Response.status(400).entity("No such user").build();
+
+        UserDAO user = userDAO.get();
+
+        Optional<byte[]> byteArray = mediaService.getUsersContainer().getImageBytes(user.getPhotoID());
+
+        if (byteArray.isEmpty())
+            throw new NotFoundException("Image not found for user.");
+
+        return Response.ok(byteArray.get()).build();
     }
 }

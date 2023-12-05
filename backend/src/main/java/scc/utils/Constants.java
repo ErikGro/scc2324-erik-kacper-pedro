@@ -5,7 +5,7 @@ import java.time.format.DateTimeFormatter;
 public class Constants {
     public static final DateTimeFormatter dateFormat = DateTimeFormatter.ofPattern("yyyy-MM-dd");
 
-    public static final boolean cachingEnabled = false;
+    public static final boolean cachingEnabled = true;
 
     ///////////////////////////////// DB Env /////////////////////////////////
 
@@ -35,5 +35,17 @@ public class Constants {
 
     public static String getBlobConnectionString() {
         return System.getenv("DB_BLOB_CONNECTION_STRING");
+    }
+
+    ///////////////////////////////// MongoDB Env /////////////////////////////////
+
+    public static String getMongoDBConnectionString() {
+        return System.getenv("MONGODB_CONNECTION_STRING");
+    }
+
+    ///////////////////////////////// Fileservice Env /////////////////////////////////
+
+    public static String getMediaRootDir() {
+        return System.getenv("MEDIA_ROOT_DIR");
     }
 }
