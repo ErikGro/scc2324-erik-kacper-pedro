@@ -1,10 +1,5 @@
     package pt.unl.fct.di.scc;
 
-    import com.azure.cosmos.util.CosmosPagedIterable;
-    import com.fasterxml.jackson.databind.ObjectMapper;
-    import redis.clients.jedis.Jedis;
-    import java.util.Set;
-    import java.util.stream.Collectors;
 
     /**
      * Azure Functions with HTTP Trigger.
@@ -29,16 +24,7 @@
         }
        
         public void updateDiscountedNearFuture() {
-            CosmosPagedIterable<HouseDAO> houses = DB.getInstance().getDiscountedHousesNearFuture();
-
-            Set<HouseDAO> set = houses.stream().collect(Collectors.toSet());
-
-            try (Jedis jedis = RedisCache.getCachePool().getResource()) {
-                ObjectMapper mapper = new ObjectMapper();
-                jedis.set("discountedNearFuture", mapper.writeValueAsString(set));
-            } catch (Exception ignored) {
-                // Do nothing
-            }
+           DB.getInstance().getDiscountedHousesNearFuture();
         }
 
        

@@ -1,19 +1,39 @@
-package pt.unl.fct.di.scc;
+ package pt.unl.fct.di.scc;
+
+import dev.morphia.annotations.Entity;
+import dev.morphia.annotations.Id;
+import dev.morphia.annotations.Property;
+import org.bson.types.ObjectId;
 
 import java.util.Collections;
 import java.util.List;
 import java.util.Set;
-
-public class HouseDAO {
+@Entity("houses")
+public class HouseDAO implements Identifiablei{
+    @Id
+    private ObjectId mongoID;
+    @Property("house_id")
     private String id;
+    @Property("owner_id")
     private String ownerID;
+    @Property("name")
     private String name;
+    @Property("address")
     private Address address;
+    @Property("description")
     private String description;
-    private List<String> photoIDs;
-    private Set<AvailablePeriod> availablePeriods;
+    @Property("photo_ids")
+    private List<String> photoIDs = Collections.emptyList();
+    @Property("available_periods")
+    private Set<AvailablePeriod> availablePeriods = Collections.emptySet();
 
-    public HouseDAO() {}
+    public ObjectId getMongoID() {
+        return mongoID;
+    }
+
+    public void setMongoID(ObjectId mongoID) {
+        this.mongoID = mongoID;
+    }
 
     public String getId() {
         return id;
@@ -69,9 +89,5 @@ public class HouseDAO {
 
     public void setAvailablePeriods(Set<AvailablePeriod> availablePeriods) {
         this.availablePeriods = availablePeriods;
-    }
-
-    public String getCachingKey() {
-        return id;
     }
 }

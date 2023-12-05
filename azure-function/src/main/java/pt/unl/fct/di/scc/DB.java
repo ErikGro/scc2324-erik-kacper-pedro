@@ -1,22 +1,29 @@
 package pt.unl.fct.di.scc;
 
-import com.azure.cosmos.*;
-import com.azure.cosmos.models.CosmosItemRequestOptions;
-import com.azure.cosmos.models.CosmosQueryRequestOptions;
-import com.azure.cosmos.models.PartitionKey;
-import com.azure.cosmos.util.CosmosPagedIterable;
+
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.mongodb.client.MongoClients;
+
+import dev.morphia.Datastore;
+import dev.morphia.Morphia;
+import redis.clients.jedis.Jedis;
+
+import static dev.morphia.query.filters.Filters.elemMatch;
+import static dev.morphia.query.filters.Filters.gte;
+import static dev.morphia.query.filters.Filters.lte;
 
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
-import java.util.Arrays;
 import java.util.Calendar;
 import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 public class DB {
     private static DB instance;
-    private final CosmosContainer houses;
-    private final CosmosContainer rentals;
-
+    private final MongoHouseCollection houseContainer;
+    private final MongoRentalCollection rentalContainer;
+    final Datastore datastore;
     public static synchronized DB getInstance() {
         if (instance != null)
             return instance;
@@ -27,24 +34,15 @@ public class DB {
     }
 
     public DB() {
-        CosmosClient client = new CosmosClientBuilder()
-                .endpoint(Constants.getDBConnectionURL())
-                .key(Constants.getDBKey())
-                //.directMode()
-                .gatewayMode()
-                // replace by .directMode() for better performance
-                .consistencyLevel(ConsistencyLevel.SESSION)
-                .connectionSharingAcrossClientsEnabled(true)
-                .contentResponseOnWriteEnabled(true)
-                .buildClient();
+        this.datastore = Morphia.createDatastore(MongoClients.create(Constants.getMongoDBConnectionString()));
 
-        CosmosDatabase db = client.getDatabase(Constants.getDBName());
+        houseContainer = new MongoHouseCollection(this.datastore);
+        rentalContainer = new MongoRentalCollection(this.datastore);
 
-        houses = db.getContainer("houses");
-        rentals = db.getContainer("rental");
     }
 
-    public synchronized CosmosPagedIterable<HouseDAO> getDiscountedHousesNearFuture() {
+    
+    synchronized public void getDiscountedHousesNearFuture() {
         Calendar cal = Calendar.getInstance();
         DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
 
@@ -53,26 +51,37 @@ public class DB {
         cal.add(Calendar.MONTH, 3);
         String endDate = dateFormat.format(cal.getTime());
 
-        String query = "SELECT * FROM houses WHERE EXISTS (SELECT VALUE p FROM p IN houses.availablePeriods WHERE p.startDate >= \"" + startDate + "\" AND p.startDate <= \"" + endDate + "\" AND IS_DEFINED(p.promotionPrice))";
-
-        return houses.queryItems(query, new CosmosQueryRequestOptions(), HouseDAO.class);
+        List<HouseDAO> houses = datastore.find(HouseDAO.class)
+                .filter(elemMatch("available_periods", gte("start_date", startDate), lte("start_date", endDate)))
+                .stream()
+                .collect(Collectors.toList());
+              Set<HouseDAO> set= houses.stream().collect(Collectors.toSet());
+        try (Jedis jedis = RedisCache.getCachePool().getResource()) {
+                    ObjectMapper mapper = new ObjectMapper();
+                    jedis.set("discountedNearFuture", mapper.writeValueAsString(set));
+                } catch (Exception ignored) {
+                    // Do nothing
+                }
+            
     }
 
     public void removeDeletedUserEntries() {
         String queryHouses = "SELECT * FROM houses WHERE houses.ownerID=\"DeletedUser\"";
-        CosmosPagedIterable<Identifiable> responseHouses = houses.queryItems(queryHouses,
+        datastore.delete(queryHouses);
+      /*  CosmosPagedIterable<Identifiable> responseHouses = houses.queryItems(queryHouses,
                 new CosmosQueryRequestOptions(),
                 Identifiable.class);
         responseHouses.forEach(o -> houses.deleteItem(o.getId(),
                 new PartitionKey(o.getId()),
                 new CosmosItemRequestOptions()));
-
+        */
         String queryRental = "SELECT * FROM rental WHERE rental.ownerID=\"DeletedUser\"";
-        CosmosPagedIterable<Identifiable> responseRentals = rentals.queryItems(queryRental,
+        datastore.delete(queryRental);
+        /*CosmosPagedIterable<Identifiable> responseRentals = rentals.queryItems(queryRental,
                 new CosmosQueryRequestOptions(),
                 Identifiable.class);
         responseRentals.forEach(o -> rentals.deleteItem(o.getId(),
                 new PartitionKey(o.getId()),
-                new CosmosItemRequestOptions()));
+                new CosmosItemRequestOptions()));*/
     }
 }
