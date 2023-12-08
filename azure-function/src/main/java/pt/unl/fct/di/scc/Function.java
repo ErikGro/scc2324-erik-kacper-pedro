@@ -14,6 +14,7 @@
             switch (functionName) {
                 case "updateDiscountedNearFuture":
                     function.updateDiscountedNearFuture();
+					 function.garbageCollector();
                     break;
                 case "garbageCollector":
                     function.garbageCollector();
