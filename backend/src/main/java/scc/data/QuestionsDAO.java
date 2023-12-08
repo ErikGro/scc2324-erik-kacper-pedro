@@ -1,20 +1,43 @@
 package scc.data;
 
+import dev.morphia.annotations.Entity;
+import dev.morphia.annotations.Id;
+import dev.morphia.annotations.Property;
 import org.bson.Document;
+import org.bson.types.ObjectId;
 import scc.cache.Identifiable;
 
-public class QuestionsDAO extends Document implements Identifiable {
+@Entity("questions")
+public class QuestionsDAO implements Identifiable {
+    @Id
+    private ObjectId mongoID;
+    @Property("id")
     private String id;
+    @Property("house_id")
     private String houseId;
+    @Property("user_id")
     private String userId;
+    @Property("text")
     private String text;
+    @Property("timestamp")
     private String timestamp;
+    @Property("answer_user_id")
     private String answerUserId;
+    @Property("answer_text")
     private String answerText;
+    @Property("answer_timestampt")
     private String answerTimestamp;
 
     public QuestionsDAO() {}
-    
+
+    public ObjectId getMongoID() {
+        return mongoID;
+    }
+
+    public void setMongoID(ObjectId mongoID) {
+        this.mongoID = mongoID;
+    }
+
     public QuestionsDAO(Questions q) {
         this(q.getId(), q.getHouseId(), q.getUserId(), q.getText(), q.getTimestamp(), q.getAnswerUserId(), q.getAnswerText(), q.getAnswerTimestamp());
     }

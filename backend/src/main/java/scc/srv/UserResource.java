@@ -90,7 +90,7 @@ public class UserResource {
         if (res.getStatusCode() != 200 || res.getItem().isEmpty())
             return Response.status(res.getStatusCode()).build();
 
-        User user = res.getItem().get().toUser();
+        User user = new User(res.getItem().get());
 
         return Response.ok(user).build();
     }
@@ -183,15 +183,12 @@ public class UserResource {
 
         UserDAO user = userDAO.get();
 
-        String photoID = UUID.randomUUID().toString();
-
-        if (user.getPhotoID() != null) {
-            photoID = user.getPhotoID(); // Overwrite
+        if (user.getPhotoID() == null) {
+            user.setPhotoID(UUID.randomUUID().toString());
         }
 
-        mediaService.getUsersContainer().upsertImage(photoID, photo);
+        mediaService.getUsersContainer().upsertImage(user.getPhotoID(), photo);
 
-        user.setPhotoID(photoID);
         ServiceResponse<UserDAO> response = userService.upsert(user);
 
         return Response.status(response.getStatusCode()).build();

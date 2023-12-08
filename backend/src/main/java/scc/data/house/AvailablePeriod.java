@@ -1,15 +1,23 @@
 package scc.data.house;
 
+import dev.morphia.annotations.Embedded;
+import dev.morphia.annotations.Entity;
+import dev.morphia.annotations.Property;
 import scc.utils.Constants;
 
 import java.time.LocalDate;
 import java.util.HashSet;
 import java.util.Set;
 
+@Entity
 public class AvailablePeriod {
+    @Property("start_date")
     private String startDate;
+    @Property("end_date")
     private String endDate;
+    @Property("normal_price_per_day")
     private Float normalPricePerDay;
+    @Property("promotion_price_per_day")
     private Float promotionPricePerDay;
 
     public AvailablePeriod() {

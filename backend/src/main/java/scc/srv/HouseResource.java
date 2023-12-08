@@ -8,8 +8,9 @@ import jakarta.ws.rs.core.Response;
 import scc.cache.HouseService;
 import scc.cache.ServiceResponse;
 import scc.cache.UserService;
+import scc.data.house.House;
 import scc.data.house.HouseDAO;
-import scc.persistence.db.cosmos.CosmosDBLayer;
+import scc.persistence.db.mongo.MongoDBLayer;
 import scc.persistence.media.FileSystemService;
 import scc.persistence.media.MediaService;
 
@@ -17,6 +18,7 @@ import java.net.URI;
 import java.util.ArrayList;
 import java.util.Optional;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 /**
  * Resource for accessing houses
@@ -103,7 +105,8 @@ public class HouseResource {
 		ServiceResponse<HouseDAO> response = houseService.getByID(id);
 
         if (response.getItem().isPresent()) {
-			return Response.ok(response.getItem().get()).build();
+			House house = new House(response.getItem().get());
+			return Response.ok(house).build();
 		} else {
 			throw new NotFoundException("House with the given id does not exist");
 		}
@@ -154,11 +157,11 @@ public class HouseResource {
 		ServiceResponse<List<HouseDAO>> response;
 
 		if (isValidQuery(userID)) { // List of houses of a given user
-			response = CosmosDBLayer.getInstance().getHouseContainer().getHousesByUserID(userID);
+			response = MongoDBLayer.getInstance().getHouseContainer().getHousesByUserID(userID);
 		} else if (isValidQuery(city) && isValidQuery(startDate) && isValidQuery(endDate)) { // Search of available houses for a given period and location
-			response = CosmosDBLayer.getInstance().getHouseContainer().getHousesByCityAndPeriod(city, startDate, endDate);
+			response = MongoDBLayer.getInstance().getHouseContainer().getHousesByCityAndPeriod(city, startDate, endDate);
 		} else if (isValidQuery(city)) { // List of available houses for a given location
-			response = CosmosDBLayer.getInstance().getHouseContainer().getHousesByCity(city);
+			response = MongoDBLayer.getInstance().getHouseContainer().getHousesByCity(city);
 		} else {
 			return Response.status(400).build();
 		}
@@ -167,7 +170,12 @@ public class HouseResource {
 			throw new NotFoundException();
 		}
 
-		return Response.ok(response.getItem().get()).build();
+		List<House> houses = response.getItem().get()
+				.stream()
+				.map(House::new)
+				.collect(Collectors.toList());
+
+		return Response.ok(houses).build();
 	}
 
 	private boolean isValidQuery(String string) {
@@ -184,7 +192,12 @@ public class HouseResource {
 	public Response getDiscountedHousesNearFuture() {
 		List<HouseDAO> discountedSoon = houseService.getDiscountedSoon();
 
-		return Response.ok(discountedSoon).build();
+		List<House> houses = discountedSoon
+				.stream()
+				.map(House::new)
+				.toList();
+
+		return Response.ok(houses).build();
 	}
 
 	/////////////////// PHOTOS ENDPOINTS ///////////////////////

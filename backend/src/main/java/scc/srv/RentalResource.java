@@ -8,6 +8,7 @@ import scc.cache.HouseService;
 import scc.cache.RentalService;
 import scc.cache.ServiceResponse;
 import scc.cache.UserService;
+import scc.data.Rental;
 import scc.data.RentalDAO;
 import scc.data.house.AvailablePeriod;
 import scc.data.house.HouseDAO;
@@ -52,6 +53,10 @@ public class RentalResource {
         }
 
         HouseDAO house = optionalHouse.get();
+
+        if (rentalDAO.getStartDate() == null || rentalDAO.getEndDate() == null) {
+            throw new BadRequestException("startDate and endDate mandatory");
+        }
 
         LocalDate start = LocalDate.parse(rentalDAO.getStartDate(), Constants.dateFormat);
         LocalDate end = LocalDate.parse(rentalDAO.getEndDate(), Constants.dateFormat);
@@ -136,7 +141,12 @@ public class RentalResource {
         if (response.getItem().isEmpty())
             throw new NotFoundException("No rentals for the given house found.");
 
-        return Response.ok(response.getItem().get()).build();
+        List<Rental> rentals = response.getItem().get()
+                .stream()
+                .map(Rental::new)
+                .toList();
+
+        return Response.ok(rentals).build();
     }
 
     /**
@@ -155,7 +165,9 @@ public class RentalResource {
         if (response.getItem().isEmpty())
             throw new NotFoundException("Rental with the given id does not exist");
 
-        return Response.ok(response.getItem().get()).build();
+        Rental rental = new Rental(response.getItem().get());
+
+        return Response.ok(rental).build();
     }
 
     /**
