@@ -20,4 +20,8 @@ public class Constants {
     public static String getRedisKey() {
         return System.getenv("REDIS_KEY");
     }
+    
+    public static String getMongoDBConnectionString() {
+        return System.getenv("MONGODB_CONNECTION_STRING");
+    }
 }

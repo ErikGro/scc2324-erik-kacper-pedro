@@ -1,8 +1,5 @@
 package pt.unl.fct.di.scc;
 
-import java.time.LocalDate;
-import java.util.HashSet;
-import java.util.Set;
 
 public class AvailablePeriod {
     private String startDate;
