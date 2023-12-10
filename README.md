@@ -1,8 +1,8 @@
 # scc2324-erik-kacper
 ## Group members
-- Erik Großkopf 68858 (MEI)
-- Pedro Ribeiro 55921 (MIEI)
-- Kacper Motyka 68806 (MEI)
+- Erik Großkopf 68858 e.grosskopf@campus.fct.unl.pt (MEI)
+- Pedro Ribeiro 55921 pmd.ribeiro@campus.fct.unl.pt (MIEI)
+- Kacper Motyka 68806 k.motyka@campus.fct.unl.pt (MEI)
 
 ## Deadlines
 - **20/October** – delivery of checkpoint – at this point, you are expected to have implemented the basic functionality + application-level caching
